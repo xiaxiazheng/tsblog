@@ -1,23 +1,56 @@
 import Vue from 'vue';
-import Router from 'vue-router';
-import Home from './views/Home.vue';
+import VueRouter from 'vue-router';
 
-Vue.use(Router);
+Vue.use(VueRouter);
 
-export default new Router({
+export default new VueRouter({
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: Home,
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
-    },
+			path: '',
+			component: () => import('@/views/Home.vue'),
+			children: [
+				{
+					path: '',
+					name: 'Main',
+					component: () => import('@/views/home/Main.vue'),
+				},
+				{
+					path: 'tree',
+					name: 'Tree',
+					component: () => import('@/views/home/Tree.vue'),
+				},
+				{
+					path: 'photowall',
+					name: 'PhotoWall',
+					component: () => import('@/views/home/PhotoWall.vue'),
+				}
+			]
+		},
+		{
+			path: '/login',
+			name: 'Login',
+			component: () => import('@/views/Login.vue'),
+		},
+		{
+			path: '/admin',
+			component: () => import('@/views/Admin.vue'),
+			children: [
+				{
+					path: '',
+					name: 'AdminMain',
+					component: () => import('@/views/admin/AdminMain.vue'),
+				},
+				{
+					path: 'admintree',
+					name: 'AdminTree',
+					component: () => import('@/views/admin/AdminTree.vue'),
+				},
+				{
+					path: 'adminphotowall',
+					name: 'AdminPhotoWall',
+					component: () => import('@/views/admin/AdminPhotoWall.vue'),
+				}
+			]
+		},
   ],
 });

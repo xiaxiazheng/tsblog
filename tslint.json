@@ -1,19 +1,40 @@
 {
-  "defaultSeverity": "warning",
-  "extends": [
-    "tslint:recommended"
-  ],
+  "defaultSeverity": "error",
+  "extends": "tslint-config-airbnb",
   "linterOptions": {
     "exclude": [
       "node_modules/**"
     ]
   },
   "rules": {
-    "quotemark": [true, "single"],
-    "indent": [true, "spaces", 2],
+    "no-import-side-effect": false,
+    "member-access": false,
+    "no-empty-interface": false,
+    "no-magic-numbers": true,
+    "arrow-parens": false,
+    "no-non-null-assertion": false,
+    "no-string-literal": false,
+    "prefer-const": false,
+    "quotemark": false,
+    "trailing-comma": false,
+    "eofline": false,
+    "match-default-export-name": false,
+    "import-name": false,
+    "no-unnecessary-class": [
+      true,
+      "allow-empty-class"
+    ],
+    "no-empty": false,
+    "forin": false,
+    "no-any": true,
+    "indent": [
+      true,
+      "spaces",
+      2
+    ],
     "interface-name": false,
     "ordered-imports": false,
     "object-literal-sort-keys": false,
     "no-consecutive-blank-lines": false
-  }
+  },
 }

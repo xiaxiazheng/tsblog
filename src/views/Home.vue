@@ -1,18 +1,31 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <Nav type="home"></Nav>
+    <router-view class="homerouter"></router-view>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+import Nav from '@/components/Nav.vue'; // @ is an alias to /src
 
 @Component({
   components: {
-    HelloWorld,
+    Nav
   },
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+
+}
 </script>
+
+<style lang="less" scoped>
+@import '../static/global.less';
+
+  .home {
+    height: 100%;
+    .homerouter {
+      height: calc(100% - 3.6rem);
+    }
+  }
+</style>

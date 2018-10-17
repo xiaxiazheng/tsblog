@@ -1,20 +1,28 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <router-view></router-view>
   </div>
 </template>
 
 <style lang="less">
+html {height: 100%;}
+body,ul,ol,li,p,h1,h2,h3,h4,h5,h6,form,fieldset,table,td,img,div {margin:0;padding:0;} 
+body {background:#fff;color:#333;font-size:12px;font-family:"SimSun","宋体","Arial Narrow";height:100%;} 
+  
+ul,ol {list-style-type:none;} 
+select,input,img,select {vertical-align:middle;} 
+  
+a {text-decoration:none;} 
+a:link {color:#009;} 
+a:visited {color:#800080;} 
+a:hover,a:active,a:focus {color:#c00;text-decoration:underline;}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  height: 100%;
 }
 #nav {
   padding: 30px;
