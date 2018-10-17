@@ -1,7 +1,6 @@
 // 后台启动的服务地址
 import { baseUrl } from '@/config'
 import axios from 'axios'
-import Vue from 'vue'
 
 const axiosGetHelper = async (url: string) => {
   let res = await axios.get(url);
@@ -30,10 +29,15 @@ const axiosPostHelper = async (url: string, params: any) => {
   return res.data;
 }
 
+/** 用户 */
 export class userClient {
-  /** 登录 */
-  static postLogin(params: any) {
-    return axios.post(baseUrl + '/login', params);
+  static postLogin(username: any, userpword: any) {
+    let url = baseUrl + '/login';
+    let params = {
+      username: username,
+      userpword: userpword
+    };
+    return axiosPostHelper(url, params);
   }
 }
 
@@ -43,20 +47,25 @@ export class treeClient {
     let url = baseUrl + '/tree?type=' + type;
     return axiosGetHelper(url);
   }
-  static getChildName(params: any) {
-    return axios.get(baseUrl + '/getchildname', {params});
+  static getChildName(id: string) {
+    let url = baseUrl + `/getchildname?id=${id}`;
+    return axiosGetHelper(url);
   }
   static addTreeNode(params: any) {
-    return axios.get(baseUrl + '/addtreenode', {params});
+    let url = baseUrl + '/addtreenode';
+    return axios.get(url, {params});
   }
-  static modifyTreeNode(params: any) {
-    return axios.get(baseUrl + '/modifytreenode', {params});
+  static modifyTreeNode(id: any, label: any, level: any) {
+    let url = baseUrl + `/modifytreenode?id=${id}&label=${label}&level=${level}`;
+    return axiosGetHelper(url);
   }
-  static deleteTreeNode(params: any) {
-    return axios.get(baseUrl + '/deletetreenode', {params});
+  static deleteTreeNode(id: string, level: any) {
+    let url = baseUrl + `/deletetreenode?id=${id}&level=${level}`;
+    return axiosGetHelper(url);
   }
-  static changeSort(params: any) {
-    return axios.get(baseUrl + '/changesort', {params});
+  static changeSort(level: any, thisId: any, thisSort: any, otherId: any, otherSort: any) {
+    let url = baseUrl + `/changesort?level=${level}&thisId=${thisId}&thisSort=${thisSort}&otherId=${otherId}&otherSort=${otherSort}`
+    return axiosGetHelper(url);
   }
   static changeFather(params: any) {
     return axios.get(baseUrl + '/changefather', {params});
@@ -65,32 +74,43 @@ export class treeClient {
 
 export class contClient {
   /** 操作子节点内容 */
-  static getNodeCont(params: any) {
-    return axios.get(baseUrl + '/cont', {params});
+  static getNodeCont(id: any) {
+    let url = baseUrl + `/cont?id=${id}`
+    return axiosGetHelper(url);
   }
-  static addNodeCont(params: any) {
+  static addNodeCont(id: string, sort: any) {
+    let params = {
+      id: id,
+      sort: sort
+    };
     return axios.post(baseUrl + '/addnodecont', params);
   }
-  static modifyNodeCont(params: any) {
-    return axios.post(baseUrl + '/modifynodecont', params);
+  static modifyNodeCont(obj: any) {
+    let params = obj;
+    return axiosPostHelper(baseUrl + '/modifynodecont', params);
   }
-  static deleteNodeCont(params: any) {
-    return axios.get(baseUrl + '/deletenodecont', {params});
+  static deleteNodeCont(id: string, sort: any) {
+    let url = baseUrl + `/deletenodecont?id=${id}&sort=${sort}`;
+    return axiosGetHelper(url);
   }
-  static changeContSort(params: any) {
-    return axios.get(baseUrl + '/changecontsort', {params});
+  static changeContSort(thiscTime: string, thisSort: any, othercTime: string, otherSort: any) {
+    let url = baseUrl + `/changecontsort?thiscTime=${thiscTime}&thisSort=${thisSort}&othercTime=${othercTime}&otherSort=${otherSort}`;
+    return axiosGetHelper(url);
   }
 }
 
 export class imgClient {
   /** 获取某个类型的图片名称列表 */
-  static getImgList(params: any) {
-    return axios.get(baseUrl + '/getimglist', {params});
+  static getImgList(type: string) {
+    let url = baseUrl + `/getimglist?type=${type}`;
+    return axiosGetHelper(url);
   }
-  static deleteImg(params: any) {
-    return axios.get(baseUrl + '/deleteimg', {params});
+  static deleteImg(type: string, img_id: any, filename: string) {
+    let url = baseUrl + `/deleteimg?type=${type}&img_id=${img_id}&filename=${filename}`;
+    return axiosGetHelper(url);
   }
-  static deleteTreeContImg(params: any) {
-    return axios.get(baseUrl + '/deletetreecontimg', {params});
+  static deleteTreeContImg(filename: string) {
+    let url = baseUrl + `/deletetreecontimg?filename=${filename}`;
+    return axiosGetHelper(url);
   }
 }

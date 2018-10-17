@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { apiUrl } from '../api/url'
+import { imgClient } from '../util/clientHelper';
 import { baseUrl } from '../config'
 
 @Component
@@ -40,28 +40,23 @@ export default class UploadPhotoWall extends Vue {
     });
   }
   
-  init() {
+  async init() {
     this.uploadUrl = baseUrl + '/' + this.type + '_upload';
-    let self = this,
-        params = {
-          type: this.type
-        };
-    apiUrl.getImgList(params).then(function(res) {
-      if(res.data.length !== 0) {
-        self.imgUrllist = [];
-        for(let item of res.data) {
-          self.imgUrllist.push({
-            img_id: item.img_id,
-            imgname: item.imgname,
-            filename: item.filename,
-            cTime: item.cTime,
-            url: baseUrl + '/' + self.type + '/' + item.filename
-          });
-        }
+    let type = this.type;
+    let res = await imgClient.getImgList(type);
+    if(!res) return;
+    if(res.data.length !== 0) {
+      this.imgUrllist = [];
+      for(let item of res.data) {
+        this.imgUrllist.push({
+          img_id: item.img_id,
+          imgname: item.imgname,
+          filename: item.filename,
+          cTime: item.cTime,
+          url: baseUrl + '/' + this.type + '/' + item.filename
+        });
       }
-    }).catch(function(res) {
-      console.log(res);
-    });
+    }
   }
 
   // 点击查看大图
@@ -101,22 +96,13 @@ export default class UploadPhotoWall extends Vue {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
-    }).then(() => {
-      let self = this,
-          params = {
-            type: this.type,
-            img_id: file.img_id,
-            filename: file.filename
-          };
-      apiUrl.deleteImg(params).then(function(res) {
-        self['$message']({
-          type: 'success',
-          message: '删除成功'
-        });
-        self.init();
-      }).catch(function(res) {
-        console.log(res);
-      });
+    }).then(async () => {
+      let type = this.type,
+          img_id = file.img_id,
+          filename = file.filename;
+      let res = await imgClient.deleteImg(type, img_id, filename);
+      if(!res) return;
+      this.init();
     }).catch(() => {
       this['$message']({
         type: 'info',

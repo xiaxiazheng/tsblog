@@ -6,7 +6,6 @@ exports.checkLogin = function(req, res) {
   db.pool.getConnection(function(err, connection) {
     if(err) {
       res.json({ resultsCode: 'error', message: '连接数据库失败' });
-      console.log(err);
       return;
     }
     var array = [];

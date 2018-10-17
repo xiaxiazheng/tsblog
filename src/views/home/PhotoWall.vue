@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { apiUrl } from "../../api/url"
+import { imgClient } from '../../util/clientHelper'
 import { baseUrl } from "../../config"
 
 @Component
@@ -54,26 +54,20 @@ export default class PhotoWall extends Vue {
     });
   }
 
-  init() {
-    let self = this,
-      params = {
-        type: "wall"
-      };
-    apiUrl.getImgList(params).then(function(res) {
-      if (res.data.length !== 0) {
-        for (let item of res.data) {
-          self.imgUrllist.push({
-            img_id: item.img_id,
-            imgname: item.imgname,
-            filename: item.filename,
-            cTime: item.cTime,
-            url: baseUrl + "/wall/" + item.filename
-          });
-        }
+  async init() {
+    let res: any = imgClient.getImgList('wall');
+    if(!res) return;
+    if (res.data.length !== 0) {
+      for (let item of res.data) {
+        this.imgUrllist.push({
+          img_id: item.img_id,
+          imgname: item.imgname,
+          filename: item.filename,
+          cTime: item.cTime,
+          url: baseUrl + "/wall/" + item.filename
+        });
       }
-    }).catch(function(res) {
-      console.log(res);
-    });
+    }
   }
 
   handlePictureCardPreview(file) {

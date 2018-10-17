@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { apiUrl } from '../api/url';
+import { userClient } from '../util/clientHelper'
 
 @Component
 export default class Login extends Vue {
@@ -26,65 +26,51 @@ export default class Login extends Vue {
   userpword = ''
   showPassword = false
 
-  created() {
+  async created() {
     if(sessionStorage.getItem("xia_username") && sessionStorage.getItem("xia_password")) {
-      var self = this,
-        params = {
-          username: sessionStorage.getItem("xia_username"),
-          userpword: window.atob(sessionStorage.getItem("xia_password"))
-        };
-      apiUrl.postLogin(params).then(function(res) {
-        if(res.data.resultsCode === "success") {
-          self['$router'].replace({ path: 'admin' });
-          return;
-        } else {
-          self["$message"]({
-            type: 'error',
-            message: "请重新登陆"
-          });
-          return;
-        }
-      }).catch(function(res) {
-        self["$message"]({
+      let username = sessionStorage.getItem("xia_username"),
+          userpword = window.atob(sessionStorage.getItem("xia_password"));
+      let res = await userClient.postLogin(username, userpword);
+      if(!res) return;
+      if(res.resultsCode === "success") {
+        this['$router'].replace({ path: 'admin' });
+        return;
+      } else {
+        this["$message"]({
           type: 'error',
-          message: res.data.message
+          message: "请重新登陆"
         });
-      });
+        return;
+      }
     }
   }
 
-  login() {
+  async login() {
     if(!this.checkEmpty()) {
       return;
     }
-    var self = this,
-        params = {
-          username: self.username,
-          userpword: self.userpword
-        };
-    apiUrl.postLogin(params).then(function(res) {
-      if(res.data.resultsCode === "success") {
-        self["$router"].replace({ path: 'admin' });
-        sessionStorage.setItem("xia_username", self.username);
-        sessionStorage.setItem("xia_password", window.btoa(self.userpword));
-      } else if(res.data.resultsCode === "error") {
-        self["$message"]({
-          type: 'error',
-          message: "密码错误，请重新输入密码"
-        });
-        self.userpword = '';
-      } else {
-        self["$message"]({
-          type: 'error',
-          message: "用户不存在，请重新输入用户名"
-        });
-      }
-    }).catch(function(res) {
-      self["$message"]({
+    let username = this.username,
+        userpword = this.userpword;
+    let res = await userClient.postLogin(username, userpword);
+    if(!res) {
+      this["$message"]({
         type: 'error',
-        message: res.data.message
+        message: "密码错误，请重新输入密码"
       });
-    });
+      this.userpword = '';
+      return;
+    }
+    console.log(res);
+    if(res.resultsCode === "success") {
+      this["$router"].replace({ path: 'admin' });
+      sessionStorage.setItem("xia_username", this.username);
+      sessionStorage.setItem("xia_password", window.btoa(this.userpword));
+    } else {
+      this["$message"]({
+        type: 'error',
+        message: "用户不存在，请重新输入用户名"
+      });
+    }
   }
 
   // 查是否为空

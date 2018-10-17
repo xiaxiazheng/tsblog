@@ -80,7 +80,7 @@ import { treeClient } from '../util/clientHelper';
 
 @Component
 export default class Nav extends Vue {
-  @Prop()  type: string;
+  @Prop() type: string;
 
   tree = []
   activeTab = ''
@@ -93,10 +93,10 @@ export default class Nav extends Vue {
   };
 
   async init() {
-    let resdata: any = await treeClient.getTree('home');
-    if(!resdata) return;
+    let res: any = await treeClient.getTree('home');
+    if(!res) return;
     this.tree = [];
-    for(let item of resdata) {
+    for(let item of res.data) {
       for(let jtem of item.children) {
         for(let ktem of jtem.children) {
           this.tree.push({

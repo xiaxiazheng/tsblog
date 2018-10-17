@@ -162,9 +162,9 @@ export default class AdminTree extends Vue {
     if(this['$route'].query.id) {
       this.expandedList.push(parseInt(atob(this['$route'].query.id))); // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
     }
-    let resdata: any = await treeClient.getTree('admin');
-    if(!resdata) return;
-    this.tree = resdata;
+    let res: any = await treeClient.getTree('admin');
+    if(!res) return;
+    this.tree = res.data;
     this.fatherNodeList = [];
     // 给树设置hover属性
     for(let i in this.tree) {
@@ -225,7 +225,7 @@ export default class AdminTree extends Vue {
   }
 
   // 新增节点
-  append(node, data) {
+  async append(node, data) {
     // 这里先请求后台数据
     var self = this,
         params = {
@@ -248,13 +248,11 @@ export default class AdminTree extends Vue {
       var list = node.parent.data;
       params['sort'] = list[list.length - 1].sort;
     }
-    apiUrl.addTreeNode(params).then(function(res) {
-      self.msgTips(res);
-      self.saveFathExpend(node);
-      self.init();
-    }).catch(function(res) {
-      self.msgTips(res);
-    });
+    let res = await treeClient.addTreeNode(params);
+    if(!res) return;
+    this.msgTips(res);
+    this.saveFathExpend(node);
+    this.init();
   }
 
   // 删除节点
@@ -264,7 +262,7 @@ export default class AdminTree extends Vue {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
+      }).then(async () => {
         let category_id = data.category_id;
         let parentId = node.parent.data.id;
         for(let i in this.tree) {
@@ -281,19 +279,14 @@ export default class AdminTree extends Vue {
                   return;
                 }
                 // 删除子节点
-                var self = this,
-                    params = {
-                      id: data.id,
-                      level: node.level
-                    };
-                apiUrl.deleteTreeNode(params).then(function(res) {
-                  self.msgTips(res);
-                  self.saveFathExpend(node);
-                  self.init();
-                  self.propsname = ''; // 改变传过去的值
-                }).catch(function(res) {
-                  self.msgTips(res);
-                });
+                let id = data.id,
+                    level = node.level;
+                let res = await treeClient.deleteTreeNode(id, level);
+                if(!res) return;
+                this.msgTips(res);
+                this.saveFathExpend(node);
+                this.init();
+                this.propsname = ''; // 改变传过去的值
               }
             }
             
@@ -312,7 +305,7 @@ export default class AdminTree extends Vue {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
+      }).then(async () => {
         // 保证至少有一个二级节点
         if(node.parent.data.children.length === 1) {
           this['$message']({
@@ -322,19 +315,14 @@ export default class AdminTree extends Vue {
           return;
         }
         // 删除二级节点
-        var self = this,
-            params = {
-              level: node.level,
-              id: data.id,
-            };
-        apiUrl.deleteTreeNode(params).then(function(res) {
-          self.msgTips(res);
-          self.saveFathExpend(node);
-          self.init();
-          self.propsname = '';
-        }).catch(function(res) {
-          self.msgTips(res);
-        });
+        let level = node.level,
+            id = data.id;
+        let res = await treeClient.deleteTreeNode(id, level);
+        if(!res) return;
+        this.msgTips(res);
+        this.saveFathExpend(node);
+        this.init();
+        this.propsname = '';
       }).catch(() => {
         this['$message']({
           type: 'info',
@@ -348,7 +336,7 @@ export default class AdminTree extends Vue {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
+      }).then(async () => {
         // 保证至少有一个一级节点
         if(node.parent.childNodes.length === 1) {
           this['$message']({
@@ -358,19 +346,14 @@ export default class AdminTree extends Vue {
           return;
         }
         // 删除一级节点
-        var self = this,
-            params = {
-              level: node.level,
-              id: data.id,
-            };
-        apiUrl.deleteTreeNode(params).then(function(res) {
-          self.msgTips(res);
-          self.saveFathExpend(node);
-          self.init();
-          self.propsname = '';
-        }).catch(function(res) {
-          self.msgTips(res);
-        });
+        let id = data.id,
+            level = node.level;
+        let res = await treeClient.deleteTreeNode(id, level);
+        if(!res) return;
+        this.msgTips(res);
+        this.saveFathExpend(node);
+        this.init();
+        this.propsname = '';
       }).catch(() => {
         this['$message']({
           type: 'info',
@@ -405,41 +388,31 @@ export default class AdminTree extends Vue {
   }
 
   // 上移
-  up(node, data) {
-    var self = this,
-        params = {
-          level: node.level,
-          thisId: node.data.id,
-          thisSort: node.data.sort,
-          otherId: node.previousSibling.data.id,
-          otherSort: node.previousSibling.data.sort
-        };
-    apiUrl.changeSort(params).then(function(res) {
-      self.msgTips(res);
-      self.saveFathExpend(node);
-      self.init();
-    }).catch(function(res) {
-      self.msgTips(res);
-    });
+  async up(node, data) {
+    let level = node.level,
+        thisId = node.data.id,
+        thisSort = node.data.sort,
+        otherId = node.previousSibling.data.id,
+        otherSort = node.previousSibling.data.sort;
+    let res = await treeClient.changeSort(level, thisId, thisSort, otherId, otherSort);
+    if(!res) return;
+    this.msgTips(res);
+    this.saveFathExpend(node);
+    this.init();
   }
 
   // 下移
-  down(node, data) {
-    var self = this,
-        params = {
-          level: node.level,
-          thisId: node.data.id,
-          thisSort: node.data.sort,
-          otherId: node.nextSibling.data.id,
-          otherSort: node.nextSibling.data.sort
-        };
-    apiUrl.changeSort(params).then(function(res) {
-      self.msgTips(res);
-      self.saveFathExpend(node);
-      self.init();
-    }).catch(function(res) {
-      self.msgTips(res);
-    });
+  async down(node, data) {
+    let level = node.level,
+        thisId = node.data.id,
+        thisSort = node.data.sort,
+        otherId = node.nextSibling.data.id,
+        otherSort = node.nextSibling.data.sort;
+    let res = await treeClient.changeSort(level, thisId, thisSort, otherId, otherSort);
+    if(!res) return;
+    this.msgTips(res);
+    this.saveFathExpend(node);
+    this.init();
   }
 
   // 处理关闭dialog
@@ -464,25 +437,20 @@ export default class AdminTree extends Vue {
       });
       return;
     }
-    var self = this,
-        params = {
-          id: this.motifyNode.id,
-          label: this.motifyNode.newNodeName,
-          level: this.motifyNode.level
-        };
-    apiUrl.modifyTreeNode(params).then(function(res) {
-      self.showEditDialog = false;
-      self.msgTips(res);
-      self.init();
-      self.propsname = self.motifyNode.newNodeName;  // 保证修改的值能直接传给子组件，因为改了值路由没变，子组件不会刷新
-      self.motifyNode.newNodeName = '';
-    }).catch(function(res) {
-      self.msgTips(res);
-    });
+    let id = this.motifyNode.id,
+        label = this.motifyNode.newNodeName,
+        level = this.motifyNode.level;
+    let res = treeClient.modifyTreeNode(id, label, level);
+    if(!res) return;
+    this.msgTips(res);
+    this.showEditDialog = false;
+    this.init();
+    this.propsname = this.motifyNode.newNodeName;  // 保证修改的值能直接传给子组件，因为改了值路由没变，子组件不会刷新
+    this.motifyNode.newNodeName = '';
   }
 
   // 保存穿梭
-  handleSaveShuttle() {
+  async handleSaveShuttle() {
     if(this.choiceFathId === this.originFathId) {
       this['$message']({
         type: 'warning',
@@ -495,11 +463,11 @@ export default class AdminTree extends Vue {
       for(let item of this.tree) {  // 二级节点穿梭，就要到一级节点找穿梭到的节点
         if(item.id === this.choiceFathId) {
           params = {
-              category_id: item.id,
-              f_sort:  item.children[item.children.length - 1].sort + 1,
-              f_id: this.shuttleChildId,
-              shuttleLevel: this.shuttleLevel
-            }
+            category_id: item.id,
+            f_sort:  item.children[item.children.length - 1].sort + 1,
+            f_id: this.shuttleChildId,
+            shuttleLevel: this.shuttleLevel
+          }
           break;
         }
       }
@@ -526,14 +494,11 @@ export default class AdminTree extends Vue {
         }
       }
     }
-    let self = this;
-    apiUrl.changeFather(params).then(function(res) {
-      self.msgTips(res);
-      self.showShuttleDialog = false;
-      self.init();
-    }).catch(function(res) {
-      self.msgTips(res);
-    });
+    let res = await treeClient.changeFather(params);
+    if(!res) return;
+    this.msgTips(res);
+    this.showShuttleDialog = false;
+    this.init();
   }
 
   // 保存当前一二级节点们的展开状态
@@ -566,8 +531,8 @@ export default class AdminTree extends Vue {
   // 弹框提示
   msgTips(res) {
     this['$message']({
-      type: res.data.resultsCode,
-      message: res.data.message
+      type: res.resultsCode,
+      message: res.message
     });
   }
 }

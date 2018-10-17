@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { apiUrl } from '../api/url'
+import { userClient } from '../util/clientHelper'
 import Nav from '@/components/Nav.vue'
 
 @Component({
@@ -16,29 +16,21 @@ import Nav from '@/components/Nav.vue'
   },
 })
 export default class Admin extends Vue {
-  beforeCreate() {
+  async beforeCreate() {
 		if(sessionStorage.getItem("xia_username") && sessionStorage.getItem("xia_password")) {
-      var self = this,
-        params = {
-          username: sessionStorage.getItem("xia_username"),
-          userpword: window.atob(sessionStorage.getItem("xia_password"))
-        };
-      apiUrl.postLogin(params).then(function(res) {
-        if(res.data.resultsCode === "success") {
-          return;
-        } else {
-          self['$message']({
-            type: 'error',
-            message: "请重新登陆"
-          });
-          self['$router'].push('/login');
-        }
-      }).catch(function(res) {
-        self['$message']({
+      let username = sessionStorage.getItem("xia_username"),
+          userpword = window.atob(sessionStorage.getItem("xia_password"));
+      let res: any = await userClient.postLogin(username, userpword);
+      if(!res) return;
+      if(res.resultsCode === "success") {
+        return;
+      } else {
+        this['$message']({
           type: 'error',
-          message: res.message
+          message: "请重新登陆"
         });
-      });
+        this['$router'].push('/login');
+      }
     } else {
       this['$message']({
         type: 'warning',

@@ -43,7 +43,11 @@ exports.getNodeCont = function(req, res) {
             filename: results[i].filename
           });
         }
-        res.json(contObj);
+        res.json({ 
+          resultsCode: 'success',
+          message: '获取子节点数据成功', 
+          data: contObj
+        });
       } else {
         res.json({ resultsCode: 'error', message: '没找到子节点数据' })
       }

@@ -151,7 +151,11 @@ exports.getImgList = function(req, res) {
         res.json({ resultsCode: 'error', message: '查询image失败' });
         return;
       }
-      res.json(results);
+      res.json({
+        resultsCode: 'success',
+        message: '查询image成功',
+        data: results
+      });
 
       connection.release();
     });

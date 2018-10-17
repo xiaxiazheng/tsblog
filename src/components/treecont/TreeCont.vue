@@ -32,7 +32,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { apiUrl } from '../../api/url';
+import { treeClient, contClient } from '../../util/clientHelper';
 import { baseUrl } from "../../config";
 import TreeMain from '@/components/TreeMain.vue';
 
@@ -72,80 +72,26 @@ export default class TreeCont extends Vue {
     this.init();
   }
 
-  init() {
+  async init() {
     if (this["$route"].query.id) {
       let id = decodeURIComponent(atob(this["$route"].query.id));
-      let self = this,
-        params = {
-          id: id // 子节点的id
-        };
-      this.getChildName(id); // 获取当前节点名称
-      apiUrl
-        .getChildName(params)
-        .then(function(res) {
-          self.title = res.data[0].c_label;
-        })
-        .catch(function(res) {
-          self["$message"]({
-            type: "error",
-            message: "初始化出错"
-          });
-        });
-      apiUrl.getNodeCont(params).then(function(res) {
-          self.contObj = res.data;
-          for (let i in self.contObj["list"]) {
-            self.contObj["list"][i].cont = self.contObj["list"][i].cont.replace(
-              /</g,
-              "&lt;"
-            ); // html标签的<转成实体字符,让所有的html标签失效
-            self.contObj["list"][i].cont = self.contObj["list"][i].cont.replace(
-              /&lt;pre/g,
-              "<pre"
-            ); // 把pre标签转回来
-            self.contObj["list"][i].cont = self.contObj["list"][i].cont.replace(
-              /pre>\n/g,
-              "pre>"
-            ); // 把pre后面的空格去掉
-            self.contObj["list"][i].cont = self.contObj["list"][i].cont.replace(
-              /&lt;\/pre>/g,
-              "</pre>"
-            ); // 把pre结束标签转回来
-            self.contObj["list"][i].cont = self.contObj["list"][i].cont.replace(
-              /  /g,
-              "&nbsp;&nbsp;"
-            ); // 把空格转成实体字符，以防多空格被合并
-            self.contObj["list"][i].cont = self.contObj["list"][i].cont.replace(
-              /\n|\r\n/g,
-              "<br/>"
-            ); // 把换行转成br标签
-          }
-        })
-        .catch(function(res) {
-          self["$message"]({
-            type: "error",
-            message: "初始化出错"
-          });
-        });
-    }
-  }
 
-  // 获取当前三级节点的名称
-  getChildName(id) {
-    let self = this,
-      params = {
-        id: id
-      };
-    apiUrl
-    .getChildName(params)
-    .then(function(res) {
-      self.title = res.data[0].c_label;
-    })
-    .catch(function(res) {
-      self["$message"]({
-        type: "error",
-        message: "获取内容名称出错"
-      });
-    });
+      let res0 = await treeClient.getChildName(id); // 获取当前节点的名称
+      if(!res0) return;
+      this.title = res0.data[0].c_label;
+
+      let res = await contClient.getNodeCont(id);
+      if(!res) return;
+      this.contObj = res.data;
+      for (let i in this.contObj["list"]) {
+        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/</g, "&lt;"); // html标签的<转成实体字符,让所有的html标签失效
+        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/&lt;pre/g, "<pre"); // 把pre标签转回来
+        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/pre>\n/g, "pre>"); // 把pre后面的空格去掉
+        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/&lt;\/pre>/g, "</pre>"); // 把pre结束标签转回来
+        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/  /g, "&nbsp;&nbsp;"); // 把空格转成实体字符，以防多空格被合并
+        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/\n|\r\n/g, "<br/>"); // 把换行转成br标签
+      }
+    }
   }
 
   /* 获取文件原本的名称，没有id没有后缀那种 */

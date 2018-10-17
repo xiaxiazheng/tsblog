@@ -85,9 +85,9 @@ export default class Tree extends Vue {
       this.defaultExpandedKeys = []; // 前台展示的话直接清空
       this.defaultExpandedKeys.push(parseInt(atob(this["$route"].query.id)));
     }
-    let resdata: any = await treeClient.getTree('home');
-    if(!resdata) return;
-    this.tree = resdata;
+    let res: any = await treeClient.getTree('home');
+    if(!res) return;
+    this.tree = res.data;
   }
 
   handleClick(nodeObj, node, c) {

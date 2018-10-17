@@ -84,10 +84,10 @@
 </template>
 
 <script lang="ts">
-import { apiUrl } from '../../api/url'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { treeClient, contClient, imgClient } from '../../util/clientHelper'
 import { baseUrl } from '../../config'
 import TreeMain from '@/components/TreeMain.vue'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 @Component({
   components: {
@@ -108,9 +108,11 @@ export default class AdminTreeCont extends Vue {
   dialogImageUrl = ''
 
 	mounted() {
-		this.$nextTick(function() {
+		this.$nextTick(async function() {
 			this.init();
-			this.getChildName(decodeURIComponent(atob(this['$route'].query.id)));
+      let id = decodeURIComponent(atob(this['$route'].query.id));
+      let res0: any = await treeClient.getChildName(id);
+      this.title = res0.data[0].c_label;
 		});
   }
   
@@ -122,21 +124,21 @@ export default class AdminTreeCont extends Vue {
       this['$router'].push({ query: {} });
     }
   }
+
   @Watch('$route')
   onRouteChanged() {
     this.init();
   }
   
-  init() {
+  async init() {
     if(this['$route'].query.id !== '') {
       let id = decodeURIComponent(atob(this['$route'].query.id)); // 子节点的id
-      var self = this,
-          params = {
-            id: id, // 子节点的id
-          };
-      this.getChildName(id);
-      apiUrl.getNodeCont(params).then(function(res) {
-        self.contObj = {
+      let res0: any = await treeClient.getChildName(id);
+      this.title = res0.data[0].c_label;
+      let res: any = await contClient.getNodeCont(id);
+      // apiUrl.getNodeCont(params).then(function(res) {
+      if(!res) return;
+      this.contObj = {
           id: res.data.id,
           list: []
         };
@@ -147,10 +149,10 @@ export default class AdminTreeCont extends Vue {
             let list = item.filename.split('.');
             let filetype = list[list.length - 1]; // 文件类型
             let randomNum = list[list.length - 2];
-            let originname = item.filename.substr(0, item.filename.length - filetype.length - randomNum.length - 2 - decodeURIComponent(atob(self['$route'].query.id)).length);
+          let originname = item.filename.substr(0, item.filename.length - filetype.length - randomNum.length - 2 - decodeURIComponent(atob(this['$route'].query.id)).length);
             imgname = originname + '.' + filetype;
           }
-          self.contObj['list'].push({
+        this.contObj['list'].push({
             cont: item.cont,
             createtime: item.createtime,
             motifytime: item.motifytime,
@@ -165,41 +167,17 @@ export default class AdminTreeCont extends Vue {
             }] : [],
           });
         }
-      }).catch(function(res) {
-        console.log(res);
-      });
     }
   }
 
-  // 获取当前三级节点的名称
-  getChildName(id) {
-    let self = this,
-        params = {
-          id: id
-        };
-    apiUrl.getChildName(params).then(function(res) {
-      self.title = res.data[0].c_label;
-    }).catch(function(res) {
-      self['$message']({
-        type: 'error',
-        message: '获取内容名称出错'
-      });
-    });
-  }
-
   // 新增节点
-  addCont() {
-    var self = this,
-        params = {
-          id: decodeURIComponent(atob(this['$route'].query.id)), // 子节点的id
-          sort: this.contObj['list'][this.contObj['list'].length - 1].sort,
-        };
-    apiUrl.addNodeCont(params).then(function(res) {
-      self.msgTips(res);
-      self.init();
-    }).catch(function(res) {
-      self.msgTips(res);
-    });
+  async addCont() {
+    let  id = decodeURIComponent(atob(this['$route'].query.id)), // 子节点的id
+         sort = this.contObj['list'][this.contObj['list'].length - 1].sort;
+    let res = await contClient.addNodeCont(id, sort);
+    if(!res) return;
+    this.msgTips(res);
+    this.init();
   }
 
   // 删除节点
@@ -208,18 +186,13 @@ export default class AdminTreeCont extends Vue {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
-    }).then(() => { 
-      var self = this,
-          params = {
-            id: decodeURIComponent(atob(this['$route'].query.id)), // 子节点的id
-            sort: item.sort,
-          };
-      apiUrl.deleteNodeCont(params).then(function(res) {
-        self.msgTips(res);
-        self.init();
-      }).catch(function(res) {
-        self.msgTips(res);
-      });
+    }).then(async () => { 
+      let id = decodeURIComponent(atob(this['$route'].query.id)), // 子节点的id
+          sort = item.sort;
+      let res = await contClient.deleteNodeCont(id, sort);
+      if(!res) return;
+      this.msgTips(res);
+      this.init();
     }).catch(() => {
       this['$message']({
         type: 'info',
@@ -229,37 +202,27 @@ export default class AdminTreeCont extends Vue {
   }
 
   // 上移节点
-  upCont(item, index) {
-    var self = this,
-        params = {
-          thiscTime: item.createtime,
-          thisSort: item.sort,
-          othercTime: this.contObj['list'][index - 1].createtime,
-          otherSort: this.contObj['list'][index - 1].sort
-        };
-    apiUrl.changeContSort(params).then(function(res) {
-      self.msgTips(res);
-      self.init();
-    }).catch(function(res) {
-      self.msgTips(res);
-    });
+  async upCont(item, index) {
+    let thiscTime = item.createtime,
+        thisSort = item.sort,
+        othercTime = this.contObj['list'][index - 1].createtime,
+        otherSort = this.contObj['list'][index - 1].sort;
+    let res = await contClient.changeContSort(thiscTime, thisSort, othercTime, otherSort);
+    if(!res) return;
+    this.msgTips(res);
+    this.init();
   }
 
   // 下移节点
-  downCont(item, index) {
-    var self = this,
-        params = {
-          thiscTime: item.createtime,
-          thisSort: item.sort,
-          othercTime: this.contObj['list'][index + 1].createtime,
-          otherSort: this.contObj['list'][index + 1].sort
-        };
-    apiUrl.changeContSort(params).then(function(res) {
-      self.msgTips(res);
-      self.init();
-    }).catch(function(res) {
-      self.msgTips(res);
-    });
+  async downCont(item, index) {
+    let thiscTime = item.createtime,
+        thisSort = item.sort,
+        othercTime = this.contObj['list'][index + 1].createtime,
+        otherSort = this.contObj['list'][index + 1].sort;
+    let res = await contClient.changeContSort(thiscTime, thisSort, othercTime, otherSort);
+    if(!res) return;
+    this.msgTips(res);
+    this.init();
   }
 
   // 先判断判断
@@ -277,24 +240,21 @@ export default class AdminTreeCont extends Vue {
   }
 
   // 再保存修改
-  saveModify() {
-    var self = this,
-        params = this.contObj;
-    apiUrl.modifyNodeCont(params).then(function(res) {
-      self.msgTips(res);
-      setTimeout(function() {
-        self.init();
-      }, 1000);
-    }).catch(function(res) {
-      self.msgTips(res);
-    });
+  async saveModify() {
+    let params = this.contObj;
+    let res = await contClient.modifyNodeCont(this.contObj);
+    if(!res) return;
+    this.msgTips(res);
+    setTimeout(() => {
+      this.init();
+    }, 1000);
   }
 
   // 弹框提示
   msgTips(res) {
     this['$message']({
-      type: res.data.resultsCode,
-      message: res.data.message
+      type: res.resultsCode,
+      message: res.message
     });
   }
 
@@ -332,17 +292,10 @@ export default class AdminTreeCont extends Vue {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
-    }).then(() => {
-      let self = this,
-          params = {
-            filename: file.filename
-          };
-      apiUrl.deleteTreeContImg(params).then(function(res) {
-        self.msgTips(res);
-        self.init();
-      }).catch(function(res) {
-        self.msgTips(res);
-      });
+    }).then(async () => {
+      let res = await imgClient.deleteTreeContImg(file.filename);
+      if(!res) return;
+      this.init();
     }).catch(() => {
       this['$message']({
         type: 'info',

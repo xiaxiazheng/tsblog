@@ -21,29 +21,29 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { apiUrl } from '../../api/url';
+import { imgClient } from '../../util/clientHelper';
 import { baseUrl } from "../../config";
 
 @Component
 export default class Main extends Vue {
   imgUrlList: any[] = [];
+
   mounted() {
     this.$nextTick(function() {
       this.init();
     });
   }
-  init() {
+
+  async init() {
     let self = this,
         params = {
           type: 'main'
         };
-    apiUrl.getImgList(params).then(function(res) {
-      for(let item of res.data) {
-        self.imgUrlList.push(baseUrl + '/main/' + item.filename);
-      }
-    }).catch(function(res) {
-      console.log(res);
-    });
+    let res = await imgClient.getImgList('type');
+    if(!res) return;
+    for(let item of res.data) {
+      this.imgUrlList.push(baseUrl + '/main/' + item.filename);
+    }
   }
 }
 </script>

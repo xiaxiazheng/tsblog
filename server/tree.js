@@ -347,17 +347,17 @@ exports.changeSort = function(req, res) {
       var array1 = [req.query.otherSort, req.query.thisId];
       connection.query(sql1, array1, function(err, results) {
         if(err) {
-          console.log("操作category失败1");
+          res.json({ resultsCode: 'error', message: '操作category失败1' });
           return;
         }
         var sql2 = "UPDATE category SET sort=? WHERE category_id=?";
         var array2 = [req.query.thisSort, req.query.otherId];
         connection.query(sql2, array2, function(err, results) {
           if(err) {
-            console.log("操作category失败2");
+            res.json({ resultsCode: 'error', message: '操作category失败2' });
             return;
           }
-          res.json({ resultsCode: 'success', message: '移动成功' })
+          res.json({ resultsCode: 'success', message: '移动成功' });
           connection.release();
         });
       });
@@ -373,14 +373,14 @@ exports.changeSort = function(req, res) {
       var array1 = [req.query.otherSort, req.query.thisId];
       connection.query(sql1, array1, function(err, results) {
         if(err) {
-          console.log("操作tree失败1");
+          res.json({ resultsCode: 'error', message: '操作tree失败1' });
           return;
         }
         var sql2 = "UPDATE tree SET " + flag + "_sort=? WHERE " + flag + "_id=?";
         var array2 = [req.query.thisSort, req.query.otherId];
         connection.query(sql2, array2, function(err, results) {
           if(err) {
-            console.log("操作tree失败2");
+            res.json({ resultsCode: 'error', message: '操作tree失败2' });
             return;
           }
           res.json({ resultsCode: 'success', message: '移动成功' })
