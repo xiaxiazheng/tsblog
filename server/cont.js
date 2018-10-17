@@ -70,10 +70,10 @@ exports.addNodeCont = function(req, res) {
     var array = [req.query.id];
     connection.query(sql, array, function(err, results) {
       if(err) {
-        res.json({ resultsCode: 'error', message: '添加失败' })
+        res.json({ resultsCode: 'error', message: '添加失败' });
         return;
       }
-      res.json({ resultsCode: 'success', message: '添加成功' })
+      res.json({ resultsCode: 'success', message: '添加成功' });
 
       connection.release();
     });
@@ -135,10 +135,10 @@ exports.deleteNodeCont = function(req, res) {
     var array = [req.query.id, req.query.sort];
     connection.query(sql, array, function(err, results) {
       if(err) {
-        res.json({ resultsCode: 'error', message: err.message })
+        res.json({ resultsCode: 'error', message: err.message });
         return;
       }
-      res.json({ resultsCode: 'success', message: '删除成功' })
+      res.json({ resultsCode: 'success', message: '删除成功' });
 
       connection.release();
     });

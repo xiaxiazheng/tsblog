@@ -79,11 +79,12 @@ export class contClient {
     return axiosGetHelper(url);
   }
   static addNodeCont(id: string, sort: any) {
+    let url = baseUrl + '/addnodecont';
     let params = {
       id: id,
       sort: sort
     };
-    return axios.post(baseUrl + '/addnodecont', params);
+    return axiosPostHelper(url, params);
   }
   static modifyNodeCont(obj: any) {
     let params = obj;
