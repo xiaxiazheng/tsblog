@@ -26,11 +26,11 @@ exports.getTree = function(req, res) {
         }
         /* 先把tree里的二级树整理好 */
         let list = [];
-        for(let i in res2) {
+        for (let i in res2) {
           let find = false;
-          if(i !== 0) {
-            for(let j in list) {
-              if(list[j].id === res2[i].f_id) {
+          if (i !== 0) {
+            for (let j in list) {
+              if (list[j].id === res2[i].f_id) {
                 list[j].children.push({
                   id: res2[i].c_id,
                   label: res2[i].c_label,
@@ -42,7 +42,7 @@ exports.getTree = function(req, res) {
               }
             }
           }
-          if(!find) {
+          if (!find) {
             list.push({
               id: res2[i].f_id,
               label: res2[i].f_label,
@@ -59,13 +59,13 @@ exports.getTree = function(req, res) {
         }
         /* 然后再把分类套在上面 */
         let flist = [];
-        for(let item of res1) {
+        for (let item of res1) {
           let clist = [];
-          if(item.label === 'My Secret Place' && req.query.type === 'home') {
+          if (item.label === 'My Secret Place' && req.query.type === 'home') {
             continue;
           }
-          for(let j in list) {
-            if(item.category_id === list[j].category_id) {
+          for (let j in list) {
+            if (item.category_id === list[j].category_id) {
               clist.push(list[j]);
             }
           }
@@ -90,7 +90,7 @@ exports.getTree = function(req, res) {
 // 查三级节点名
 exports.getChildName = function(req, res) {
   db.pool.getConnection(function(err, connection) {
-    if(err) {
+    if (err) {
       res.json({ resultsCode:'error', message:'连接数据库失败' });
       console.log(err);
       return;
@@ -98,7 +98,7 @@ exports.getChildName = function(req, res) {
     var sql = "SELECT c_label FROM tree WHERE c_id=?";
     var array = [req.query.id];
     connection.query(sql, array, function(err, result) {
-      if(err) {
+      if (err) {
         res.json({ resultsCode:'error', message:'查找失败，操作tree失败' });
         return;
       }
@@ -116,27 +116,27 @@ exports.getChildName = function(req, res) {
 // 增
 exports.addTreeNode = function(req, res) {
   db.pool.getConnection(function(err, connection) {
-    if(err) {
+    if (err) {
       res.json({ resultsCode:'error', message:'连接数据库失败' });
       console.log(err);
       return;
     }
     var sql = '';
     var newchildId = Common.getRandomNum();
-    if(req.query.level === '1') { // 若为一个大类
+    if (req.query.level === '1') { // 若为一个大类
       let newfathId = Common.getRandomNum();
       let newcateId = Common.getRandomNum();
       sql = "INSERT INTO category VALUES (?, ?, ?)";
       let array = [newcateId, 'newCategory', (parseInt(req.query.sort) + 1)];
       connection.query(sql, array, function(err, res1) {
-        if(err) {
+        if (err) {
           res.json({ resultsCode:'error', message:'添加失败，操作category失败' });
           return;
         }
         sql = "INSERT INTO tree VALUES (?, ?, ?, ?, ?, ?, ?)";
         array = [newfathId, 'newNode', 1, newchildId, 'newChildNode', 1, newcateId];
         connection.query(sql, array, function(err, res2) {
-          if(err) {
+          if (err) {
             res.json({ resultsCode:'error', message:'添加失败，操作tree失败' });
             return;
           }
@@ -144,7 +144,7 @@ exports.addTreeNode = function(req, res) {
           sql = "INSERT INTO cont VALUES(" + newchildId + ", '" + time + "', '" + time + "', '标题', '内容', 1, '')";
           var array = [];
           connection.query(sql, array, function(err, res3) {
-            if(err) {
+            if (err) {
               res.json({ resultsCode:'error', message:'添加失败，操作cont失败' });
               return;
             }
@@ -229,7 +229,7 @@ exports.modifyTreeNode = function(req, res) {
 // 删
 exports.deleteTreeNode = function(req, res) {
   db.pool.getConnection(function(err, connection) {
-    if(err) {
+    if (err) {
       res.json({ resultsCode:'error', message:'连接数据库失败' });
       console.log(err);
       return;
@@ -239,12 +239,12 @@ exports.deleteTreeNode = function(req, res) {
       var sql = "SELECT c_id FROM tree WHERE category_id=?";
       var array = [req.query.id];
       connection.query(sql, array, function(err, res1) {
-        if(err) {
+        if (err) {
           res.json({ resultsCode:'error', message:'删除失败，操作tree失败1' });
           return;
         }
         // 再根据三级节点id逐个逐个删除三级节点的具体信息
-        for(let i in res1) {
+        for (let i in res1) {
           var sql2 = "DELETE FROM cont WHERE c_id=?";
           var array2 = [res1[i].c_id];
           connection.query(sql2, array2, function(err, res2) {
@@ -285,7 +285,7 @@ exports.deleteTreeNode = function(req, res) {
           return;
         }
         // 再根据三级节点id逐个逐个删除三级节点的具体信息
-        for(let i in results) {
+        for (let i in results) {
           var sql2 = "DELETE FROM cont WHERE c_id=?";
           var array2 = [results[i].c_id];
           connection.query(sql2, array2, function(err, results) {

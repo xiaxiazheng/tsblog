@@ -39,7 +39,7 @@ exports.getImageName = function(name, id) {
   let nameArray = name.split(".");
 
   let filerealname = '';
-  for(let i = 0; i < nameArray.length - 1; i++) {
+  for (let i = 0; i < nameArray.length - 1; i++) {
     filerealname += nameArray[i];
     if(i === nameArray.length - 2) {
       filerealname += id;

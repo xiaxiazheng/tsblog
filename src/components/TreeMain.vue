@@ -14,19 +14,13 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-@Component({
-  components: {
-    TreeMain
-  },
-})
+@Component
 export default class TreeMain extends Vue {
-  @Prop() type: string;
+  @Prop() type: any;
 }
 </script>
 
 <style lang="less" scoped>
-@import '../static/global.less';
-
   .treemain {
     height: 100%;
   }

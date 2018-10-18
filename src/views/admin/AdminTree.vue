@@ -106,10 +106,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import AdminTreeCont from '@/components/treecont/AdminTreeCont.vue'
-import TreeCont from '@/components/treecont/TreeCont.vue'
-import { treeClient } from '../../util/clientHelper';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import AdminTreeCont from '@/components/treecont/AdminTreeCont.vue';
+import TreeCont from '@/components/treecont/TreeCont.vue';
+import { TreeClient } from '../../util/clientHelper';
 
 @Component({
   components: {
@@ -118,38 +118,38 @@ import { treeClient } from '../../util/clientHelper';
   },
 })
 export default class AdminTree extends Vue {
-  tree = []
-  allNodelist = [] // 整棵树的节点和状态
-  isEdit = false  // 切换编辑版和展示版
+  tree: any[] = [];
+  allNodelist: any[] = []; // 整棵树的节点和状态
+  isEdit: boolean = false;  // 切换编辑版和展示版
   defaultProps = {
     children: 'children',
     label: 'label'
-  }
+  };
   // 传给子组件的名字
-  propsname = ''
+  propsname: string = '';
   // 保存当前默认展开的节点，不然一操作树init数据树就要折叠
-  expandedList = []
+  expandedList: any[] = [];
   /* 节点改名 */
-  showEditDialog = false
+  showEditDialog: boolean = false;
   motifyNode = {
     id: '',
     newNodeName: '',
     level: ''
-  }
-  notice = ''
+  };
+  notice: string = '';
   /* 子节点穿梭 */
-  fatherNodeList = [] // 子节点上一级的所有节点
-  showShuttleDialog = false
-  shuttleLevel = 0
-  originFathId = ''
-  choiceFathId = ''
-  shuttleChildId = ''
-  shuttleChildLabel = ''
+  fatherNodeList: any[] = []; // 子节点上一级的所有节点
+  showShuttleDialog: boolean = false;
+  shuttleLevel: Number = 0;
+  originFathId: string = '';
+  choiceFathId: string = '';
+  shuttleChildId: string = '';
+  shuttleChildLabel: string = '';
 
-	mounted() {
-		this.$nextTick(function() {
-			this.init();
-		});
+  mounted() {
+    this.$nextTick(function () {
+      this.init();
+    });
   }
   
   @Watch("$route")
@@ -159,43 +159,44 @@ export default class AdminTree extends Vue {
   }
 
   async init() {
-    if(this['$route'].query.id) {
-      this.expandedList.push(parseInt(atob(this['$route'].query.id))); // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
+    if (this['$route'].query.id) {
+      // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
+      this.expandedList.push(parseInt(atob(this['$route'].query.id), 10));
     }
-    let res: any = await treeClient.getTree('admin');
-    if(!res) return;
+    let res: any = await TreeClient.getTree('admin');
+    if (!res) return;
     this.tree = res.data;
     this.fatherNodeList = [];
     // 给树设置hover属性
-    for(let i in this.tree) {
+    for (let i in this.tree) {
       Vue.set(this.tree[i], 'hovering', false);
-      for(let j in this.tree[i].children) {
+      for (let j in this.tree[i].children) {
         // hovering
         Vue.set(this.tree[i].children[j], 'hovering', false);
-        for(let k in this.tree[i].children[j].children) {
+        for (let k in this.tree[i].children[j].children) {
           Vue.set(this.tree[i].children[j].children[k], 'hovering', false);
         }
       }
     }
   }
 
-  //onmouseover时显示图标
-  showIcon(item) {
+  // onmouseover时显示图标
+  showIcon(item: any) {
     item.data.hovering = true;
   }
   
-  //onmouseout时隐藏图标
-  hideIcon(item) {
+  // onmouseout时隐藏图标
+  hideIcon(item: any) {
     item.data.hovering = false;
   }
     
   // 点击节点，三个参数分别为传递给 data 属性的数组中该节点所对应的对象、节点对应的 Node、节点组件本身。
-  handleClick(obj, node, component) {
-    if(node.level === 3) { // 若是子节点则右边显示具体信息
+  handleClick(obj: any, node: any, component: any) {
+    if (node.level === 3) { // 若是子节点则右边显示具体信息
       this['$router'].push({ 
         query: {
           id: btoa(encodeURIComponent(node.data.id))
-        } 
+        }
       });
       this.propsname = node.data.label;
     }
@@ -203,173 +204,171 @@ export default class AdminTree extends Vue {
   }
 
   // 修改节点
-  motify(node, data) {
+  motify(node: any, data: any) {
     let level = node.level;
-    if(level === 3) {
+    if (level === 3) {
       this.notice = '修改三级节点名称';
     }
-    if(level === 2) {
+    if (level === 2) {
       this.notice = '修改二级节点名称';
     }
-    if(level === 1) {
+    if (level === 1) {
       this.notice = '修改一级节点名称';
     }
     this.motifyNode = {
       id: data.id,
       level: node.level,
       newNodeName: data.label,
-    }
-    this.showEditDialog = true;	
-    
+    };
+    this.showEditDialog = true;
     this.saveFathExpend(node);
   }
 
   // 新增节点
-  async append(node, data) {
+  async append(node: any, data: any) {
     // 这里先请求后台数据
-    var self = this,
-        params = {
-          level: node.level,
-        };
-    if(node.level === 3) {  // 若是子节点
-      params['id'] = node.parent.data.id;
-      params['label'] = node.parent.data.label;
-      params['f_sort'] = node.parent.data.sort;
-      params['category_id'] = node.data.category_id;
-      var list = node.parent.data.children;
-      params['c_sort'] = list[list.length - 1].sort; // 传当前父节点的最后一个子节点的sort过去
-    }
-    if(node.level === 2) { // 若是父节点
-      params['category_id'] = node.data.category_id;
-      var list = node.parent.data.children;
-      params['sort'] = list[list.length - 1].sort; // 传最后一个父节点的sort过去
-    }
-    if(node.level === 1) { // 若是一大类
-      var list = node.parent.data;
-      params['sort'] = list[list.length - 1].sort;
-    }
-    let res = await treeClient.addTreeNode(params);
-    if(!res) return;
-    this.msgTips(res);
-    this.saveFathExpend(node);
-    this.init();
+    // var self = this,
+    //     params = {
+    //       level: node.level,
+    //     };
+    // if (node.level === 3) {  // 若是子节点
+    //   params['id'] = node.parent.data.id;
+    //   params['label'] = node.parent.data.label;
+    //   params['f_sort'] = node.parent.data.sort;
+    //   params['category_id'] = node.data.category_id;
+    //   var list = node.parent.data.children;
+    //   params['c_sort'] = list[list.length - 1].sort; // 传当前父节点的最后一个子节点的sort过去
+    // }
+    // if (node.level === 2) { // 若是父节点
+    //   params['category_id'] = node.data.category_id;
+    //   var list = node.parent.data.children;
+    //   params['sort'] = list[list.length - 1].sort; // 传最后一个父节点的sort过去
+    // }
+    // if (node.level === 1) { // 若是一大类
+    //   var list = node.parent.data;
+    //   params['sort'] = list[list.length - 1].sort;
+    // }
+    // let res = await TreeClient.addTreeNode(params);
+    // if (!res) return;
+    // this.msgTips(res);
+    // this.saveFathExpend(node);
+    // this.init();
   }
 
   // 删除节点
-  remove(node, data) {
-    if(node.level === 3) { // 若是叶子节点
-      this['$confirm'](`你将删除的是三级节点${data.label}, 你确定?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(async () => {
-        let category_id = data.category_id;
-        let parentId = node.parent.data.id;
-        for(let i in this.tree) {
-          if(category_id === this.tree[i].id) {
-            for(let j in this.tree[i].children) {
-              if(this.tree[i].children[j].id === parentId) {
-                // 保证每个父节点至少有一个子节点
-                let childlist = this.tree[i].children[j].children;
-                if(childlist.length === 1) {
-                  this['$message']({
-                    type: 'error',
-                    message: "这里只有一个三级节点了，不能删除"
-                  });
-                  return;
-                }
-                // 删除子节点
-                let id = data.id,
-                    level = node.level;
-                let res = await treeClient.deleteTreeNode(id, level);
-                if(!res) return;
-                this.msgTips(res);
-                this.saveFathExpend(node);
-                this.init();
-                this.propsname = ''; // 改变传过去的值
+  async remove(node: any, data: any) {
+    if (node.level === 3) { // 若是叶子节点
+      // this['$confirm'](`你将删除的是三级节点${data.label}, 你确定?`, '提示', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // }).then(async () => {
+      let category_id: any = data.category_id;
+      let parentId: any = node.parent.data.id;
+      for (let i in this.tree) {
+        if (category_id === this.tree[i].id) {
+          for (let j in this.tree[i].children) {
+            if (this.tree[i].children[j].id === parentId) {
+              // 保证每个父节点至少有一个子节点
+              let childlist = this.tree[i].children[j].children;
+              if (childlist.length === 1) {
+                // this['$message']({
+                  // type: 'error',
+                  // message: "这里只有一个三级节点了，不能删除"
+                // });
+                return;
               }
+              // 删除子节点
+              let id: any = data.id;
+              let level: any = node.level;
+              let res = await TreeClient.deleteTreeNode(id, level);
+              if (!res) return;
+              this.msgTips(res);
+              this.saveFathExpend(node);
+              this.init();
+              this.propsname = ''; // 改变传过去的值
             }
-            
           }
         }
-      }).catch(() => {
-        this['$message']({
-          type: 'info',
-          message: '已取消删除' + data.label
-        });          
-      });
+      }
+      // }).catch(() => {
+        // this['$message']({
+          // type: 'info',
+          // message: '已取消删除' + data.label
+        // });
+      // });
     }
 
-    if(node.level === 2) { // 若是二级节点
-      this['$confirm'](`你将删除的是二级节点${data.label}, 你确定?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(async () => {
+    if (node.level === 2) { // 若是二级节点
+      // this['$confirm'](`你将删除的是二级节点${data.label}, 你确定?`, '提示', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // }).then(async () => {
         // 保证至少有一个二级节点
-        if(node.parent.data.children.length === 1) {
-          this['$message']({
-            type: 'error',
-            message: "只剩下一个二级节点了，不能删除"
-          });
-          return;
-        }
-        // 删除二级节点
-        let level = node.level,
-            id = data.id;
-        let res = await treeClient.deleteTreeNode(id, level);
-        if(!res) return;
-        this.msgTips(res);
-        this.saveFathExpend(node);
-        this.init();
-        this.propsname = '';
-      }).catch(() => {
-        this['$message']({
-          type: 'info',
-          message: '已取消删除' + data.label
-        });          
-      });
+      if (node.parent.data.children.length === 1) {
+        // this['$message']({
+          // type: 'error',
+          // message: "只剩下一个二级节点了，不能删除"
+        // });
+        return;
+      }
+      // 删除二级节点
+      let level: any = node.level;
+      let id: any = data.id;
+      let res: any = await TreeClient.deleteTreeNode(id, level);
+      if (!res) return;
+      this.msgTips(res);
+      this.saveFathExpend(node);
+      this.init();
+      this.propsname = '';
+      // }).catch(() => {
+        // this['$message']({
+          // type: 'info',
+          // message: '已取消删除' + data.label
+        // });
+      // });
     }
 
-    if(node.level === 1) { // 若是一级节点
-      this['$confirm'](`你将删除的是一级节点${data.label}, 你确定?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(async () => {
+    if (node.level === 1) { // 若是一级节点
+      // this['$confirm'](`你将删除的是一级节点${data.label}, 你确定?`, '提示', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // }).then(async () => {
         // 保证至少有一个一级节点
-        if(node.parent.childNodes.length === 1) {
-          this['$message']({
-            type: 'error',
-            message: "只剩下一个一级节点了，不能删除"
-          });
-          return;
-        }
+      if (node.parent.childNodes.length === 1) {
+          // this['$message']({
+            // type: 'error',
+            // message: "只剩下一个一级节点了，不能删除"
+          // });
+        return;
+      }
         // 删除一级节点
-        let id = data.id,
-            level = node.level;
-        let res = await treeClient.deleteTreeNode(id, level);
-        if(!res) return;
-        this.msgTips(res);
-        this.saveFathExpend(node);
-        this.init();
-        this.propsname = '';
-      }).catch(() => {
-        this['$message']({
-          type: 'info',
-          message: '已取消删除' + data.label
-        });          
-      });
+      let id: any = data.id;
+      let level: any = node.level;
+      let res: any = await TreeClient.deleteTreeNode(id, level);
+      if (!res) return;
+      this.msgTips(res);
+      this.saveFathExpend(node);
+      this.init();
+      this.propsname = '';
+      // }).catch(() => {
+        // this['$message']({
+          // type: 'info',
+          // message: '已取消删除' + data.label
+        // });
+      // });
     }
   }
 
   // 穿梭节点
-  shuttle(node, data) {
-    if(node.parent.childNodes.length === 1) {
-      this['$message']({
-        type: 'warning',
-        message: '当前节点的父节点只有这一个子节点，不能穿梭'
-      });
+  shuttle(node: any, data: any) {
+    if (node.parent.childNodes.length === 1) {
+      // this['$message']({
+        // type: 'warning',
+        // message: '当前节点的父节点只有这一个子节点，不能穿梭'
+      // });
       return;
     }
 
@@ -382,34 +381,33 @@ export default class AdminTree extends Vue {
     this.originFathId = this.choiceFathId;
     this.shuttleChildId = data.id;
     this.shuttleChildLabel = data.label;
-
     this.showShuttleDialog = true;
     this.saveFathExpend(node);
   }
 
   // 上移
-  async up(node, data) {
-    let level = node.level,
-        thisId = node.data.id,
-        thisSort = node.data.sort,
-        otherId = node.previousSibling.data.id,
-        otherSort = node.previousSibling.data.sort;
-    let res = await treeClient.changeSort(level, thisId, thisSort, otherId, otherSort);
-    if(!res) return;
+  async up(node: any, data: any) {
+    let level: any = node.level;
+    let thisId: any = node.data.id;
+    let thisSort: any = node.data.sort;
+    let otherId: any = node.previousSibling.data.id;
+    let otherSort: any = node.previousSibling.data.sort;
+    let res: any = await TreeClient.changeSort(level, thisId, thisSort, otherId, otherSort);
+    if (!res) return;
     this.msgTips(res);
     this.saveFathExpend(node);
     this.init();
   }
 
   // 下移
-  async down(node, data) {
-    let level = node.level,
-        thisId = node.data.id,
-        thisSort = node.data.sort,
-        otherId = node.nextSibling.data.id,
-        otherSort = node.nextSibling.data.sort;
-    let res = await treeClient.changeSort(level, thisId, thisSort, otherId, otherSort);
-    if(!res) return;
+  async down(node: any, data: any) {
+    let level: any = node.level;
+    let thisId: any = node.data.id;
+    let thisSort: any = node.data.sort;
+    let otherId: any = node.nextSibling.data.id;
+    let otherSort: any = node.nextSibling.data.sort;
+    let res: any = await TreeClient.changeSort(level, thisId, thisSort, otherId, otherSort);
+    if (!res) return;
     this.msgTips(res);
     this.saveFathExpend(node);
     this.init();
@@ -430,18 +428,18 @@ export default class AdminTree extends Vue {
 
   // 保存修改的节点名称
   handleSaveNode() {
-    if(this.motifyNode.newNodeName === '') {
-      this['$message']({
-        type: 'warning',
-        message: '节点名称不能为空'
-      });
+    if (this.motifyNode.newNodeName === '') {
+      // this['$message']({
+        // type: 'warning',
+        // message: '节点名称不能为空'
+      // });
       return;
     }
-    let id = this.motifyNode.id,
-        label = this.motifyNode.newNodeName,
-        level = this.motifyNode.level;
-    let res = treeClient.modifyTreeNode(id, label, level);
-    if(!res) return;
+    let id: any = this.motifyNode.id;
+    let label: any = this.motifyNode.newNodeName;
+    let level: any = this.motifyNode.level;
+    let res: any = TreeClient.modifyTreeNode(id, label, level);
+    if (!res) return;
     this.msgTips(res);
     this.showEditDialog = false;
     this.init();
@@ -451,32 +449,32 @@ export default class AdminTree extends Vue {
 
   // 保存穿梭
   async handleSaveShuttle() {
-    if(this.choiceFathId === this.originFathId) {
-      this['$message']({
-        type: 'warning',
-        message: '当前所选与原来的相同'
-      });
+    if (this.choiceFathId === this.originFathId) {
+      // this['$message']({
+      //   type: 'warning',
+      //   message: '当前所选与原来的相同'
+      // });
       return;
     }
-    let params = {};
-    if(this.shuttleLevel === 2) {
-      for(let item of this.tree) {  // 二级节点穿梭，就要到一级节点找穿梭到的节点
-        if(item.id === this.choiceFathId) {
+    let params: any = {};
+    if (this.shuttleLevel === 2) {
+      for (let item of this.tree) {  // 二级节点穿梭，就要到一级节点找穿梭到的节点
+        if (item.id === this.choiceFathId) {
           params = {
             category_id: item.id,
             f_sort:  item.children[item.children.length - 1].sort + 1,
             f_id: this.shuttleChildId,
             shuttleLevel: this.shuttleLevel
-          }
+          };
           break;
         }
       }
     }
-    if(this.shuttleLevel === 3) {  // 三级节点穿梭，就要到二级节点找穿梭到的节点
-      for(let item of this.tree) {
+    if (this.shuttleLevel === 3) {  // 三级节点穿梭，就要到二级节点找穿梭到的节点
+      for (let item of this.tree) {
         let isfind = false;
-        for(let jtem of item.children) {
-          if(jtem.id === this.choiceFathId) {
+        for (let jtem of item.children) {
+          if (jtem.id === this.choiceFathId) {
             params = {
               fatherid: jtem.id,
               fatherlabel: jtem.label,
@@ -484,44 +482,43 @@ export default class AdminTree extends Vue {
               newchildsort: jtem.children[jtem.children.length - 1].sort + 1,
               childid: this.shuttleChildId,
               shuttleLevel: this.shuttleLevel,
-            }
+            };
             isfind = true;
             break;
           }
         }
-        if(isfind) {
+        if (isfind) {
           break;
         }
       }
     }
-    let res = await treeClient.changeFather(params);
-    if(!res) return;
+    let res: any = await TreeClient.changeFather(params);
+    if (!res) return;
     this.msgTips(res);
     this.showShuttleDialog = false;
     this.init();
   }
 
   // 保存当前一二级节点们的展开状态
-  saveFathExpend(node) {
-    if(node) {
+  saveFathExpend(node: any) {
+    if (node) {
       let list = [];
-      if(node.level === 1) {  // 一级节点
+      if (node.level === 1) {  // 一级节点
         list = node.parent.childNodes;
-      } else if(node.level === 2) {  // 二级节点
+      } else if (node.level === 2) {  // 二级节点
         list = node.parent.parent.childNodes;
       } else {  // 三级节点
         list = node.parent.parent.parent.childNodes;
       }
       this.allNodelist = list;
     }
-    
     this.expandedList = [];
-    for(let item of this.allNodelist) {
-      if(item.expanded) {
+    for (let item of this.allNodelist) {
+      if (item.expanded) {
         this.expandedList.push(item.data.id);
       }
-      for(let jtem of item.childNodes) {
-        if(jtem.expanded) {
+      for (let jtem of item.childNodes) {
+        if (jtem.expanded) {
           this.expandedList.push(jtem.data.id);
         }
       }
@@ -529,18 +526,18 @@ export default class AdminTree extends Vue {
   }
 
   // 弹框提示
-  msgTips(res) {
-    this['$message']({
-      type: res.resultsCode,
-      message: res.message
-    });
+  msgTips(res: any) {
+    // this['$message']({
+      // type: res.resultsCode,
+      // message: res.message
+    // });
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less">
-@import '../../static/global.less';
+// @import '../../static/global.less';
 
   .admintree {
 		.custom-tree-node {

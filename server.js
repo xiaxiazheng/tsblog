@@ -23,7 +23,7 @@ app.all('*', function(req, res, next) {
 
 // 放在最前，返回dist里的index
 app.get('/', function(req, res) {
-	fs.readFile('./dist/index.html', function(err, content) {
+	fs.readFile('./dist/indexback.html', function(err, content) {
 		if(err) {
 			res.setHeader('Content-Type', 'text/plain');
 			res.status(400).send(err.message);
@@ -132,17 +132,19 @@ app.get('*', function(req, res) {
 });
 
 // 起服务
-// 本地
-var server = app.listen(3000, 'localhost', function () {
-  var host = server.address().address;
-  var port = server.address().port;
-  console.log('Graduation app listening at http://%s:%s', host, port);
-});
-// 服务器端
-// var server = app.listen(80, function () {
-// 	var port = server.address().port;
-// 	console.log('Graduation app listening at http://123.207.5.131:%s', port);
-// });
+console.log("环境:", process.env.NODE_ENV);
+if (!process.env.NODE_ENV) {  // 本地
+	var server = app.listen(3000, 'localhost', function () {
+		var host = server.address().address;
+		var port = server.address().port;
+		console.log('Graduation app listening at http://%s:%s', host, port);
+	});
+} else {  // 服务器端
+	var server = app.listen(80, function () {
+		var port = server.address().port;
+		console.log('Graduation app listening at http://123.207.5.131:%s', port);
+	});
+}
 
 // 获取文件类型
 function getType(endTag){

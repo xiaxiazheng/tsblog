@@ -32,9 +32,13 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { treeClient, contClient } from '../../util/clientHelper';
+import { TreeClient, ContClient } from '../../util/clientHelper';
 import { baseUrl } from "../../config";
 import TreeMain from '@/components/TreeMain.vue';
+
+interface ContType {
+  list: any[]
+}
 
 @Component({
   components: {
@@ -42,15 +46,16 @@ import TreeMain from '@/components/TreeMain.vue';
   },
 })
 export default class TreeCont extends Vue {
-  @Prop() propsname: string;
+  @Prop() propsname: any;
 
-  title = ""
-  contObj = []
-  baseImgUrl = baseUrl + "/treecont/"
-  dialogVisible = false
-  dialogImageName = ""
-  dialogImageUrl = ""
-
+  title: string = ""
+  contObj: ContType = {
+    list: []
+  }
+  baseImgUrl: string = baseUrl + "/treecont/"
+  dialogVisible: boolean = false
+  dialogImageName: string = ""
+  dialogImageUrl: string = ""
 
   mounted() {
     this.$nextTick(function() {
@@ -76,12 +81,12 @@ export default class TreeCont extends Vue {
     if (this["$route"].query.id) {
       let id = decodeURIComponent(atob(this["$route"].query.id));
 
-      let res0 = await treeClient.getChildName(id); // 获取当前节点的名称
-      if(!res0) return;
+      let res0 = await TreeClient.getChildName(id); // 获取当前节点的名称
+      if (!res0) return;
       this.title = res0.data[0].c_label;
 
-      let res = await contClient.getNodeCont(id);
-      if(!res) return;
+      let res = await ContClient.getNodeCont(id);
+      if (!res) return;
       this.contObj = res.data;
       for (let i in this.contObj["list"]) {
         this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/</g, "&lt;"); // html标签的<转成实体字符,让所有的html标签失效
@@ -95,7 +100,7 @@ export default class TreeCont extends Vue {
   }
 
   /* 获取文件原本的名称，没有id没有后缀那种 */
-  getRealImgName(filename) {
+  getRealImgName(filename: any) {
     if (filename) {
       let list = filename.split(".");
       let filetype = list[list.length - 1]; // 文件类型
@@ -106,7 +111,7 @@ export default class TreeCont extends Vue {
   }
 
   /* 点击查看大图 */
-  showBigImg(imgurl, imgname) {
+  showBigImg(imgurl: any, imgname: any) {
     this.dialogImageUrl = imgurl;
     this.dialogImageName = imgname;
     this.dialogVisible = true;
@@ -115,8 +120,6 @@ export default class TreeCont extends Vue {
 </script>
 
 <style lang="less" scoped>
-@import '../../static/global.less';
-
   .treecont {
     padding: 10px;
     text-align: left;
@@ -187,11 +190,13 @@ export default class TreeCont extends Vue {
     pre::-webkit-scrollbar-thumb {
       /*滚动条里面小方块*/
       border-radius: 0.5rem;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
       -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
       background: white;
     }
     pre::-webkit-scrollbar-track {
       /*滚动条里面轨道*/
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
       -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
       border-radius: 0.5rem;
       background: #282c34;

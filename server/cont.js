@@ -19,7 +19,7 @@ exports.getNodeCont = function(req, res) {
       }
       if(results.length !== 0) {
         var contObj = {};
-        for(let i in results) {
+        for (let i in results) {
           if(i == 0) {
             contObj = {
               id: results[0].c_id,
@@ -97,7 +97,7 @@ exports.modifyNodeCont = function(req, res) {
         return;
       }
       let isUpdate = false;
-      for(let i in results1) {
+      for (let i in results1) {
         // 后判断
         let cont = req.body.list[i].cont.replace(/\n|\r\n/g, "<br/>");  // 处理换行再对比，对比统一用<br/>
         if(results1[i].title != req.body.list[i].title || results1[i].cont != cont) {

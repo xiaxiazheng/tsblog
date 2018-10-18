@@ -46,7 +46,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { treeClient } from '../../util/clientHelper';
+import { TreeClient } from '../../util/clientHelper';
 import TreeCont from '@/components/treecont/TreeCont.vue';
 
 @Component({
@@ -55,19 +55,19 @@ import TreeCont from '@/components/treecont/TreeCont.vue';
   },
 })
 export default class Tree extends Vue {
-  tree = []
+  tree: any[] = [];
   defaultProps = {
     children: 'children',
     label: 'label'
-  }
-  defaultExpandedKeys = []
-  isPC = false
-  showTree = false
-  title = '虾虾郑的个人空间'
+  };
+  defaultExpandedKeys: any = [];
+  isPC: boolean = false;
+  showTree: boolean = false;
+  title: string = '虾虾郑的个人空间';
 
 
   mounted() {
-    this.$nextTick(function() {
+    this.$nextTick(function () {
       this.init();
     });
   }
@@ -78,25 +78,26 @@ export default class Tree extends Vue {
   }
 
   async init() {
-    if(window.screen.width > 600) {
+    let phonescreen: number = 600;
+    if (window.screen.width > phonescreen) {
       this.isPC = true;
     }
-    if(this["$route"].query.id) {  // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
+    if (this["$route"].query.id) {  // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
       this.defaultExpandedKeys = []; // 前台展示的话直接清空
-      this.defaultExpandedKeys.push(parseInt(atob(this["$route"].query.id)));
+      this.defaultExpandedKeys.push(parseInt(atob(this["$route"].query.id), 10));
     }
-    let res: any = await treeClient.getTree('home');
-    if(!res) return;
+    let res: any = await TreeClient.getTree('home');
+    if (!res) return;
     this.tree = res.data;
   }
 
-  handleClick(nodeObj, node, c) {
+  handleClick(nodeObj: any, node: any, c: any) {
     let isLeaf = node.isLeaf;
-    if(isLeaf) {
+    if (isLeaf) {
       this["$router"].push({ // 点击节点就改路由
         query: {
           id: btoa(encodeURIComponent(node.data.id))
-        } 
+        }
       });
 
       // 移动端
@@ -112,8 +113,6 @@ export default class Tree extends Vue {
 </script>
 
 <style lang="less" scoped>
-@import '../../static/global.less';
-
   .tree {
     .PC {
       height: 100%;

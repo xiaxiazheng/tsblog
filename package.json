@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "start": "SET NODE_ENV=production && node server.js"
   },
   "dependencies": {
     "express": "^4.16.4",
@@ -13,13 +14,16 @@
     "mysql": "^2.16.0"
   },
   "devDependencies": {
+    "@types/highlight.js": "^9.12.3",
     "@vue/cli-plugin-typescript": "^3.0.5",
     "@vue/cli-service": "^3.0.5",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "file-loader": "^2.0.0",
+    "highlight.js": "^9.13.1",
     "less": "^3.8.1",
     "less-loader": "^4.1.0",
+    "tslint-config-airbnb": "^5.11.0",
     "typescript": "^3.0.0",
     "vue": "^2.5.17",
     "vue-class-component": "^6.0.0",

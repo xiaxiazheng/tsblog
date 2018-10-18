@@ -1,5 +1,5 @@
 {
-  "defaultSeverity": "error",
+  "defaultSeverity": "warning",
   "extends": "tslint-config-airbnb",
   "linterOptions": {
     "exclude": [
@@ -10,7 +10,7 @@
     "no-import-side-effect": false,
     "member-access": false,
     "no-empty-interface": false,
-    "no-magic-numbers": true,
+    "no-magic-numbers": false,
     "arrow-parens": false,
     "no-non-null-assertion": false,
     "no-string-literal": false,
@@ -25,8 +25,9 @@
       "allow-empty-class"
     ],
     "no-empty": false,
+    "no-trailing-whitespace": false,
     "forin": false,
-    "no-any": true,
+    "no-any": false,
     "indent": [
       true,
       "spaces",

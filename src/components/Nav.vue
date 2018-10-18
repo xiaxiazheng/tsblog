@@ -76,15 +76,15 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { treeClient } from '../util/clientHelper';
+import { TreeClient } from '../util/clientHelper';
 
 @Component
 export default class Nav extends Vue {
-  @Prop() type: string;
+  @Prop() type: any;
 
-  tree = []
-  activeTab = ''
-  searchkeyword = ''
+  tree: any[] = []
+  activeTab: string = ''
+  searchkeyword: string = ''
 
   mounted() {
     this.$nextTick(function() {
@@ -93,12 +93,12 @@ export default class Nav extends Vue {
   };
 
   async init() {
-    let res: any = await treeClient.getTree('home');
-    if(!res) return;
+    let res: any = await TreeClient.getTree('home');
+    if (!res) return;
     this.tree = [];
-    for(let item of res.data) {
-      for(let jtem of item.children) {
-        for(let ktem of jtem.children) {
+    for (let item of res.data) {
+      for (let jtem of item.children) {
+        for (let ktem of jtem.children) {
           this.tree.push({
             id: ktem.id,
             flabel: item.label + ' -> ' + jtem.label,
@@ -109,29 +109,29 @@ export default class Nav extends Vue {
     }
   };
 
-  clickTabs(tabName) {
+  clickTabs(tabName: any) {
     this["$router"].push({ name: tabName });
     this.activeTab = tabName;
   };
 
   // 处理是否搜索
-  querySearch(queryString, cb) {
-    var tree = this.tree;
-    var results = queryString ? tree.filter(this.createFilter(queryString)) : tree;
+  querySearch(queryString: any, cb: any) {
+    let tree = this.tree;
+    let results = queryString ? tree.filter(this.createFilter(queryString)) : tree;
     
     cb(results); // 调用 callback 返回建议列表的数据
   };
 
   // 处理搜索的筛选
-  createFilter(queryString) {
-    return (item) => {
+  createFilter(queryString: any) {
+    return (item: any) => {
       return (item.label.toLowerCase().indexOf(queryString.toLowerCase()) !== -1 || item.flabel.toLowerCase().indexOf(queryString.toLowerCase()) !== -1);
     };
   };
   
   // 点击搜索出来的待选
-  handleSelect(item) {
-    if(this.type === 'home') {
+  handleSelect(item: any) {
+    if (this.type === 'home') {
       this["$router"].replace({
         name: "Tree",
         query: {
@@ -139,7 +139,7 @@ export default class Nav extends Vue {
         }
       })
     }
-    if(this.type === 'admin') {
+    if (this.type === 'admin') {
       this["$router"].replace({
         name: "AdminTree",
         query: {

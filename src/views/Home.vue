@@ -20,8 +20,6 @@ export default class Home extends Vue {
 </script>
 
 <style lang="less" scoped>
-@import '../static/global.less';
-
   .home {
     height: 100%;
     .homerouter {

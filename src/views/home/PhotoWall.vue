@@ -36,27 +36,35 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { imgClient } from '../../util/clientHelper'
-import { baseUrl } from "../../config"
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { ImgClient } from '../../util/clientHelper';
+import { baseUrl } from "../../config";
+
+interface ImgListType {
+  img_id: string;
+  imgname: string;
+  filename: string;
+  cTime: string;
+  url: string;
+}
 
 @Component
 export default class PhotoWall extends Vue {
-  dialogImageName = ""
-  dialogImageUrl = ""
-  dialogCTime = ""
-  dialogVisible = false
-  imgUrllist = []
+  dialogImageName: string = "";
+  dialogImageUrl: string = "";
+  dialogCTime: string = "";
+  dialogVisible: boolean = false;
+  imgUrllist: ImgListType[] = [];
 
   mounted() {
-    this.$nextTick(function() {
+    this.$nextTick(function () {
       this.init();
     });
   }
 
   async init() {
-    let res: any = imgClient.getImgList('wall');
-    if(!res) return;
+    let res: any = await ImgClient.getImgList('wall');
+    if (!res) return;
     if (res.data.length !== 0) {
       for (let item of res.data) {
         this.imgUrllist.push({
@@ -64,23 +72,22 @@ export default class PhotoWall extends Vue {
           imgname: item.imgname,
           filename: item.filename,
           cTime: item.cTime,
-          url: baseUrl + "/wall/" + item.filename
+          url: `${baseUrl}/wall/${item.filename}`
         });
       }
     }
   }
 
-  handlePictureCardPreview(file) {
+  handlePictureCardPreview(file: any) {
     this.dialogImageUrl = file.url;
     this.dialogImageName = file.imgname;
     this.dialogCTime = file.cTime;
     this.dialogVisible = true;
   }
-};
+}
 </script>
 
 <style lang="less">
-@import "../../static/global.less";
 
 .photowall {
   height: 100%;

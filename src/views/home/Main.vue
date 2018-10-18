@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { imgClient } from '../../util/clientHelper';
+import { ImgClient } from '../../util/clientHelper';
 import { baseUrl } from "../../config";
 
 @Component
@@ -29,28 +29,22 @@ export default class Main extends Vue {
   imgUrlList: any[] = [];
 
   mounted() {
-    this.$nextTick(function() {
+    this.$nextTick(function () {
       this.init();
     });
   }
 
   async init() {
-    let self = this,
-        params = {
-          type: 'main'
-        };
-    let res = await imgClient.getImgList('type');
-    if(!res) return;
-    for(let item of res.data) {
-      this.imgUrlList.push(baseUrl + '/main/' + item.filename);
+    let res = await ImgClient.getImgList('main');
+    if (!res) return;
+    for (let item of res.data) {
+      this.imgUrlList.push(`${baseUrl}/main/${item.filename}`);
     }
   }
 }
 </script>
 
 <style lang="less">
-@import '../../static/global.less';
-
   .main {
     height: 100%;
     .carousel {

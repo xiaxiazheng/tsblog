@@ -20,19 +20,19 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { imgClient } from '../util/clientHelper';
+import { ImgClient } from '../util/clientHelper';
 import { baseUrl } from '../config'
 
 @Component
 export default class UploadPhotoWall extends Vue {
-  @Prop() type: string; // 取值有 main 或 wall
+  @Prop() type: any; // 取值有 main 或 wall
 
-  dialogImageName = ''
-  dialogImageUrl = ''
-  dialogCTime = ''
-  dialogVisible = false
-  imgUrllist = []
-  uploadUrl = ''
+  dialogImageName: string = ''
+  dialogImageUrl: string = ''
+  dialogCTime: string = ''
+  dialogVisible: boolean = false
+  imgUrllist: any[] = []
+  uploadUrl: string = ''
 
   mounted() {
     this.$nextTick(function() {
@@ -43,11 +43,11 @@ export default class UploadPhotoWall extends Vue {
   async init() {
     this.uploadUrl = baseUrl + '/' + this.type + '_upload';
     let type = this.type;
-    let res = await imgClient.getImgList(type);
-    if(!res) return;
-    if(res.data.length !== 0) {
+    let res = await ImgClient.getImgList(type);
+    if (!res) return;
+    if (res.data.length !== 0) {
       this.imgUrllist = [];
-      for(let item of res.data) {
+      for (let item of res.data) {
         this.imgUrllist.push({
           img_id: item.img_id,
           imgname: item.imgname,
@@ -60,7 +60,7 @@ export default class UploadPhotoWall extends Vue {
   }
 
   // 点击查看大图
-  handlePictureCardPreview(file) {
+  handlePictureCardPreview(file: any) {
     this.dialogImageUrl = file.url;
     this.dialogImageName = file.imgname;
     this.dialogCTime = file.cTime;
@@ -68,55 +68,53 @@ export default class UploadPhotoWall extends Vue {
   }
 
   // 上传成功后
-  handleSuccess(response, file, fileList) {
-    this['$message']({
-      type: "success",
-      message: "上传成功"
-    });
+  handleSuccess(response: any, file: any, fileList: any) {
+    // this['$message']({
+    //   type: "success",
+    //   message: "上传成功"
+    // });
     this.init();
   }
 
   // 上传失败后
-  handleError(err, file, fileList) {
-    this['$message']({
-      type: "error",
-      message: "上传失败"
-    });
+  handleError(err: any, file: any, fileList: any) {
+    // this['$message']({
+    //   type: "error",
+    //   message: "上传失败"
+    // });
     this.init();
   }
 
   // 删除图片后
-  handleRemove(file, fileList) {
+  async handleRemove(file: any, fileList: any) {
     /* 如果不是服务器上的图片，就直接删除 */
-    if(file.status === 'ready') {
+    if (file.status === 'ready') {
       return true;
     }
 
-    this['$confirm']('此操作将永久删除该文件' + file.imgname + ', 是否继续?', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }).then(async () => {
-      let type = this.type,
-          img_id = file.img_id,
-          filename = file.filename;
-      let res = await imgClient.deleteImg(type, img_id, filename);
-      if(!res) return;
-      this.init();
-    }).catch(() => {
-      this['$message']({
-        type: 'info',
-        message: '已取消删除'
-      });
-    });
+    // this['$confirm']('此操作将永久删除该文件' + file.imgname + ', 是否继续?', '提示', {
+    //   confirmButtonText: '确定',
+    //   cancelButtonText: '取消',
+    //   type: 'warning'
+    // }).then(async () => {
+    let type = this.type,
+        img_id = file.img_id,
+        filename = file.filename;
+    let res = await ImgClient.deleteImg(type, img_id, filename);
+    if (!res) return;
+    this.init();
+    // }).catch(() => {
+      // this['$message']({
+      //   type: 'info',
+      //   message: '已取消删除'
+      // });
+    // });
     return false;
   }
 }
 </script>
 
 <style lang="less">
-@import '../static/global.less';
-
   .uploadphotowall {
     height: 100%;
   }
