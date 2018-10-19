@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "frontbuild": "SET NODE_ENV=development && npm run build",
-    "start": "SET NODE_ENV=production && node server.js"
+    "buildfront": "SET NODE_ENV=development && npm run build",
+    "build": "vue-cli-service build",
+    "start": "SET NODE_ENV=production && node server.js",
+    "buildPig": "SET NODE_ENV=productionPig && npm run build",
+    "startPig": "SET NODE_ENV=productionPig && node server.js"
   },
   "dependencies": {
     "express": "^4.16.4",

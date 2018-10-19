@@ -4,7 +4,7 @@
     <div v-if="type === 'home'">
       <div class="leftside">
         <span @click="clickTabs('Main')">
-          XIAXIAZheng
+          {{ titlehome }}
         </span>
       </div>
       <div class="rightside">
@@ -40,7 +40,7 @@
     <div v-if="type === 'admin'">
       <div class="leftside">
         <span @click="clickTabs('AdminMain')">
-          XIAXIAZheng
+          {{ titleadmin }}
         </span>
       </div>
       <div class="rightside">
@@ -77,17 +77,23 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { TreeClient } from '../util/clientHelper';
+import { baseEnv } from '../config';
 
 @Component
 export default class Nav extends Vue {
   @Prop() type: any;
-
+  titlehome: string = 'XIAXIAZheng';
+  titleadmin: string = 'XIAXIAZheng';
   tree: any[] = [];
   activeTab: string = '';
   searchkeyword: string = '';
 
   mounted() {
     this.$nextTick(function () {
+      if (baseEnv === "productionPig") {
+        this.titlehome = "黄苹苹欢迎你的到来";
+        this.titleadmin = "黄猪猪欢迎你的到来";
+      }
       this.init();
     });
   }

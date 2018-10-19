@@ -134,14 +134,19 @@ app.get('*', function(req, res) {
 // 起服务
 console.log("环境:", process.env.NODE_ENV);
 if (!process.env.NODE_ENV) {  // 本地
-	var server = app.listen(3000, 'localhost', function () {
-		var host = server.address().address;
-		var port = server.address().port;
+	let server = app.listen(3000, 'localhost', function () {
+		let host = server.address().address;
+		let port = server.address().port;
 		console.log('Graduation app listening at http://%s:%s', host, port);
 	});
-} else {  // 服务器端
-	var server = app.listen(80, function () {
-		var port = server.address().port;
+} else if ((process.env.NODE_ENV === "production")) {  // 服务器端
+	let server = app.listen(80, function () {
+		let port = server.address().port;
+		console.log('Graduation app listening at http://123.207.5.131:%s', port);
+	});
+} else {
+	let server = app.listen(518, function () {
+		let port = server.address().port;
 		console.log('Graduation app listening at http://123.207.5.131:%s', port);
 	});
 }
