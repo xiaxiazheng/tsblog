@@ -139,7 +139,7 @@ if (!process.env.NODE_ENV) {  // 本地
 		let port = server.address().port;
 		console.log('Graduation app listening at http://%s:%s', host, port);
 	});
-} else if ((process.env.NODE_ENV === "production")) {  // 服务器端
+} else if (process.env.NODE_ENV.match("production")) {  // 服务器端
 	let server = app.listen(80, function () {
 		let port = server.address().port;
 		console.log('Graduation app listening at http://123.207.5.131:%s', port);
