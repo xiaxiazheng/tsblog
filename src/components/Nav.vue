@@ -82,15 +82,15 @@ import { TreeClient } from '../util/clientHelper';
 export default class Nav extends Vue {
   @Prop() type: any;
 
-  tree: any[] = []
-  activeTab: string = ''
-  searchkeyword: string = ''
+  tree: any[] = [];
+  activeTab: string = '';
+  searchkeyword: string = '';
 
   mounted() {
-    this.$nextTick(function() {
+    this.$nextTick(function () {
       this.init();
     });
-  };
+  }
 
   async init() {
     let res: any = await TreeClient.getTree('home');
@@ -101,18 +101,18 @@ export default class Nav extends Vue {
         for (let ktem of jtem.children) {
           this.tree.push({
             id: ktem.id,
-            flabel: item.label + ' -> ' + jtem.label,
+            flabel: `${item.label} -> ${jtem.label}`,
             label: ktem.label
           });
         }
       }
     }
-  };
+  }
 
   clickTabs(tabName: any) {
     this["$router"].push({ name: tabName });
     this.activeTab = tabName;
-  };
+  }
 
   // 处理是否搜索
   querySearch(queryString: any, cb: any) {
@@ -120,14 +120,14 @@ export default class Nav extends Vue {
     let results = queryString ? tree.filter(this.createFilter(queryString)) : tree;
     
     cb(results); // 调用 callback 返回建议列表的数据
-  };
+  }
 
   // 处理搜索的筛选
   createFilter(queryString: any) {
     return (item: any) => {
       return (item.label.toLowerCase().indexOf(queryString.toLowerCase()) !== -1 || item.flabel.toLowerCase().indexOf(queryString.toLowerCase()) !== -1);
     };
-  };
+  }
   
   // 点击搜索出来的待选
   handleSelect(item: any) {
@@ -137,7 +137,7 @@ export default class Nav extends Vue {
         query: {
           id: btoa(encodeURIComponent(item.id))
         }
-      })
+      });
     }
     if (this.type === 'admin') {
       this["$router"].replace({
@@ -145,7 +145,7 @@ export default class Nav extends Vue {
         query: {
           id: btoa(encodeURIComponent(item.id))
         }
-      })
+      });
     }
   }
 }

@@ -72,8 +72,8 @@
 			<div class="save">
 				<el-button type="primary" @click="judge" :disabled="!isModify" icon="el-icon-check"></el-button>
 			</div>
-			<!-- 图片看大图 -->
-			<el-dialog :visible.sync="dialogVisible" :title="dialogImageName">
+			<!-- 查看大图的 dialog -->
+			<el-dialog width="40%" :visible.sync="dialogVisible" :title="dialogImageName">
 				<img width="100%" :src="dialogImageUrl" :alt="dialogImageName" :title="dialogImageName">
 			</el-dialog>
 		</div>
@@ -85,13 +85,13 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { TreeClient, ContClient, ImgClient } from '../../util/clientHelper'
-import { baseUrl } from '../../config'
-import TreeMain from '@/components/TreeMain.vue'
+import { TreeClient, ContClient, ImgClient } from '../../util/clientHelper';
+import { baseUrl } from '../../config';
+import TreeMain from '@/components/TreeMain.vue';
 
-interface contType {
-  id: any,
-  list: any[]
+interface ContType {
+  id: any;
+  list: any[];
 }
 
 @Component({
@@ -102,29 +102,29 @@ interface contType {
 export default class AdminTreeCont extends Vue {
   @Prop() propsname: any;
 
-  title: string = ''
-  contObj: contType = {
+  title: string = '';
+  contObj: ContType = {
     id: '',
     list: []
-  }
-  isModify: boolean = true
+  };
+  isModify: boolean = true;
   // 图片相关
-  imgUrllist: any[] = []
-  uploadUrl: string = baseUrl + '/treecont_upload'
-  dialogVisible: boolean = false
-  dialogImageName: string = '' 
-  dialogImageUrl: string = ''
+  imgUrllist: any[] = [];
+  uploadUrl: string = `${baseUrl}/treecont_upload`;
+  dialogVisible: boolean = false;
+  dialogImageName: string = '';
+  dialogImageUrl: string = '';
 
-	mounted() {
-		this.$nextTick(async function() {
-			this.init();
+  mounted() {
+    this.$nextTick(async function () {
+      this.init();
       let id: any = decodeURIComponent(atob(this['$route'].query.id));
       let res0: any = await TreeClient.getChildName(id);
       this.title = res0.data[0].c_label;
-		});
+    });
   }
   
-	@Watch('propsname')
+  @Watch('propsname')
   onPropsnameChanged() { // 父组件用传过来的名称来表示该三级节点的状态，如果该节点被删除则要清路由
     if (this.propsname !== '') {
       this.title = this.propsname;
@@ -146,41 +146,41 @@ export default class AdminTreeCont extends Vue {
       let res: any = await ContClient.getNodeCont(id);
       if (!res) return;
       this.contObj = {
-          id: res.data.id,
-          list: []
-        };
-        for (let item of res.data.list) {
-          // 处理文件名，treecont的图片名有点特殊，‘原来的名字+id+'.'+一个随机数+'.'+图片类型
-          let imgname: string = '';
-          if (item.filename) {
-            let list = item.filename.split('.');
-            let filetype = list[list.length - 1]; // 文件类型
-            let randomNum = list[list.length - 2];
+        id: res.data.id,
+        list: []
+      };
+      for (let item of res.data.list) {
+        // 处理文件名，treecont的图片名有点特殊，‘原来的名字+id+'.'+一个随机数+'.'+图片类型
+        let imgname: string = '';
+        if (item.filename) {
+          let list = item.filename.split('.');
+          let filetype = list[list.length - 1]; // 文件类型
+          let randomNum = list[list.length - 2];
           let originname = item.filename.substr(0, item.filename.length - filetype.length - randomNum.length - 2 - decodeURIComponent(atob(this['$route'].query.id)).length);
-            imgname = originname + '.' + filetype;
-          }
-        this.contObj['list'].push({
-            cont: item.cont,
-            createtime: item.createtime,
-            motifytime: item.motifytime,
-            sort: item.sort,
-            title: item.title,
-            imgname: imgname,
-            filename: item.filename || '',
-            filelist: item.filename ? [{
-              filename: item.filename || '',
-              imgname: imgname || '',
-              url: item.filename ? baseUrl + '/treecont/' + item.filename : ''
-            }] : [],
-          });
+          imgname = `${originname}.${filetype}`;
         }
+        this.contObj['list'].push({
+          imgname,
+          cont: item.cont,
+          createtime: item.createtime,
+          motifytime: item.motifytime,
+          sort: item.sort,
+          title: item.title,
+          filename: item.filename || '',
+          filelist: item.filename ? [{
+            filename: item.filename || '',
+            imgname: imgname || '',
+            url: item.filename ? `${baseUrl}/treecont/${item.filename}` : ''
+          }] : [],
+        });
+      }
     }
   }
 
   // 新增节点
   async addCont() {
-    let  id = decodeURIComponent(atob(this['$route'].query.id)), // 子节点的id
-         sort = this.contObj['list'][this.contObj['list'].length - 1].sort;
+    let id = decodeURIComponent(atob(this['$route'].query.id)); // 子节点的id
+    let sort = this.contObj['list'][this.contObj['list'].length - 1].sort;
     let res: any = await ContClient.addNodeCont(id, sort);
     if (!res) return;
     this.msgTips(res);
@@ -189,31 +189,31 @@ export default class AdminTreeCont extends Vue {
 
   // 删除节点
   async deleteCont(item: any, index: any) {
-    // this['$confirm']('你将删除“' + item.title + '”, 你确定?', '提示', {
-    //   confirmButtonText: '确定',
-    //   cancelButtonText: '取消',
-    //   type: 'warning'
-    // }).then(async () => { 
-      let id = decodeURIComponent(atob(this['$route'].query.id)), // 子节点的id
-          sort = item.sort;
+    this['$confirm'](`你将删除“ ${item.title} ”, 你确定?'`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(async () => { 
+      let id = decodeURIComponent(atob(this['$route'].query.id)); // 子节点的id
+      let sort = item.sort;
       let res: any = await ContClient.deleteNodeCont(id, sort);
       if (!res) return;
       this.msgTips(res);
       this.init();
-    // }).catch(() => {
-      // this['$message']({
-        // type: 'info',
-        // message: '已取消删除'
-      // });
-    // });
+    }).catch(() => {
+      this['$message']({
+        type: 'info',
+        message: '已取消删除'
+      });
+    });
   }
 
   // 上移节点
   async upCont(item: any, index: any) {
-    let thiscTime: any = item.createtime,
-        thisSort: any = item.sort,
-        othercTime: any = this.contObj['list'][index - 1].createtime,
-        otherSort: any = this.contObj['list'][index - 1].sort;
+    let thiscTime: any = item.createtime;
+    let thisSort: any = item.sort;
+    let othercTime: any = this.contObj['list'][index - 1].createtime;
+    let otherSort: any = this.contObj['list'][index - 1].sort;
     let res: any = await ContClient.changeContSort(thiscTime, thisSort, othercTime, otherSort);
     if (!res) return;
     this.msgTips(res);
@@ -222,10 +222,10 @@ export default class AdminTreeCont extends Vue {
 
   // 下移节点
   async downCont(item: any, index: any) {
-    let thiscTime: any = item.createtime,
-        thisSort: any = item.sort,
-        othercTime: any = this.contObj['list'][index + 1].createtime,
-        otherSort: any = this.contObj['list'][index + 1].sort;
+    let thiscTime: any = item.createtime;
+    let thisSort: any = item.sort;
+    let othercTime: any = this.contObj['list'][index + 1].createtime;
+    let otherSort: any = this.contObj['list'][index + 1].sort;
     let res: any = await ContClient.changeContSort(thiscTime, thisSort, othercTime, otherSort);
     if (!res) return;
     this.msgTips(res);
@@ -236,10 +236,10 @@ export default class AdminTreeCont extends Vue {
   judge() {
     for (let item of this.contObj['list']) {
       if (item.cont === '') {
-        // this['$message']({
-          // type: "warning",
-          // message: '输入框可以为空，但文本域不能为空撒'
-        // });
+        this['$message']({
+          type: "warning",
+          message: '输入框可以为空，但文本域不能为空撒'
+        });
         return;
       }
     }
@@ -252,17 +252,15 @@ export default class AdminTreeCont extends Vue {
     let res: any = await ContClient.modifyNodeCont(this.contObj);
     if (!res) return;
     this.msgTips(res);
-    setTimeout(() => {
-      this.init();
-    }, 1000);
+    setTimeout(() => { this.init(); }, 1000);
   }
 
   // 弹框提示
   msgTips(res: any) {
-    // this['$message']({
-      // type: res.resultsCode,
-      // message: res.message
-    // });
+    this['$message']({
+      type: res.resultsCode,
+      message: res.message
+    });
   }
 
   /** 图片操作 */
@@ -274,18 +272,18 @@ export default class AdminTreeCont extends Vue {
   }
   // 上传成功后
   handleSuccess(response: any, file: any, fileList: any) {
-    // this['$message']({
-      // type: "success",
-      // message: "上传成功"
-    // });
+    this['$message']({
+      type: "success",
+      message: "上传成功"
+    });
     this.init();
   }
   // 上传失败后
   handleError(err: any, file: any, fileList: any) {
-    // this['$message']({
-      // type: "error",
-      // message: "上传失败"
-    // });
+    this['$message']({
+      type: "error",
+      message: "上传失败"
+    });
     this.init();
   }
   // 删除图片后
@@ -295,20 +293,20 @@ export default class AdminTreeCont extends Vue {
       return true;
     }
 
-    // this['$confirm']('此操作将永久删除该文件' + file.imgname + ', 是否继续?', '提示', {
-    //   confirmButtonText: '确定',
-    //   cancelButtonText: '取消',
-    //   type: 'warning'
-    // }).then(async () => {
+    this['$confirm'](`此操作将永久删除该文件${file.imgname}, 是否继续?`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(async () => {
       let res: any = await ImgClient.deleteTreeContImg(file.filename);
       if (!res) return;
       this.init();
-    // }).catch(() => {
-      // this['$message']({
-        // type: 'info',
-        // message: '已取消删除'
-      // });
-    // });
+    }).catch(() => {
+      this['$message']({
+        type: 'info',
+        message: '已取消删除'
+      });
+    });
     return false;
   }
 }
@@ -368,6 +366,10 @@ export default class AdminTreeCont extends Vue {
 			text-align: center;
 			right: 4.5rem;
 			bottom: 2rem;
-		}
+    }
+    .el-dialog {
+      max-width: 800px;
+      min-width: 400px;
+    }
   }
 </style>

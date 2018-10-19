@@ -6,6 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "frontbuild": "SET NODE_ENV=development && npm run build",
     "start": "SET NODE_ENV=production && node server.js"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     "@vue/cli-service": "^3.0.5",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
+    "element-ui": "^2.4.8",
     "file-loader": "^2.0.0",
     "highlight.js": "^9.13.1",
     "less": "^3.8.1",

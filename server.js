@@ -23,7 +23,7 @@ app.all('*', function(req, res, next) {
 
 // 放在最前，返回dist里的index
 app.get('/', function(req, res) {
-	fs.readFile('./dist/indexback.html', function(err, content) {
+	fs.readFile('./dist/index.html', function(err, content) {
 		if(err) {
 			res.setHeader('Content-Type', 'text/plain');
 			res.status(400).send(err.message);

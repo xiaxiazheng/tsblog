@@ -13,6 +13,13 @@ let hlfunc = function (el: any) {
 };
 Vue.directive('highlight', hlfunc);
 
+import {
+  Message,
+  MessageBox
+} from 'element-ui';
+Vue['prototype']['$message'] = Message;   // this["$message"]
+Vue['prototype']['$confirm'] = MessageBox.confirm; // this["$confirm"]
+
 Vue.config.productionTip = false;
 
 import './static/global.less';

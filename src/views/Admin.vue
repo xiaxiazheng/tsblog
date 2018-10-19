@@ -21,22 +21,22 @@ export default class Admin extends Vue {
       let username: any = sessionStorage.getItem("xia_username");
       let userpword: any = window.atob(<string>sessionStorage.getItem("xia_password"));
       let res: any = await UserClient.postLogin(username, userpword);
-      if (!res) return;
-      if (res.resultsCode === "success") {
-        return;
-      } else {
-        // this['$message']({
-        //   type: 'error',
-        //   message: "请重新登陆"
-        // });
+      if (!res) {
+        this['$router'].push('/login'); 
+      }
+      if (res.resultsCode !== "success") {
+        this['$message']({
+          type: 'error',
+          message: "请重新登陆"
+        });
         this['$router'].push('/login');
       }
-    // } else {
-      // this['$message']({
-      //   type: 'warning',
-      //   message: "请先登陆"
-      // });
-      // this['$router'].push('/login');
+    } else {
+      this['$message']({
+        type: 'warning',
+        message: "请先登陆"
+      });
+      this['$router'].push('/login');
     }
   }
 }

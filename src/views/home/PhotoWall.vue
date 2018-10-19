@@ -9,7 +9,8 @@
         :file-list="imgUrllist">
         <i class="el-icon-plus"></i>
       </el-upload>
-      <el-dialog :visible.sync="dialogVisible" :title="dialogImageName">
+      <!-- 查看大图的 dialog -->
+      <el-dialog width="40%" :visible.sync="dialogVisible" :title="dialogImageName">
         <img width="100%" :src="dialogImageUrl" alt="">
         <span>{{ dialogCTime }}</span>
       </el-dialog>
@@ -104,6 +105,10 @@ export default class PhotoWall extends Vue {
   .el-upload--picture-card {
     // 去掉上传图片的框
     display: none !important;
+  }
+  .el-dialog {
+    max-width: 800px;
+    min-width: 400px;
   }
 }
 </style>

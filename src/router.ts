@@ -1,8 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-if (process.env.NODE_ENV === 'development') {
-  Vue.use(VueRouter);
-}
+Vue.use(VueRouter);
 
 export default new VueRouter({
   routes: [

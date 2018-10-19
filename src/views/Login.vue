@@ -34,13 +34,11 @@ export default class Login extends Vue {
       if (!res) return;
       if (res.resultsCode === "success") {
         this['$router'].replace({ path: 'admin' });
-        return;
-      // } else {
-        // this["$message"]({
-          // type: 'error',
-          // message: "请重新登陆"
-        // });
-        // return;
+      } else {
+        this["$message"]({
+          type: 'error',
+          message: "请重新登陆"
+        });
       }
     }
   }
@@ -51,10 +49,10 @@ export default class Login extends Vue {
     }
     let res = await UserClient.postLogin(this.username, this.userpword);
     if (!res) {
-      // this["$message"]({
-        // type: 'error',
-        // message: "密码错误，请重新输入密码"
-      // });
+      this["$message"]({
+        type: 'error',
+        message: "密码错误，请重新输入密码"
+      });
       this.userpword = '';
       return;
     }
@@ -63,10 +61,10 @@ export default class Login extends Vue {
       sessionStorage.setItem("xia_username", this.username);
       sessionStorage.setItem("xia_password", window.btoa(this.userpword));
     } else {
-      // this["$message"]({
-        // type: 'error',
-        // message: "用户不存在，请重新输入用户名"
-      // });
+      this["$message"]({
+        type: 'error',
+        message: "用户不存在，请重新输入用户名"
+      });
     }
   }
 
@@ -76,10 +74,10 @@ export default class Login extends Vue {
       return true;
     }
     let warning = this.username === '' ? '账号' : '密码';
-    // this["$message"]({
-      // type: 'warning',
-      // message: warning + "不可为空"
-    // });
+    this["$message"]({
+      type: 'warning',
+      message: `${warning}不可为空`
+    });
     return false;
   }
 

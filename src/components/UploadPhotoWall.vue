@@ -11,7 +11,8 @@
       :file-list="imgUrllist">
       <i class="el-icon-plus"></i>
     </el-upload>
-    <el-dialog :visible.sync="dialogVisible" :title="dialogImageName">
+    <!-- 查看大图的 dialog -->
+    <el-dialog width="40%" :visible.sync="dialogVisible" :title="dialogImageName">
       <img width="100%" :src="dialogImageUrl" alt="">
       <span>{{ dialogCTime }}</span>
     </el-dialog>
@@ -21,27 +22,27 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { ImgClient } from '../util/clientHelper';
-import { baseUrl } from '../config'
+import { baseUrl } from '../config';
 
 @Component
 export default class UploadPhotoWall extends Vue {
   @Prop() type: any; // 取值有 main 或 wall
 
-  dialogImageName: string = ''
-  dialogImageUrl: string = ''
-  dialogCTime: string = ''
-  dialogVisible: boolean = false
-  imgUrllist: any[] = []
-  uploadUrl: string = ''
+  dialogImageName: string = '';
+  dialogImageUrl: string = '';
+  dialogCTime: string = '';
+  dialogVisible: boolean = false;
+  imgUrllist: any[] = [];
+  uploadUrl: string = '';
 
   mounted() {
-    this.$nextTick(function() {
+    this.$nextTick(function () {
       this.init();
     });
   }
   
   async init() {
-    this.uploadUrl = baseUrl + '/' + this.type + '_upload';
+    this.uploadUrl = `${baseUrl}/${this.type}_upload`;
     let type = this.type;
     let res = await ImgClient.getImgList(type);
     if (!res) return;
@@ -53,7 +54,7 @@ export default class UploadPhotoWall extends Vue {
           imgname: item.imgname,
           filename: item.filename,
           cTime: item.cTime,
-          url: baseUrl + '/' + this.type + '/' + item.filename
+          url: `${baseUrl}/${this.type}/${item.filename}`
         });
       }
     }
@@ -69,19 +70,19 @@ export default class UploadPhotoWall extends Vue {
 
   // 上传成功后
   handleSuccess(response: any, file: any, fileList: any) {
-    // this['$message']({
-    //   type: "success",
-    //   message: "上传成功"
-    // });
+    this['$message']({
+      type: "success",
+      message: "上传成功"
+    });
     this.init();
   }
 
   // 上传失败后
   handleError(err: any, file: any, fileList: any) {
-    // this['$message']({
-    //   type: "error",
-    //   message: "上传失败"
-    // });
+    this['$message']({
+      type: "error",
+      message: "上传失败"
+    });
     this.init();
   }
 
@@ -92,23 +93,23 @@ export default class UploadPhotoWall extends Vue {
       return true;
     }
 
-    // this['$confirm']('此操作将永久删除该文件' + file.imgname + ', 是否继续?', '提示', {
-    //   confirmButtonText: '确定',
-    //   cancelButtonText: '取消',
-    //   type: 'warning'
-    // }).then(async () => {
-    let type = this.type,
-        img_id = file.img_id,
-        filename = file.filename;
-    let res = await ImgClient.deleteImg(type, img_id, filename);
-    if (!res) return;
-    this.init();
-    // }).catch(() => {
-      // this['$message']({
-      //   type: 'info',
-      //   message: '已取消删除'
-      // });
-    // });
+    this['$confirm'](`此操作将永久删除该文件${file.imgname}, 是否继续?`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(async () => {
+      let type = this.type;
+      let img_id = file.img_id;
+      let filename = file.filename;
+      let res = await ImgClient.deleteImg(type, img_id, filename);
+      if (!res) return;
+      this.init();
+    }).catch(() => {
+      this['$message']({
+        type: 'info',
+        message: '已取消删除'
+      });
+    });
     return false;
   }
 }
@@ -117,5 +118,9 @@ export default class UploadPhotoWall extends Vue {
 <style lang="less">
   .uploadphotowall {
     height: 100%;
+    .el-dialog {
+      max-width: 800px;
+      min-width: 400px;
+    }
   }
 </style>

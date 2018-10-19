@@ -20,6 +20,7 @@
     "eofline": false,
     "match-default-export-name": false,
     "import-name": false,
+    "max-line-length": false,
     "no-unnecessary-class": [
       true,
       "allow-empty-class"

@@ -18,8 +18,8 @@
           </div>
         </li>
       </ul>
-      <!-- 图片看大图 -->
-      <el-dialog :visible.sync="dialogVisible" :title="dialogImageName">
+      <!-- 查看大图的 dialog -->
+      <el-dialog width="40%" :visible.sync="dialogVisible" :title="dialogImageName">
         <img width="100%" :src="dialogImageUrl" :alt="dialogImageName" :title="dialogImageName">
       </el-dialog>
     </div>
@@ -37,7 +37,7 @@ import { baseUrl } from "../../config";
 import TreeMain from '@/components/TreeMain.vue';
 
 interface ContType {
-  list: any[]
+  list: any[];
 }
 
 @Component({
@@ -48,20 +48,20 @@ interface ContType {
 export default class TreeCont extends Vue {
   @Prop() propsname: any;
 
-  title: string = ""
+  title: string = "";
   contObj: ContType = {
     list: []
-  }
-  baseImgUrl: string = baseUrl + "/treecont/"
-  dialogVisible: boolean = false
-  dialogImageName: string = ""
-  dialogImageUrl: string = ""
+  };
+  baseImgUrl: string = `${baseUrl}/treecont/`;
+  dialogVisible: boolean = false;
+  dialogImageName: string = "";
+  dialogImageUrl: string = "";
 
   mounted() {
-    this.$nextTick(function() {
+    this.$nextTick(function () {
       this.init();
     });
-  };
+  }
 
   @Watch('propsname')
   onPropsNameChanged() {
@@ -119,7 +119,7 @@ export default class TreeCont extends Vue {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
   .treecont {
     padding: 10px;
     text-align: left;
@@ -200,6 +200,10 @@ export default class TreeCont extends Vue {
       -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
       border-radius: 0.5rem;
       background: #282c34;
+    }
+    .el-dialog {
+      max-width: 800px;
+      min-width: 400px;
     }
   }
 </style>
