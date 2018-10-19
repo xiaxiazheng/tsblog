@@ -20,12 +20,14 @@
     <!-- 移动端 -->
     <div v-else class="Mobile">
       <div class="topMobile">
+        <h1>{{ title }}</h1>
+      </div>
+      <div>
         <el-button 
           type="primary" 
           icon="el-icon-tickets"
           @click="isShowTree">
         </el-button>
-        <h1>{{ title }}</h1>
       </div>
       <div class="leftMobile" v-show="showTree">
         <el-tree
@@ -47,6 +49,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { TreeClient } from '../../util/clientHelper';
+import { isPC } from '../../config'
 import TreeCont from '@/components/treecont/TreeCont.vue';
 
 @Component({
@@ -55,14 +58,16 @@ import TreeCont from '@/components/treecont/TreeCont.vue';
   },
 })
 export default class Tree extends Vue {
+  // 移动端相关
+  isPC: boolean = isPC;
+  showTree: boolean = false;
+
   tree: any[] = [];
   defaultProps = {
     children: 'children',
     label: 'label'
   };
   defaultExpandedKeys: any = [];
-  isPC: boolean = false;
-  showTree: boolean = false;
   title: string = '虾虾郑的个人空间';
 
 
@@ -78,10 +83,6 @@ export default class Tree extends Vue {
   }
 
   async init() {
-    let phonescreen: number = 600;
-    if (window.screen.width > phonescreen) {
-      this.isPC = true;
-    }
     if (this["$route"].query.id) {  // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
       this.defaultExpandedKeys = []; // 前台展示的话直接清空
       this.defaultExpandedKeys.push(parseInt(atob(this["$route"].query.id), 10));
@@ -117,6 +118,7 @@ export default class Tree extends Vue {
     .PC {
       height: 100%;
     }
+    // 移动端样式
     .Mobile {
       .topMobile {
         position: fixed;

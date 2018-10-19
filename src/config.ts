@@ -1,3 +1,4 @@
+// 前端访问路径及所在环境
 let url: string = "";
 let env: string = "";
 if (process.env.NODE_ENV.match('productionPig')) {
@@ -13,3 +14,10 @@ if (process.env.NODE_ENV.match('productionPig')) {
 console.log(process.env.NODE_ENV, url);
 export const baseUrl = url;
 export const baseEnv = env;
+
+// 是否为手机端
+let ispc = true;
+if (window.screen.width > 600) {
+  ispc = false;
+}
+export const isPC = ispc;

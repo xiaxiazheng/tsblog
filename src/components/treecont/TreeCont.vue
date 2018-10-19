@@ -47,6 +47,7 @@ interface ContType {
 })
 export default class TreeCont extends Vue {
   @Prop() propsname: any;
+  @Prop() isPC: any;
 
   title: string = "";
   contObj: ContType = {
