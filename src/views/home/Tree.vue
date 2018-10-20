@@ -49,7 +49,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { TreeClient } from '../../util/clientHelper';
-import { isPC } from '../../config'
+import { isPC } from '../../config';
 import TreeCont from '@/components/treecont/TreeCont.vue';
 
 @Component({

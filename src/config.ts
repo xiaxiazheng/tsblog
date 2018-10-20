@@ -17,7 +17,7 @@ export const baseEnv = env;
 
 // 是否为手机端
 let ispc = true;
-if (window.screen.width > 600) {
+if (window.screen.width < 600) {
   ispc = false;
 }
 export const isPC = ispc;
