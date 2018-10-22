@@ -13,6 +13,11 @@
   },
   "dependencies": {
     "express": "^4.16.4",
+    "koa": "^2.5.3",
+    "koa-bodyparser": "^3.2.0",
+    "koa-cors": "^0.0.16",
+    "koa-router": "^7.4.0",
+    "koa-static": "^5.0.0",
     "multer": "^1.4.1",
     "mysql": "^2.16.0"
   },
@@ -27,6 +32,7 @@
     "highlight.js": "^9.13.1",
     "less": "^3.8.1",
     "less-loader": "^4.1.0",
+    "nodemon": "^1.18.4",
     "tslint-config-airbnb": "^5.11.0",
     "typescript": "^3.0.0",
     "vue": "^2.5.17",

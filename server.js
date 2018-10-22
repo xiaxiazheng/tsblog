@@ -1,29 +1,34 @@
-var fs = require('fs');
-var express = require('express');
-var app = express();
+const fs = require('fs');
+const path = require('path');
+const Koa = require('koa');
+const app = new Koa();
 
-app.use(express.static('server/img'));  // 在这里设置了静态目录，到时直接用'域名+文件名'访问server/img目录下的静态文件
+// 使用路由
+const Router = require('koa-router');
+let router = new Router();
 
-// 让req获取到参数
-var bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+// 静态资源目录对于相对入口文件index.js的路径
+const static = require('koa-static')
+const staticPath = './server/img'
+app.use(static(
+  path.join( __dirname,  staticPath)
+))
+
+// 使用ctx.body解析中间件
+const bodyParser = require('koa-bodyparser')
+app.use(bodyParser())
 
 // 配置上传文件相关
-var multer  = require('multer');
-var upload = multer({ dest: __dirname + '/' });
+const multer  = require('multer');
+let upload = multer({ dest: __dirname + '/' });
 
-// 给所有的加该请求头
-app.all('*', function(req, res, next) {
-	res.header('Access-Control-Allow-Origin', '*');
-	res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
-	res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
-	next();
-});
+// 跨域访问组件，允许跨域访问
+const cors = require('koa-cors');
+app.use(cors());
 
 // 放在最前，返回dist里的index
-app.get('/', function(req, res) {
-	fs.readFile('./dist/index.html', function(err, content) {
+router.get('/', async (ctx) => {
+	fs.readFile('./dist/index.html', async (err, content) => {
 		if(err) {
 			res.setHeader('Content-Type', 'text/plain');
 			res.status(400).send(err.message);
@@ -38,98 +43,102 @@ app.get('/', function(req, res) {
 
 /* 开始写接口 */
 	// 登录
-	var login = require('./server/login.js');
-	app.post('/login', function(req, res) {
-		login.checkLogin(req, res);
+	let login = require('./server/login.js');
+	router.post('/login', async (ctx) => {
+		login.checkLogin(ctx);
 	});
 	// 操作树节点
-	var tree = require('./server/tree.js');
-	app.get('/tree', function(req, res) {
-    tree.getTree(req, res);
+	let tree = require('./server/tree.js');
+	router.get('/tree', async (ctx) => {
+		ctx.body = await tree.getTree(ctx);
 	});
-	app.get('/getchildname', function(req, res) {
-		tree.getChildName(req, res);
+	router.get('/getchildname', async (ctx) => {
+		ctx.body = await tree.getChildName(ctx);
 	});
-	app.get('/addtreenode', function(req, res) {
-		tree.addTreeNode(req, res);
+	router.get('/addtreenode', async (ctx) => {
+		ctx.body = await tree.addTreeNode(ctx);
 	});
-	app.get('/modifytreenode', function(req, res) {
-		tree.modifyTreeNode(req, res);
+	router.get('/modifytreenode', async (ctx) => {
+		ctx.body = await tree.modifyTreeNode(ctx);
 	});
-	app.get('/deletetreenode', function(req, res) {
-		tree.deleteTreeNode(req, res);
+	router.get('/deletetreenode', async (ctx) => {
+		ctx.body = await tree.deleteTreeNode(ctx);
 	});
-	app.get('/changesort', function(req, res) {
-		tree.changeSort(req, res);
+	router.get('/changesort', async (ctx) => {
+		ctx.body = await tree.changeSort(ctx);
 	});
-	app.get('/changefather', function(req, res) {
-		tree.changeFather(req, res);
+	router.get('/changefather', async (ctx) => {
+		ctx.body = await tree.changeFather(ctx);
 	});
 	// 操作子节点
-	var cont = require('./server/cont.js');
-	app.get('/cont', function(req, res) {
-    cont.getNodeCont(req, res);
+	let cont = require('./server/cont.js');
+	router.get('/cont', async (ctx) => {
+    ctx.body = await cont.getNodeCont(ctx);
 	});
-	app.post('/addnodecont', function(req, res) {
-		cont.addNodeCont(req, res);
+	router.post('/addnodecont', async (ctx) => {
+		ctx.body = await cont.addNodeCont(ctx);
 	});
-	app.post('/modifynodecont', function(req, res) {
-		cont.modifyNodeCont(req, res);
+	router.post('/modifynodecont', async (ctx) => {
+		ctx.body = await cont.modifyNodeCont(ctx);
 	});
-	app.get('/deletenodecont', function(req, res) {
-		cont.deleteNodeCont(req, res);
+	router.get('/deletenodecont', async (ctx) => {
+		ctx.body = await cont.deleteNodeCont(ctx);
 	});
-	app.get('/changecontsort', function(req, res) {
-		cont.changeSort(req, res);
+	router.get('/changecontsort', async (ctx) => {
+		ctx.body = await cont.changeSort(ctx);
 	});
 	// 上传图片
-	var image = require('./server/image.js');
-	app.post('/main_upload', upload.single('image'), function (req, res) {
-		image.saveMainImg(req, res);
+	let image = require('./server/image.js');
+	router.post('/main_upload', upload.single('image'), async (ctx) => {
+		ctx.body = await image.saveMainImg(ctx);
 	});
-	app.post('/wall_upload', upload.single('image'), function (req, res) {
-		image.saveWallImg(req, res);
+	router.post('/wall_upload', upload.single('image'), async (ctx) => {
+		ctx.body = await image.saveWallImg(ctx);
 	});
-	app.get('/getimglist', function(req, res) {
-		image.getImgList(req, res);
+	router.get('/getimglist', async (ctx) => {
+		ctx.body = await image.getImgList(ctx);
 	});
-	app.get('/deleteimg', function(req, res) { // 删除main和wall的
-		image.deleteImg(req, res);
+	router.get('/deleteimg', async (ctx) => { // 删除main和wall的
+		ctx.body = await image.deleteImg(ctx);
 	});
-  app.post('/treecont_upload', upload.single('treecont'), function(req, res) { // treecont上传图片
-    image.saveTreeContImg(req, res);
+  router.post('/treecont_upload', upload.single('treecont'), async (ctx) => { // treecont上传图片
+    ctx.body = await image.saveTreeContImg(ctx);
 	});
-	app.get('/deletetreecontimg', function(req, res) { // 删除treecont的
-		image.deleteTreeContImg(req, res);
+	router.get('/deletetreecontimg', async (ctx) => { // 删除treecont的
+		ctx.body = await image.deleteTreeContImg(ctx);
 	});
 /* 结束 */
 
 
 // 放在最后，用于传递文件
-app.get('*', function(req, res) {
+router.get('*', async (ctx) => {
 	// console.log(req.baseUrl);    // 这个拿不到值
 	// console.log(req.path)        // 这个可以
 	// console.log(req.originalUrl) // 这个也可以
-	fs.readFile("./dist" + req.path, function(err, data) {
+	fs.readFile("./dist" + req.path, async (err, context) => {
 		if(err) {
 			res.setHeader("Content-Type", "text/html");
-			res.status(400).send(err.message);
+			await res.status(400).send(err.message);
 			console.log("拿不到文件:%s", req.path);
 		}
 		else {
-			var filename = req.path.substring(1);    // 去掉前导'/'
-			var type = filename.substring(filename.lastIndexOf('.') + 1);
-      var contType = getType(type);
+			let filename = req.path.substring(1);    // 去掉前导'/'
+			let type = filename.substring(filename.lastIndexOf('.') + 1);
+      let contType = getType(type);
 			res.writeHead(200, { "Content-Type": contType });
 			if(type === 'ico' || type === 'jpg' || type === 'jpeg' || type === 'png') { // 传图片和ico文件
-				res.write(data, "binary");
+				await res.write(data, "binary");
 			} else { // 其他
-				res.write(data.toString());
+				await res.write(data.toString());
 			}
 		}
 		res.end();
 	});
 });
+
+app.use(router.routes());
+app.use(router.allowedMethods());
+
 
 // 起服务
 console.log("环境:", process.env.NODE_ENV);
@@ -153,7 +162,7 @@ if (!process.env.NODE_ENV) {  // 本地
 
 // 获取文件类型
 function getType(endTag){
-	var type=null;
+	let type=null;
 	switch(endTag){
 	case 'html' :
 	case 'htm' :

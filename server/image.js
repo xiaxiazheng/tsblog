@@ -1,135 +1,109 @@
 /** 上传图片 */
-var db = require('./db.js');
-var Common = require('./common.js');
-var fs = require('fs');
+let { query } = require('./db.js');
+let Common = require('./common.js');
+let fs = require('fs');
 
 /** 获取上传的图片保存到本地，并将文件名保存到数据库 */
 // 主页的，main
-exports.saveMainImg = function(req, res) {
-  // console.log(req.file);  /* 上传的文件信息 */
+exports.saveMainImg = async (ctx) => {
+  // console.log(ctx.request.file);  /* 上传的文件信息 */
   let img_id = Common.getRandomNum();
-  let filename = Common.getImageName(req.file.originalname, img_id);
+  let filename = Common.getImageName(ctx.request.file.originalname, img_id);
   let des_file = __dirname + "/img/main/" + filename; /* 这里要注意，因为这个文件已经在server里了，所以这里的__dirname是有server的 */
-  fs.readFile(req.file.path, function (err, data) {
-    fs.writeFile(des_file, data, function (err) {
+  fs.readFile(ctx.request.file.path, function (err, data) {
+    fs.writeFile(des_file, data, async function (err) {
       if( err ){
         console.log( err );
       } else {
         let time = Common.getNowFormatDate();
-        var sql = "INSERT INTO image VALUES (?, ?, ?, 'main', ?)";
-        db.pool.getConnection(function(err, connection) {
-          if(err) {
-            res.json({ resultsCode: 'error', message: '连接数据库失败' });
-            console.log(err);
-            return;
-          }
-          var array = [img_id, req.file.originalname, filename, time];
-          connection.query(sql, array, function(err, results) {
-            if(err) {
-              res.json({ resultsCode: 'error', message: '保存图片信息失败' });
-              return;
-            }
-            fs.unlink(req.file.path, function (err) {  // 删除缓存
-              if(err) {
-                res.json({ resultsCode: 'error', message: err });
-              } else {
-                res.json({ resultsCode: 'success', message: '保存图片成功' });
-              }
-            });
+        let sql = "INSERT INTO image VALUES (?, ?, ?, 'main', ?)";
+        let array = [img_id, ctx.request.file.originalname, filename, time];
+        await query(sql, array);
 
-            connection.release();
-          });
+        fs.unlink(ctx.request.file.path, function (err) {  // 删除缓存
+          if(err) {
+            return {
+              resultsCode: 'error',
+              message: err
+            };
+          } else {
+            return {
+              resultsCode: 'success',
+              message: '保存图片成功'
+            };
+          }
         });
       }
     });
   });
 };
+
 // 图片墙的，wall
-exports.saveWallImg = function(req, res) {
-  // console.log(req.file);  /* 上传的文件信息 */
+exports.saveWallImg = async (ctx) => {
+  // console.log(ctx.request.file);  /* 上传的文件信息 */
   let img_id = Common.getRandomNum();
-  let filename = Common.getImageName(req.file.originalname, img_id);
+  let filename = Common.getImageName(ctx.request.file.originalname, img_id);
   let des_file = __dirname + "/img/wall/" + filename; /* 这里要注意，因为这个文件已经在server里了，所以这里的__dirname是有server的 */
-  fs.readFile(req.file.path, function (err, data) {
-    fs.writeFile(des_file, data, function (err) {
+  fs.readFile(ctx.request.file.path, function (err, data) {
+    fs.writeFile(des_file, data, async function (err) {
       if( err ){
         console.log( err );
       } else {
         let time = Common.getNowFormatDate();
-        var sql = "INSERT INTO image VALUES (?, ?, ?, 'wall', ?)";
-        db.pool.getConnection(function(err, connection) {
-          if(err) {
-            res.json({ resultsCode: 'error', message: '连接数据库失败' });
-            console.log(err);
-            return;
-          }
-          var array = [img_id, req.file.originalname, filename, time];
-          connection.query(sql, array, function(err, results) {
-            if(err) {
-              res.json({ resultsCode: 'error', message: '保存图片信息失败' });
-              return;
-            }
-            fs.unlink(req.file.path, function (err) {  // 删除缓存
-              if(err) {
-                res.json({ resultsCode: 'error', message: err });
-              } else {
-                res.json({ resultsCode: 'success', message: '保存图片成功' });
-              }
-            });
+        let sql = "INSERT INTO image VALUES (?, ?, ?, 'wall', ?)";
+        let array = [img_id, ctx.request.file.originalname, filename, time];
+        await query(sql, array);
 
-            connection.release();
-          });
+        fs.unlink(ctx.request.file.path, function (err) {  // 删除缓存
+          if(err) {
+            return {
+              resultsCode: 'error',
+              message: err
+            };
+          } else {
+            return {
+              resultsCode: 'success',
+              message: '保存图片成功'
+            };
+          }
         });
       }
     });
   });
 };
+
 // 树详细内容的，treeCont
-exports.saveTreeContImg = function(req, res) {
-  // console.log(req.file);  /* 上传的文件信息 */
-  console.log(req.file);
+exports.saveTreeContImg = async (ctx) => {
+  // console.log(ctx.request.file);  /* 上传的文件信息 */
+  console.log(ctx.request.file);
   console.log(req.body.c_id);
-  let filename = Common.getImageName(req.file.originalname, (req.body.c_id + '.' + Common.getRandomNum()));
+  let filename = Common.getImageName(ctx.request.file.originalname, (req.body.c_id + '.' + Common.getRandomNum()));
   console.log(filename);
   let des_file = __dirname + "/img/treecont/" + filename; /* 这里要注意，因为这个文件已经在server里了，所以这里的__dirname是有server的 */
-  fs.readFile(req.file.path, function (err, data) {
+  fs.readFile(ctx.request.file.path, function (err, data) {
     if(err){
       console.log(err);
       return;
     }
-    fs.writeFile(des_file, data, function (err) {
+    fs.writeFile(des_file, data, async function (err) {
       if(err){
-        res.json({ resultsCode: 'error', message: '保存本地图片失败' });
+        return { resultsCode: 'error', message: '保存本地图片失败' };
         console.log(err);
         return;
       } else {
         let time = Common.getNowFormatDate();
-        db.pool.getConnection(function(err, connection) {
+        let sql = "UPDATE cont SET filename=?, mTime=? WHERE c_id=? && sort=?";
+        let array = [filename, time, req.body.c_id, req.body.sort];
+        await query(sql, array);
+
+        fs.unlink(ctx.request.file.path, function (err) {  // 删除缓存
           if(err) {
-            res.json({ resultsCode: 'error', message: '连接数据库失败' });
+            return { resultsCode: 'error', message: '删除缓存失败' };
             console.log(err);
             return;
+          } else {
+            return { resultsCode: 'success', message: '保存图片成功' };
           }
-          var sql = "UPDATE cont SET filename=?, mTime=? WHERE c_id=? && sort=?";
-          var array = [filename, time, req.body.c_id, req.body.sort];
-          connection.query(sql, array, function(err, results) {
-            if(err) {
-              res.json({ resultsCode: 'error', message: '保存图片信息失败' });
-              console.log(err);
-              return;
-            }
-            fs.unlink(req.file.path, function (err) {  // 删除缓存
-              if(err) {
-                res.json({ resultsCode: 'error', message: '删除缓存失败' });
-                console.log(err);
-                return;
-              } else {
-                res.json({ resultsCode: 'success', message: '保存图片成功' });
-              }
-            });
-
-            connection.release();
-          });
         });
       }
     });
@@ -137,91 +111,52 @@ exports.saveTreeContImg = function(req, res) {
 };
 
 // 获取image中某个type的所有图片名称，然后可以通过express静态资源获取
-exports.getImgList = function(req, res) {
-  var sql = "SELECT * FROM image WHERE type=? ORDER BY cTime";
-  db.pool.getConnection(function(err, connection) {
-    if(err) {
-      res.json({ resultsCode: 'error', message: '连接数据库失败' });
-      console.log(err);
-      return;
-    }
-    var array = [req.query.type];
-    connection.query(sql, array, function(err, results) {
-      if(err) {
-        res.json({ resultsCode: 'error', message: '查询image失败' });
-        return;
-      }
-      res.json({
-        resultsCode: 'success',
-        message: '查询image成功',
-        data: results
-      });
+exports.getImgList = async (ctx) => {
+  let sql = "SELECT * FROM image WHERE type=? ORDER BY cTime";
+  let array = [ctx.query.type];
+  let results = await query(sql, array);
 
-      connection.release();
-    });
-  });
+  return {
+    resultsCode: 'success',
+    message: '查询image成功',
+    data: results
+  };
 };
 
 // 删除某张图片，删掉本地的还要删掉image数据库的记录
-exports.deleteImg = function(req, res) {
+exports.deleteImg = async (ctx) => {
   let des_file = '';
-  if(req.query.type === 'main') {
-    des_file = __dirname + "/img/main/" + req.query.filename;
+  if(ctx.query.type === 'main') {
+    des_file = __dirname + "/img/main/" + ctx.query.filename;
   }
-  if(req.query.type === 'wall') {
-    des_file = __dirname + "/img/wall/" + req.query.filename;
+  if(ctx.query.type === 'wall') {
+    des_file = __dirname + "/img/wall/" + ctx.query.filename;
   }
-  fs.unlink(des_file, function (err) {
+  fs.unlink(des_file, async function (err) {
     if( err ){
       console.log( err );
     } else {
-      var sql = "DELETE FROM image WHERE img_id=? && type=?";
-      db.pool.getConnection(function(err, connection) {
-        if(err) {
-          res.json({ resultsCode: 'error', message: '连接数据库失败' });
-          console.log(err);
-          return;
-        }
-        var array = [req.query.img_id, req.query.type];
-        connection.query(sql, array, function(err, results) {
-          if(err) {
-            res.json({ resultsCode: 'error', message: '保存图片信息失败' });
-            return;
-          }
-          res.json({ resultsCode: 'success', message: '删除成功' })
+      let sql = "DELETE FROM image WHERE img_id=? && type=?";
+      let array = [ctx.query.img_id, ctx.query.type];
+      await query(sql, array);
 
-          connection.release();
-        });
-      });
+      return { resultsCode: 'success', message: '删除成功' };
     }
   });
 }
 
 // 删除树的某图片，删掉本地的图片，还要把cont数据库的对应filename设为''
-exports.deleteTreeContImg = function(req, res) {
-  let des_file = __dirname + "/img/treecont/" + req.query.filename;
-  fs.unlink(des_file, function (err) {
+exports.deleteTreeContImg = async (ctx) => {
+  let des_file = __dirname + "/img/treecont/" + ctx.query.filename;
+  fs.unlink(des_file, async function (err) {
     if(err){
-      res.json({ resultsCode: 'error', message: '删除本地图片失败' });
+      return { resultsCode: 'error', message: '删除本地图片失败' };
     } else {
-      db.pool.getConnection(function(err, connection) {
-        if(err) {
-          res.json({ resultsCode: 'error', message: '连接数据库失败' });
-          console.log(err);
-          return;
-        }
-        var sql = "UPDATE cont SET filename='' WHERE filename=?";
-        var array = [req.query.filename];
-        connection.query(sql, array, function(err, results) {
-          if(err) {
-            res.json({ resultsCode: 'error', message: '更改cont的filename为\'\'失败' });
-            return;
-          }
-          res.json({ resultsCode: 'success', message: '删除成功' })
+      let sql = "UPDATE cont SET filename='' WHERE filename=?";
+      let array = [ctx.query.filename];
+      await query(sql, array);
 
-          connection.release();
-        });
-      });
+      return { resultsCode: 'success', message: '删除成功' };
     }
   });
 }

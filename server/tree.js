@@ -1,420 +1,281 @@
 /** 操作树 */
-var db = require('./db.js');
-var Common = require('./common.js');
+const { query } = require('./db.js');
+const Common = require('./common.js');
 
 // 查
-exports.getTree = function(req, res) {
-  db.pool.getConnection(function(err, connection) {
-    if(err) {
-      res.json({ resultsCode:'error', message:'连接数据库失败' });
-      console.log(err);
-      return;
-    }
-    var sql1 = "SELECT * FROM category ORDER BY sort";
-    var array1 = [];
-    connection.query(sql1, array1, function(err, res1) {
-      if(err) {
-        res.json({ resultsCode:'error', message:'查找失败，操作categroy失败' });
-        return;
-      }
-      var sql2 = "SELECT * FROM tree ORDER BY f_sort, c_sort";
-      var array2 = [];
-      connection.query(sql2, array2, function(err, res2) {
-        if(err) {
-          res.json({ resultsCode:'error', message:'查找失败，操作tree失败' });
-          return;
-        }
-        /* 先把tree里的二级树整理好 */
-        let list = [];
-        for (let i in res2) {
-          let find = false;
-          if (i !== 0) {
-            for (let j in list) {
-              if (list[j].id === res2[i].f_id) {
-                list[j].children.push({
-                  id: res2[i].c_id,
-                  label: res2[i].c_label,
-                  sort: res2[i].c_sort,
-                  category_id: res2[i].category_id
-                });
-                find = true;
-                break;
-              }
-            }
-          }
-          if (!find) {
-            list.push({
-              id: res2[i].f_id,
-              label: res2[i].f_label,
-              sort: res2[i].f_sort,
-              category_id: res2[i].category_id,
-              children: [{
-                id: res2[i].c_id,
-                label: res2[i].c_label,
-                sort: res2[i].c_sort,
-                category_id: res2[i].category_id
-              }]
-            });
-          }
-        }
-        /* 然后再把分类套在上面 */
-        let flist = [];
-        for (let item of res1) {
-          let clist = [];
-          if (item.label === 'My Secret Place' && req.query.type === 'home') {
-            continue;
-          }
-          for (let j in list) {
-            if (item.category_id === list[j].category_id) {
-              clist.push(list[j]);
-            }
-          }
-          flist.push({
-            id: item.category_id,
-            label: item.label,
-            sort: item.sort,
-            children: clist
+exports.getTree = async (ctx) => {
+  let array = [];
+  let sql1 = "SELECT * FROM category ORDER BY sort";
+  let res1 = await query(sql1, array);
+  let sql2 = "SELECT * FROM tree ORDER BY f_sort, c_sort";
+  let res2 = await query(sql2, array);
+  /* 先把tree里的二级树整理好 */
+  let list = [];
+  for (let i in res2) {
+    let find = false;
+    if (i !== 0) {
+      for (let j in list) {
+        if (list[j].id === res2[i].f_id) {
+          list[j].children.push({
+            id: res2[i].c_id,
+            label: res2[i].c_label,
+            sort: res2[i].c_sort,
+            category_id: res2[i].category_id
           });
+          find = true;
+          break;
         }
-        res.json({ 
-          resultsCode: 'success',
-          message: '获取树成功',
-          data: flist,
-        });
-
-        connection.release();
-      });
-    });
-  });
-};
-// 查三级节点名
-exports.getChildName = function(req, res) {
-  db.pool.getConnection(function(err, connection) {
-    if (err) {
-      res.json({ resultsCode:'error', message:'连接数据库失败' });
-      console.log(err);
-      return;
-    }
-    var sql = "SELECT c_label FROM tree WHERE c_id=?";
-    var array = [req.query.id];
-    connection.query(sql, array, function(err, result) {
-      if (err) {
-        res.json({ resultsCode:'error', message:'查找失败，操作tree失败' });
-        return;
       }
-      res.json({ 
-        resultsCode: 'success',
-        message: '获取三级节点名称成功',
-        data: result,
+    }
+    if (!find) {
+      list.push({
+        id: res2[i].f_id,
+        label: res2[i].f_label,
+        sort: res2[i].f_sort,
+        category_id: res2[i].category_id,
+        children: [{
+          id: res2[i].c_id,
+          label: res2[i].c_label,
+          sort: res2[i].c_sort,
+          category_id: res2[i].category_id
+        }]
       });
-
-      connection.release();
+    }
+  }
+  /* 然后再把分类套在上面 */
+  let flist = [];
+  for (let item of res1) {
+    let clist = [];
+    if (item.label === 'My Secret Place' && ctx.query.type === 'home') {
+      continue;
+    }
+    for (let j in list) {
+      if (item.category_id === list[j].category_id) {
+        clist.push(list[j]);
+      }
+    }
+    flist.push({
+      id: item.category_id,
+      label: item.label,
+      sort: item.sort,
+      children: clist
     });
-  });
+  }
+  return {
+    resultsCode: 'success',
+    message: '获取树成功',
+    data: flist,
+  };
+}
+// 查三级节点名
+exports.getChildName = async (ctx) => {
+  let sql = "SELECT c_label FROM tree WHERE c_id=?";
+  let array = [ctx.query.id];
+  let result = await query(sql, array);
+  return {
+    resultsCode: 'success',
+    message: '获取三级节点名称成功',
+    data: result,
+  };
 }
 
 // 增
-exports.addTreeNode = function(req, res) {
-  db.pool.getConnection(function(err, connection) {
-    if (err) {
-      res.json({ resultsCode:'error', message:'连接数据库失败' });
-      console.log(err);
-      return;
-    }
-    var sql = '';
-    var newchildId = Common.getRandomNum();
-    if (req.query.level === '1') { // 若为一个大类
+exports.addTreeNode = async (ctx) => {
+  let sql = '';
+  let newchildId = Common.getRandomNum();
+  if (ctx.query.level === '1') { // 若为一个大类
+    let newfathId = Common.getRandomNum();
+    let newcateId = Common.getRandomNum();
+    sql = "INSERT INTO category VALUES (?, ?, ?)";
+    let array = [newcateId, 'newCategory', (parseInt(ctx.query.sort) + 1)];
+    await query(sql, array);
+
+    sql = "INSERT INTO tree VALUES (?, ?, ?, ?, ?, ?, ?)";
+    array = [newfathId, 'newNode', 1, newchildId, 'newChildNode', 1, newcateId];
+    await query(sql, array);
+
+    let time = Common.getNowFormatDate();
+    sql = "INSERT INTO cont VALUES(" + newchildId + ", '" + time + "', '" + time + "', '标题', '内容', 1, '')";
+    array = [];
+    await query(sql, array);
+
+    return {
+      resultsCode:'success',
+      message:'添加成功'
+    };
+  }
+  else {
+    if(ctx.query.level === '2') { // 若是父节点
       let newfathId = Common.getRandomNum();
-      let newcateId = Common.getRandomNum();
-      sql = "INSERT INTO category VALUES (?, ?, ?)";
-      let array = [newcateId, 'newCategory', (parseInt(req.query.sort) + 1)];
-      connection.query(sql, array, function(err, res1) {
-        if (err) {
-          res.json({ resultsCode:'error', message:'添加失败，操作category失败' });
-          return;
-        }
-        sql = "INSERT INTO tree VALUES (?, ?, ?, ?, ?, ?, ?)";
-        array = [newfathId, 'newNode', 1, newchildId, 'newChildNode', 1, newcateId];
-        connection.query(sql, array, function(err, res2) {
-          if (err) {
-            res.json({ resultsCode:'error', message:'添加失败，操作tree失败' });
-            return;
-          }
-          let time = Common.getNowFormatDate();
-          sql = "INSERT INTO cont VALUES(" + newchildId + ", '" + time + "', '" + time + "', '标题', '内容', 1, '')";
-          var array = [];
-          connection.query(sql, array, function(err, res3) {
-            if (err) {
-              res.json({ resultsCode:'error', message:'添加失败，操作cont失败' });
-              return;
-            }
-            res.json({ resultsCode:'success', message:'添加成功' });
-            connection.release();
-          });
-        });
-      });
+      sql = "INSERT INTO tree VALUES (" + newfathId + ", 'newNode', " + (parseInt(ctx.query.sort) + 1) + ", " + newchildId + ", 'newChildNode', " + 1 + ", " + ctx.query.category_id + ")";
     }
-    else {
-      if(req.query.level === '2') { // 若是父节点
-        let newfathId = Common.getRandomNum();
-        sql = "INSERT INTO tree VALUES (" + newfathId + ", 'newNode', " + (parseInt(req.query.sort) + 1) + ", " + newchildId + ", 'newChildNode', " + 1 + ", " + req.query.category_id + ")";
-      }
-      if(req.query.level === '3') { // 若是子节点
-        sql = "INSERT INTO tree VALUES (" + req.query.id + ", '" + req.query.label + "', " + req.query.f_sort + ", " + newchildId + ", 'newChildNode', " + (parseInt(req.query.c_sort) + 1) + ", " + req.query.category_id + ")";
-      }
-      var array = [];
-      connection.query(sql, array, function(err, results) {
-        if(err) {
-          console.log("操作失败1");
-          return;
-        }
-        let time = Common.getNowFormatDate();
-        var sql1 = "INSERT INTO cont VALUES(" + newchildId + ", '" + time + "', '" + time + "', '标题', '内容', 1, '')";
-        var array1 = [];
-        connection.query(sql1, array1, function(err, results) {
-          if(err) {
-            console.log("操作失败2");
-            return;
-          }
-          res.json({ resultsCode:'success', message:'添加成功' });
-          connection.release();
-        });
-      });
+    if(ctx.query.level === '3') { // 若是子节点
+      sql = "INSERT INTO tree VALUES (" + ctx.query.id + ", '" + ctx.query.label + "', " + ctx.query.f_sort + ", " + newchildId + ", 'newChildNode', " + (parseInt(ctx.query.c_sort) + 1) + ", " + ctx.query.category_id + ")";
     }
-  });
+    let array = [];
+    await query(sql, array);
+    
+    let time = Common.getNowFormatDate();
+    let sql1 = "INSERT INTO cont VALUES(" + newchildId + ", '" + time + "', '" + time + "', '标题', '内容', 1, '')";
+    await query(sql1, array);
+
+    return {
+      resultsCode:'success',
+      message:'添加成功'
+    };
+  }
 };
 
 // 改
-exports.modifyTreeNode = function(req, res) {
-  db.pool.getConnection(function(err, connection) {
-    if(err) {
-      res.json({ resultsCode:'error', message:'连接数据库失败' });
-      console.log(err);
-      return;
+exports.modifyTreeNode = async (ctx) => {
+  if(ctx.query.level === '1') {
+    let sql = "UPDATE category SET label=? WHERE category_id=?";
+    let array = [ctx.query.label, ctx.query.id];
+    await query(sql, array);
+
+    return {
+      resultsCode:'success',
+      message:'修改成功'
+    };
+  } else {
+    let flag = '';
+    if(ctx.query.level === '3') {
+      flag = 'c';
     }
-    var flag = '';
-    if(req.query.level === '1') {
-      var sql = "UPDATE category SET label=? WHERE category_id=?";
-      var array = [req.query.label, req.query.id];
-      connection.query(sql, array, function(err, results) {
-        if(err) {
-          res.json({ resultsCode:'error', message:'修改失败' });
-          return;
-        }
-        res.json({ resultsCode:'success', message:'修改成功' });
-        connection.release();
-      });
-    } else {
-      if(req.query.level === '3') {
-        flag = 'c';
-      }
-      if(req.query.level === '2') {
-        flag = 'f';
-      }
-      var sql = "UPDATE tree SET " + flag + "_label=? WHERE " + flag + "_id=?";
-      var array = [req.query.label, req.query.id];
-      connection.query(sql, array, function(err, results) {
-        if(err) {
-          res.json({ resultsCode:'error', message:'修改失败' });
-          return;
-        }
-        res.json({ resultsCode:'success', message:'修改成功' });
-        connection.release();
-      });
+    if(ctx.query.level === '2') {
+      flag = 'f';
     }
+    let sql = "UPDATE tree SET " + flag + "_label=? WHERE " + flag + "_id=?";
+    let array = [ctx.query.label, ctx.query.id];
+    await query(sql, array);
     
-  });
-};
+    return { 
+      resultsCode:'success',
+      message:'修改成功'
+    };
+  }
+}
 
-// 删
-exports.deleteTreeNode = function(req, res) {
-  db.pool.getConnection(function(err, connection) {
-    if (err) {
-      res.json({ resultsCode:'error', message:'连接数据库失败' });
-      console.log(err);
-      return;
-    }
-    if(req.query.level === '1') { // 若为一级节点
-      // 先找到该一级节点的所有三级节点
-      var sql = "SELECT c_id FROM tree WHERE category_id=?";
-      var array = [req.query.id];
-      connection.query(sql, array, function(err, res1) {
-        if (err) {
-          res.json({ resultsCode:'error', message:'删除失败，操作tree失败1' });
-          return;
-        }
-        // 再根据三级节点id逐个逐个删除三级节点的具体信息
-        for (let i in res1) {
-          var sql2 = "DELETE FROM cont WHERE c_id=?";
-          var array2 = [res1[i].c_id];
-          connection.query(sql2, array2, function(err, res2) {
-            if(err) {
-              res.json({ resultsCode: 'error', message: '删除失败，操作cont失败' });
-              return;
-            }
-          });
-        }
-      });
-      // 再删除树上的该一级节点及其二三级节点
-      var sql = "DELETE FROM tree WHERE category_id=?";
-      var array = [req.query.id];
-      connection.query(sql, array, function(err, res1) {
-        if(err) {
-          res.json({ resultsCode: 'error', message: '删除失败，操作tree失败2' });
-          return;
-        }
-        // 最后删除category表上的一级节点
-        var sql2 = "DELETE FROM category WHERE category_id=?";
-        connection.query(sql2, array, function(err, res2) {
-          if(err) {
-            res.json({ resultsCode: 'error', message: '删除失败，操作category失败' });
-            return;
-          }
-          res.json({ resultsCode: 'success', message: '删除成功' });
-          connection.release();
-        });
-      });
-    }
-    if(req.query.level === '2') { // 若为二级节点
-      // 先找到该二级节点的所有三级节点
-      var sql = "SELECT c_id FROM tree WHERE f_id=?";
-      var array = [req.query.id];
-      connection.query(sql, array, function(err, results) {
-        if(err) {
-          res.json({ resultsCode: 'error', message: '删除失败，操作tree失败1' });
-          return;
-        }
-        // 再根据三级节点id逐个逐个删除三级节点的具体信息
-        for (let i in results) {
-          var sql2 = "DELETE FROM cont WHERE c_id=?";
-          var array2 = [results[i].c_id];
-          connection.query(sql2, array2, function(err, results) {
-            if(err) {
-              res.json({ resultsCode: 'error', message: '删除失败，操作cont失败' });
-              return;
-            }
-          });
-        }
-      });
-      // 最后删除树上的该二级节点及其三级节点
-      var sql = "DELETE FROM tree WHERE f_id=?";
-      var array = [req.query.id];
-      connection.query(sql, array, function(err, results) {
-        if(err) {
-          res.json({ resultsCode: 'error', message: '删除失败，操作tree失败2' });
-          return;
-        }
-        res.json({ resultsCode: 'success', message: '删除成功' });
-        connection.release();
-      });
-    }
-    if(req.query.level === '3') { // 若为三级节点
-      // 删除该子节点的具体信息
-      var sql = "DELETE FROM cont WHERE c_id=?";
-      var array = [req.query.id];
-      connection.query(sql, array, function(err, results) {
-        if(err) {
-          res.json({ resultsCode: 'error', message: '删除失败，操作cont失败' });
-          return;
-        }
-      });
-      // 删除树上的点
-      var sql = "DELETE FROM tree WHERE c_id=?";
-      connection.query(sql, array, function(err, results) {
-        if(err) {
-          res.json({ resultsCode: 'error', message: '删除失败，操作tree失败' });
-          return;
-        }
-        res.json({ resultsCode:'success', message:'删除成功' });
+  // 删
+exports.deleteTreeNode = async (ctx) => {
+  if(ctx.query.level === '1') { // 若为一级节点
+    // 先找到该一级节点的所有三级节点
+    let sql1 = "SELECT c_id FROM tree WHERE category_id=?";
+    let array = [ctx.query.id];
+    let res1 = await query(sql1, array);
 
-        connection.release();
-      });
+    // 再根据三级节点id逐个逐个删除三级节点的具体信息
+    for (let i in res1) {
+      let sql2 = "DELETE FROM cont WHERE c_id=?";
+      let array2 = [res1[i].c_id];
+      await query(sql2, array2);
     }
-  });
-};
 
+    // 再删除树上的该一级节点及其二三级节点
+    let sql3 = "DELETE FROM tree WHERE category_id=?";
+    await query(sql3, array);
+
+    // 最后删除category表上的一级节点
+    let sql4 = "DELETE FROM category WHERE category_id=?";
+    await query(sql4, array);
+    
+    return {
+      resultsCode: 'success',
+      message: '删除成功'
+    };
+  }
+  if(ctx.query.level === '2') { // 若为二级节点
+    // 先找到该二级节点的所有三级节点
+    let sql1 = "SELECT c_id FROM tree WHERE f_id=?";
+    let array = [ctx.query.id];
+    let res1 = await(sql1, array);
+
+    // 再根据三级节点id逐个逐个删除三级节点的具体信息
+    for (let i in res1) {
+      let sql2 = "DELETE FROM cont WHERE c_id=?";
+      let array2 = [res1[i].c_id];
+      await query(sql2, array2);
+    }
+
+    // 最后删除树上的该二级节点及其三级节点
+    let sql3 = "DELETE FROM tree WHERE f_id=?";
+    await query(sql3, array);
+
+    return {
+      resultsCode: 'success',
+      message: '删除成功'
+    };
+  }
+  if(ctx.query.level === '3') { // 若为三级节点
+    // 删除该子节点的具体信息
+    let sql1 = "DELETE FROM cont WHERE c_id=?";
+    let array = [ctx.query.id];
+    await query(sql1, array);
+
+    // 删除树上的点
+    let sql2 = "DELETE FROM tree WHERE c_id=?";
+    await query(sql2, array);
+    
+    return {
+      resultsCode:'success',
+      message:'删除成功'
+    };
+  }
+}
 
 // 交换顺序，上移或下移
-exports.changeSort = function(req, res) {
-  db.pool.getConnection(function(err, connection) {
-    if(err) {
-      console.log("连接数据库失败");
-      console.log(err);
-      return;
+exports.changeSort = async (ctx) => {
+  if(ctx.query.level === '1') {
+    let sql1 = "UPDATE category SET sort=? WHERE category_id=?";
+    let array1 = [ctx.query.otherSort, ctx.query.thisId];
+    await query(sql1, array1);
+
+    let sql2 = "UPDATE category SET sort=? WHERE category_id=?";
+    let array2 = [ctx.query.thisSort, ctx.query.otherId];
+    await query(sql2, array2);
+
+    return {
+      resultsCode: 'success',
+      message: '移动成功'
+    };
+  } else {
+    let flag = '';
+    if(ctx.query.level === '3') {
+      flag = 'c';
     }
-    if(req.query.level === '1') {
-      var sql1 = "UPDATE category SET sort=? WHERE category_id=?";
-      var array1 = [req.query.otherSort, req.query.thisId];
-      connection.query(sql1, array1, function(err, results) {
-        if(err) {
-          res.json({ resultsCode: 'error', message: '操作category失败1' });
-          return;
-        }
-        var sql2 = "UPDATE category SET sort=? WHERE category_id=?";
-        var array2 = [req.query.thisSort, req.query.otherId];
-        connection.query(sql2, array2, function(err, results) {
-          if(err) {
-            res.json({ resultsCode: 'error', message: '操作category失败2' });
-            return;
-          }
-          res.json({ resultsCode: 'success', message: '移动成功' });
-          connection.release();
-        });
-      });
-    } else {
-      var flag = '';
-      if(req.query.level === '3') {
-        flag = 'c';
-      }
-      if(req.query.level === '2') {
-        flag = 'f';
-      }
-      var sql1 = "UPDATE tree SET " + flag + "_sort=? WHERE " + flag + "_id=?";
-      var array1 = [req.query.otherSort, req.query.thisId];
-      connection.query(sql1, array1, function(err, results) {
-        if(err) {
-          res.json({ resultsCode: 'error', message: '操作tree失败1' });
-          return;
-        }
-        var sql2 = "UPDATE tree SET " + flag + "_sort=? WHERE " + flag + "_id=?";
-        var array2 = [req.query.thisSort, req.query.otherId];
-        connection.query(sql2, array2, function(err, results) {
-          if(err) {
-            res.json({ resultsCode: 'error', message: '操作tree失败2' });
-            return;
-          }
-          res.json({ resultsCode: 'success', message: '移动成功' })
-          connection.release();
-        });
-      });
+    if(ctx.query.level === '2') {
+      flag = 'f';
     }
-  });
+    let sql1 = "UPDATE tree SET " + flag + "_sort=? WHERE " + flag + "_id=?";
+    let array1 = [ctx.query.otherSort, ctx.query.thisId];
+    await query(sql1, array1);
+    
+    let sql2 = "UPDATE tree SET " + flag + "_sort=? WHERE " + flag + "_id=?";
+    let array2 = [ctx.query.thisSort, ctx.query.otherId];
+    await query(sql2, array2);
+        
+    return {
+      resultsCode: 'success',
+      message: '移动成功'
+    };
+  }
 };
 
 // 穿梭，子节点改变父节点（加到别的树枝下）
-exports.changeFather = function(req, res) {
-  db.pool.getConnection(function(err, connection) {
-    if(err) {
-      console.log("连接数据库失败");
-      console.log(err);
-      return;
-    }
-    let sql = '', array = [];
-    if(req.query.shuttleLevel === '2') { // 二级节点要穿梭
-      sql = "UPDATE tree SET category_id=?, f_sort=? WHERE f_id=?";
-      array = [req.query.category_id, req.query.f_sort, req.query.f_id];
-    }
-    if(req.query.shuttleLevel === '3') {  // 三级节点要穿梭
-      sql = "UPDATE tree SET f_id=?, f_label=?, f_sort=?, c_sort=? WHERE c_id=?";
-      array = [req.query.fatherid, req.query.fatherlabel, req.query.fathersort, req.query.newchildsort, req.query.childid];
-    }
-    connection.query(sql, array, function(err, results) {
-      if(err) {
-        console.log("穿梭失败");
-        return;
-      }
-      res.json({ resultsCode: 'success', message: '穿梭成功' });
-      connection.release();
-    });
-  });
-};
+exports.changeFather = async (ctx) => {
+  let sql = '', array = [];
+  if(ctx.query.shuttleLevel === '2') { // 二级节点要穿梭
+    sql = "UPDATE tree SET category_id=?, f_sort=? WHERE f_id=?";
+    array = [ctx.query.category_id, ctx.query.f_sort, ctx.query.f_id];
+  }
+  if(ctx.query.shuttleLevel === '3') {  // 三级节点要穿梭
+    sql = "UPDATE tree SET f_id=?, f_label=?, f_sort=?, c_sort=? WHERE c_id=?";
+    array = [ctx.query.fatherid, ctx.query.fatherlabel, ctx.query.fathersort, ctx.query.newchildsort, ctx.query.childid];
+  }
+  await query(sql, array);
+
+  return {
+    resultsCode: 'success',
+    message: '穿梭成功'
+  };
+}

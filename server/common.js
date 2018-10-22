@@ -1,14 +1,14 @@
 /** 后台公用函数 */
 // 获取当前日期时间，格式“yyyy-MM-dd HH:MM:SS”
 exports.getNowFormatDate = function() {
-  var date = new Date();
-  var seperator1 = "-";
-  var seperator2 = ":";
-  var month = date.getMonth() + 1;
-  var strDate = date.getDate();
-  var hour = date.getHours();
-  var minute = date.getMinutes();
-  var second = date.getSeconds();
+  let date = new Date();
+  let seperator1 = "-";
+  let seperator2 = ":";
+  let month = date.getMonth() + 1;
+  let strDate = date.getDate();
+  let hour = date.getHours();
+  let minute = date.getMinutes();
+  let second = date.getSeconds();
   if(month >= 1 && month <= 9) {
     month = "0" + month;
   }
@@ -24,7 +24,7 @@ exports.getNowFormatDate = function() {
   if(second >= 0 && second <= 9) {
     second = "0" + second;
   }
-  var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate + " " + hour + seperator2 + minute + seperator2 + second;
+  let currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate + " " + hour + seperator2 + minute + seperator2 + second;
   return currentdate;
 };
 

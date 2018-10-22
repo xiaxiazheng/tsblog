@@ -2,7 +2,7 @@
 let mysql = require('mysql');
 let pool;
 
-if (process.env.NODE_ENV.match("productionPig")) {
+if (process.env.NODE_ENV && process.env.NODE_ENV.match("productionPig")) {
 	pool = mysql.createPool({
 		host: "123.207.5.131", // 服务器地址
 		user: "root",
@@ -20,7 +20,23 @@ if (process.env.NODE_ENV.match("productionPig")) {
 	});
 }
 
+let query = function( sql, values ) {
+  return new Promise(( resolve, reject ) => {
+    pool.getConnection(function(err, connection) {
+      if (err) {
+        reject( err )
+      } else {
+        connection.query(sql, values, ( err, rows) => {
+          if ( err ) {
+            reject( err )
+          } else {
+            resolve( rows )
+          }
+          connection.release()
+        })
+      }
+    })
+  })
+}
 
-
-
-exports.pool = pool;
+module.exports = { query }
