@@ -9,35 +9,36 @@ let router = new Router();
 
 // 静态资源目录对于相对入口文件index.js的路径
 const static = require('koa-static')
-const staticPath = './server/img'
-app.use(static(
-  path.join( __dirname,  staticPath)
-))
+const staticPath = './server/img';
+app.use(static(path.join( __dirname, staticPath)));
 
 // 使用ctx.body解析中间件
-const bodyParser = require('koa-bodyparser')
-app.use(bodyParser())
+const bodyParser = require('koa-bodyparser');
+app.use(bodyParser());
 
 // 配置上传文件相关
-const multer  = require('multer');
+const multer  = require('koa-multer');
 let upload = multer({ dest: __dirname + '/' });
 
 // 跨域访问组件，允许跨域访问
 const cors = require('koa-cors');
 app.use(cors());
 
+// 公用函数
+const Common = require('./server/common.js');
 // 放在最前，返回dist里的index
 router.get('/', async (ctx) => {
-	fs.readFile('./dist/index.html', async (err, content) => {
-		if(err) {
-			res.setHeader('Content-Type', 'text/plain');
-			res.status(400).send(err.message);
-		} else {
-			res.setHeader('Content-Type', 'text/html');
-			res.status(200).send(content);
-		}
-		res.end();
-	});
+	let filedata;
+	try {
+	  filedata = await Common.readFile('./dist/index.html');
+	} catch (err) {
+		ctx.set('Content-Type', 'text/plain');
+		ctx.status = 400;
+		ctx.body = err.message;
+	}
+	ctx.set('Content-Type', 'text/html');
+	ctx.status = 200;
+	ctx.body = filedata;
 });
 
 
@@ -45,7 +46,7 @@ router.get('/', async (ctx) => {
 	// 登录
 	let login = require('./server/login.js');
 	router.post('/login', async (ctx) => {
-		login.checkLogin(ctx);
+		ctx.body = await login.checkLogin(ctx);
 	});
 	// 操作树节点
 	let tree = require('./server/tree.js');
@@ -112,28 +113,27 @@ router.get('/', async (ctx) => {
 
 // 放在最后，用于传递文件
 router.get('*', async (ctx) => {
-	// console.log(req.baseUrl);    // 这个拿不到值
-	// console.log(req.path)        // 这个可以
-	// console.log(req.originalUrl) // 这个也可以
-	fs.readFile("./dist" + req.path, async (err, context) => {
-		if(err) {
-			res.setHeader("Content-Type", "text/html");
-			await res.status(400).send(err.message);
-			console.log("拿不到文件:%s", req.path);
-		}
-		else {
-			let filename = req.path.substring(1);    // 去掉前导'/'
-			let type = filename.substring(filename.lastIndexOf('.') + 1);
-      let contType = getType(type);
-			res.writeHead(200, { "Content-Type": contType });
-			if(type === 'ico' || type === 'jpg' || type === 'jpeg' || type === 'png') { // 传图片和ico文件
-				await res.write(data, "binary");
-			} else { // 其他
-				await res.write(data.toString());
-			}
-		}
-		res.end();
-	});
+	let filedata;
+	try {
+		filedata = await Common.readFile("./dist" + ctx.path);
+	} catch (err) {
+		ctx.set("Content-Type", "text/html");
+		ctx.status = 400;
+		ctx.body = err.message;
+		// console.log("拿不到文件:%s", ctx.path);
+		return;
+	}
+
+	let filename = ctx.path.substring(1);    // 去掉前导'/'
+	let type = filename.substring(filename.lastIndexOf('.') + 1);
+	let contType = getType(type);
+	ctx.set("Content-Type", contType);
+	ctx.status = 200;
+	if(type === 'ico' || type === 'jpg' || type === 'jpeg' || type === 'png') { // 传图片和ico文件
+		ctx.body = filedata;
+	} else { // 其他
+		ctx.body = filedata.toString();
+	}
 });
 
 app.use(router.routes());
@@ -148,13 +148,13 @@ if (!process.env.NODE_ENV) {  // 本地
 		let port = server.address().port;
 		console.log('Graduation app listening at http://%s:%s', host, port);
 	});
-} else if (process.env.NODE_ENV.match("production")) {  // 服务器端
-	let server = app.listen(80, function () {
+} else if (process.env.NODE_ENV.match("productionPig")) {  // 服务器端
+	let server = app.listen(518, function () {
 		let port = server.address().port;
 		console.log('Graduation app listening at http://123.207.5.131:%s', port);
 	});
 } else {
-	let server = app.listen(518, function () {
+	let server = app.listen(80, function () {
 		let port = server.address().port;
 		console.log('Graduation app listening at http://123.207.5.131:%s', port);
 	});
@@ -162,7 +162,7 @@ if (!process.env.NODE_ENV) {  // 本地
 
 // 获取文件类型
 function getType(endTag){
-	let type=null;
+	let type = null;
 	switch(endTag){
 	case 'html' :
 	case 'htm' :

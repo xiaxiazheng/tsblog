@@ -5,8 +5,6 @@ exports.checkLogin = async (ctx) => {
 	let sql = "SELECT * FROM login";
   let array = [];
   let results = await query(sql, array);
-  console.log(results);
-  console.log(ctx.request.body);
 
   // 前端传数据到这，取出数据库数据到这，直接做判断并且直接返回resultsCode
   let find = false;

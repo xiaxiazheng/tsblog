@@ -87,7 +87,7 @@ export default class UploadPhotoWall extends Vue {
   }
 
   // 删除图片后
-  async handleRemove(file: any, fileList: any) {
+  handleRemove(file: any, fileList: any) {
     /* 如果不是服务器上的图片，就直接删除 */
     if (file.status === 'ready') {
       return true;
@@ -103,6 +103,10 @@ export default class UploadPhotoWall extends Vue {
       let filename = file.filename;
       let res = await ImgClient.deleteImg(type, img_id, filename);
       if (!res) return;
+      this['$message']({
+        type: res.resultsCode,
+        message: res.message
+      });
       this.init();
     }).catch(() => {
       this['$message']({

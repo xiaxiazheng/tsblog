@@ -1,6 +1,6 @@
 /** 后台公用函数 */
 // 获取当前日期时间，格式“yyyy-MM-dd HH:MM:SS”
-exports.getNowFormatDate = function() {
+exports.getNowFormatDate = function () {
   let date = new Date();
   let seperator1 = "-";
   let seperator2 = ":";
@@ -29,12 +29,12 @@ exports.getNowFormatDate = function() {
 };
 
 // 获取一个极大的随机数
-exports.getRandomNum = function() {
+exports.getRandomNum = function () {
   return Math.round(Math.random() * 2147483647);
 };
 
 // 获取处理过的图片名
-exports.getImageName = function(name, id) {
+exports.getImageName = function (name, id) {
   console.log(name);
   let nameArray = name.split(".");
 
@@ -47,4 +47,34 @@ exports.getImageName = function(name, id) {
     filerealname += '.';
   }
   return filerealname + nameArray[nameArray.length - 1];
+}
+
+
+let fs = require('fs');
+// 读取文件
+exports.readFile = function (fPath) {
+  return new Promise(function (resolve, reject) {
+    fs.readFile(fPath, function(err, data) {
+      if (err) reject(err);
+      else resolve(data);
+    });
+  });
+}
+// 写入文件
+exports.writeFile = function (fPath, content) {
+  return new Promise(function(resolve, reject) {
+    fs.writeFile(fPath, content, function(err, data) {
+      if (err) reject(err);
+      else resolve("Successed");
+    });
+  });
+}
+// 删除文件
+exports.deleteFile = function (fPath) {
+  return new Promise(function(resolve, reject) {
+    fs.unlink(fPath, function (err) {  // 删除缓存
+      if(err) reject(err);
+      else resolve("Successed");
+    });
+  });
 }
