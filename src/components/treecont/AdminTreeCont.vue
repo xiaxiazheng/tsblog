@@ -118,9 +118,11 @@ export default class AdminTreeCont extends Vue {
   mounted() {
     this.$nextTick(async function () {
       this.init();
-      let id: any = decodeURIComponent(atob(this['$route'].query.id));
-      let res0: any = await TreeClient.getChildName(id);
-      this.title = res0.data[0].c_label;
+      if(this['$route'].query.id && this['$route'].query.id !== '') {
+        let id: any = decodeURIComponent(atob(this['$route'].query.id));
+        let res0: any = await TreeClient.getChildName(id);
+        this.title = res0.data[0].c_label;
+      }
     });
   }
   
@@ -139,7 +141,7 @@ export default class AdminTreeCont extends Vue {
   }
   
   async init() {
-    if (this['$route'].query.id !== '') {
+    if (this['$route'].query.id && this['$route'].query.id !== '') {
       let id: any = decodeURIComponent(atob(this['$route'].query.id)); // 子节点的id
       let res0: any = await TreeClient.getChildName(id);
       this.title = res0.data[0].c_label;

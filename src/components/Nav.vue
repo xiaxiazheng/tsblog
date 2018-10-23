@@ -21,7 +21,7 @@
             class="el-icon-search el-input__icon"
             slot="suffix">
           </i>
-          <template slot-scope="{ item }" :title="item.label + '\n' + item.flabel">
+          <template slot-scope="{ item }">
             <div class="label">{{ item.label }}</div>
             <span class="flabel">{{ item.flabel }}</span>
           </template>
@@ -57,9 +57,11 @@
             class="el-icon-search el-input__icon"
             slot="suffix">
           </i>
-          <template slot-scope="{ item }" :title="item.label + '\n' + item.flabel">
-            <div class="label">{{ item.label }}</div>
-            <span class="flabel">{{ item.flabel }}</span>
+          <template slot-scope="{ item }">
+            <div :title="item.flabel + ' -> ' + item.label">
+              <div class="label">{{ item.label }}</div>
+              <span class="flabel">{{ item.flabel }}</span>
+            </div>
           </template>
         </el-autocomplete>
         <!-- 右边的 tabs 们 -->
@@ -119,7 +121,6 @@ export default class Nav extends Vue {
         }
       }
     }
-    console.log(this.tree);
   }
 
   clickTabs(tabName: any) {

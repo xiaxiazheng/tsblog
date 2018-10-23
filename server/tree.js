@@ -67,6 +67,7 @@ exports.getTree = async (ctx) => {
     data: flist,
   };
 }
+
 // 查三级节点名
 exports.getChildName = async (ctx) => {
   let sql = "SELECT c_label FROM tree WHERE c_id=?";

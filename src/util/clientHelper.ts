@@ -99,6 +99,14 @@ export namespace ContClient {
     let url = `${baseUrl}/cont?id=${id}`;
     return axiosGetHelper(url);
   }
+  export function getAllCont() {
+    let url = `${baseUrl}/allcont`;
+    return axiosGetHelper(url);
+  }
+  export function getAlmostCont() {
+    let url = `${baseUrl}/almostcont`;
+    return axiosGetHelper(url);
+  }
   export function addNodeCont(id: string, sort: any) {
     let url = `${baseUrl}/addnodecont`;
     let params = {
