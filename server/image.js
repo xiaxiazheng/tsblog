@@ -1,7 +1,6 @@
 /** 上传图片 */
 let { query } = require('./db.js');
 let Common = require('./common.js');
-let fs = require('fs');
 
 /** 获取上传的图片保存到本地，并将文件名保存到数据库 */
 // 主页的，main
