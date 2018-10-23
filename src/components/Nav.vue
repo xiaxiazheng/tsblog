@@ -14,7 +14,7 @@
           popper-class="searchBoxPopper"
           v-model="searchkeyword"
           :fetch-suggestions="querySearch"
-          placeholder="搜索树的节点"
+          placeholder="搜索树的节点 空格分隔key"
           :trigger-on-focus="false"
           @select="handleSelect">
           <i
@@ -50,7 +50,7 @@
           popper-class="searchBoxPopper"
           v-model="searchkeyword"
           :fetch-suggestions="querySearch"
-          placeholder="搜索树的节点"
+          placeholder="搜索树的节点 空格分隔key"
           :trigger-on-focus="false"
           @select="handleSelect">
           <i
@@ -79,12 +79,18 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { TreeClient } from '../util/clientHelper';
 import { baseEnv } from '../config';
 
+interface TreeType {
+  flabel: string;
+  id: number;
+  label: string;
+}
+
 @Component
 export default class Nav extends Vue {
   @Prop() type: any;
   titlehome: string = 'XIAXIAZheng';
   titleadmin: string = 'XIAXIAZheng';
-  tree: any[] = [];
+  tree: TreeType[] = [];
   activeTab: string = '';
   searchkeyword: string = '';
 
@@ -113,6 +119,7 @@ export default class Nav extends Vue {
         }
       }
     }
+    console.log(this.tree);
   }
 
   clickTabs(tabName: any) {
@@ -122,16 +129,27 @@ export default class Nav extends Vue {
 
   // 处理是否搜索
   querySearch(queryString: any, cb: any) {
-    let tree = this.tree;
-    let results = queryString ? tree.filter(this.createFilter(queryString)) : tree;
+    let results: TreeType[];
+    if (!queryString) { // 没关键字就跳过
+      results = this.tree;
+    } else {
+      let keywords: string[] = queryString.split(' '); // 去掉空格
+      keywords = keywords.filter(item => item !== ""); // 去掉连续空格造成的东西
+      results = this.tree;
+      if(keywords.length !== 0) { // 没关键字就跳过
+        for(let keyword of keywords) {
+          results = results.filter(this.createFilter(keyword))
+        }
+      }
+    }
     
     cb(results); // 调用 callback 返回建议列表的数据
   }
 
   // 处理搜索的筛选
-  createFilter(queryString: any) {
+  createFilter(keyword: any) {
     return (item: any) => {
-      return (item.label.toLowerCase().indexOf(queryString.toLowerCase()) !== -1 || item.flabel.toLowerCase().indexOf(queryString.toLowerCase()) !== -1);
+      return (item.label.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 || item.flabel.toLowerCase().indexOf(keyword.toLowerCase()) !== -1);
     };
   }
   

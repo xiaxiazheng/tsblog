@@ -15,14 +15,14 @@
 						<el-button
 							type="text"
 							size="mini"
-							@click="() => up(node, data)"
+							@click="() => upordown(node, data, 'up')"
 							v-if="node.previousSibling">
 							<i class="el-icon-arrow-up"></i>
 						</el-button>
 						<el-button
 							type="text"
 							size="mini"
-							@click="() => down(node, data)"
+							@click="() => upordown(node, data, 'down')"
 							v-if="node.nextSibling">
 							<i class="el-icon-arrow-down"></i>
 						</el-button>
@@ -154,7 +154,7 @@ export default class AdminTree extends Vue {
   
   @Watch("$route")
   onRouteChange() {
-    this.saveFathExpend(null); // 这里要在刷新前保存借点
+    this.saveFathExpend(null); // 这里要在刷新前保存节点
     this.init();
   }
 
@@ -166,7 +166,6 @@ export default class AdminTree extends Vue {
     let res: any = await TreeClient.getTree('admin');
     if (!res) return;
     this.tree = res.data;
-    this.fatherNodeList = [];
     // 给树设置hover属性
     for (let i in this.tree) {
       Vue.set(this.tree[i], 'hovering', false);
@@ -200,27 +199,6 @@ export default class AdminTree extends Vue {
       });
       this.propsname = node.data.label;
     }
-    this.saveFathExpend(node);
-  }
-
-  // 修改节点
-  motify(node: any, data: any) {
-    let level = node.level;
-    if (level === 3) {
-      this.notice = '修改三级节点名称';
-    }
-    if (level === 2) {
-      this.notice = '修改二级节点名称';
-    }
-    if (level === 1) {
-      this.notice = '修改一级节点名称';
-    }
-    this.motifyNode = {
-      id: data.id,
-      level: node.level,
-      newNodeName: data.label,
-    };
-    this.showEditDialog = true;
     this.saveFathExpend(node);
   }
 
@@ -360,68 +338,25 @@ export default class AdminTree extends Vue {
     }
   }
 
-  // 穿梭节点
-  shuttle(node: any, data: any) {
-    if (node.parent.childNodes.length === 1) {
-      this['$message']({
-        type: 'warning',
-        message: '当前节点的父节点只有这一个子节点，不能穿梭'
-      });
-      return;
+  // 修改节点
+  motify(node: any, data: any) {
+    let level = node.level;
+    if (level === 3) {
+      this.notice = '修改三级节点名称';
     }
-
-    /* 找到所有父级节点 */
-    this.fatherNodeList = node.parent.parent.childNodes;
-    /* 保存穿梭等级 */
-    this.shuttleLevel = node.level;
-    /* 保存现场 */
-    this.choiceFathId = node.parent.data.id;
-    this.originFathId = this.choiceFathId;
-    this.shuttleChildId = data.id;
-    this.shuttleChildLabel = data.label;
-    this.showShuttleDialog = true;
-    this.saveFathExpend(node);
-  }
-
-  // 上移
-  async up(node: any, data: any) {
-    let level: any = node.level;
-    let thisId: any = node.data.id;
-    let thisSort: any = node.data.sort;
-    let otherId: any = node.previousSibling.data.id;
-    let otherSort: any = node.previousSibling.data.sort;
-    let res: any = await TreeClient.changeSort(level, thisId, thisSort, otherId, otherSort);
-    if (!res) return;
-    this.msgTips(res);
-    this.saveFathExpend(node);
-    this.init();
-  }
-
-  // 下移
-  async down(node: any, data: any) {
-    let level: any = node.level;
-    let thisId: any = node.data.id;
-    let thisSort: any = node.data.sort;
-    let otherId: any = node.nextSibling.data.id;
-    let otherSort: any = node.nextSibling.data.sort;
-    let res: any = await TreeClient.changeSort(level, thisId, thisSort, otherId, otherSort);
-    if (!res) return;
-    this.msgTips(res);
-    this.saveFathExpend(node);
-    this.init();
-  }
-
-  // 处理关闭dialog
-  handleCloseDialog() {
-    this.showEditDialog = false;
+    if (level === 2) {
+      this.notice = '修改二级节点名称';
+    }
+    if (level === 1) {
+      this.notice = '修改一级节点名称';
+    }
     this.motifyNode = {
-      id: '',
-      newNodeName: '',
-      level: ''
+      id: data.id,
+      level: node.level,
+      newNodeName: data.label,
     };
-    this.showShuttleDialog = false;
-    this.shuttleChildId = '';
-    this.shuttleChildLabel = '';
+    this.showEditDialog = true;
+    this.saveFathExpend(node);
   }
 
   // 保存修改的节点名称
@@ -443,6 +378,30 @@ export default class AdminTree extends Vue {
     this.init();
     this.propsname = this.motifyNode.newNodeName;  // 保证修改的值能直接传给子组件，因为改了值路由没变，子组件不会刷新
     this.motifyNode.newNodeName = '';
+  }
+
+  // 穿梭节点
+  shuttle(node: any, data: any) {
+    this.fatherNodeList = [];
+    if (node.parent.childNodes.length === 1) {
+      this['$message']({
+        type: 'warning',
+        message: '当前节点的父节点只有这一个子节点，不能穿梭'
+      });
+      return;
+    }
+
+    /* 找到所有父级节点 */
+    this.fatherNodeList = node.parent.parent.childNodes;
+    /* 保存穿梭等级 */
+    this.shuttleLevel = node.level;
+    /* 保存现场 */
+    this.choiceFathId = node.parent.data.id;
+    this.originFathId = this.choiceFathId;
+    this.shuttleChildId = data.id;
+    this.shuttleChildLabel = data.label;
+    this.showShuttleDialog = true;
+    this.saveFathExpend(node);
   }
 
   // 保存穿梭
@@ -495,6 +454,44 @@ export default class AdminTree extends Vue {
     this.init();
   }
 
+  // 上移或下移
+  async upordown(node: any, data: any, type: string) {
+    let level: any = node.level;
+    let thisId: any = node.data.id;
+    let thisSort: any = node.data.sort;
+    let otherId: any = '';
+    let otherSort: any = '';
+    if (type === 'up') {
+      otherId = node.previousSibling.data.id;
+      otherSort = node.previousSibling.data.sort;
+    } else if (type === 'down') {
+      otherId = node.nextSibling.data.id;
+      otherSort = node.nextSibling.data.sort;
+    } else {
+      console.log('上下移动出错');
+      return;
+    }
+    
+    let res: any = await TreeClient.changeSort(level, thisId, thisSort, otherId, otherSort);
+    if (!res) return;
+    this.msgTips(res);
+    this.saveFathExpend(node);
+    this.init();
+  }
+
+  // 处理关闭dialog
+  handleCloseDialog() {
+    this.showEditDialog = false;
+    this.motifyNode = {
+      id: '',
+      newNodeName: '',
+      level: ''
+    };
+    this.showShuttleDialog = false;
+    this.shuttleChildId = '';
+    this.shuttleChildLabel = '';
+  }
+
   // 保存当前一二级节点们的展开状态
   saveFathExpend(node: any) {
     if (node) {
@@ -510,12 +507,12 @@ export default class AdminTree extends Vue {
     }
     this.expandedList = [];
     for (let item of this.allNodelist) {
-      if (item.expanded) {
+      if (item.expanded) { // 在一级节点展开的情况下才保存它下级节点的展开情况
         this.expandedList.push(item.data.id);
-      }
-      for (let jtem of item.childNodes) {
-        if (jtem.expanded) {
-          this.expandedList.push(jtem.data.id);
+        for (let jtem of item.childNodes) {
+          if (jtem.expanded) {
+            this.expandedList.push(jtem.data.id);
+          }
         }
       }
     }
@@ -533,8 +530,6 @@ export default class AdminTree extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less">
-// @import '../../static/global.less';
-
   .admintree {
 		.custom-tree-node {
 			flex: 1;
