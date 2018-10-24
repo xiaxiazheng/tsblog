@@ -10,8 +10,8 @@ export default new VueRouter({
       children: [
         {
           path: '',
-          name: 'Main',
-          component: () => import('@/views/home/Main.vue'),
+          name: 'HomeMain',
+          component: () => import('@/views/home/HomeMain.vue'),
         },
         {
           path: 'tree',

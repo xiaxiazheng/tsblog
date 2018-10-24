@@ -1,17 +1,17 @@
 <template>
   <div class="home">
-    <Nav type="home"></Nav>
+    <MyNav type="home"></MyNav>
     <router-view class="homerouter"></router-view>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Nav from '@/components/Nav.vue'; // @ is an alias to /src
+import MyNav from '@/components/MyNav.vue'; // @ is an alias to /src
 
 @Component({
   components: {
-    Nav
+    MyNav
   },
 })
 export default class Home extends Vue {

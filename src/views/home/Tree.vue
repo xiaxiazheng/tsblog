@@ -13,8 +13,8 @@
           accordion>
         </el-tree>
       </div>
-      <div class="rightcont">
-        <TreeCont></TreeCont>
+      <div class="rightcont" ref="rightcont">
+        <TreeCont @scrollToTop="scrollToTop"></TreeCont>
       </div>
     </div>
     <!-- 移动端 -->
@@ -80,6 +80,12 @@ export default class Tree extends Vue {
   @Watch("$route")
   onRouteChanged() {
     this.init();
+  }
+
+  // 滚动到顶部，给子组件调用的
+  scrollToTop() {
+    let div = this.$refs["rightcont"] as HTMLDivElement;
+    div["scrollTop"] = 0;
   }
 
   async init() {

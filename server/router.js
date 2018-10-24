@@ -55,11 +55,11 @@ router.get('/', async (ctx) => {
 	router.get('/cont', async (ctx) => {
     ctx.body = await cont.getNodeCont(ctx);
 	});
-	router.get('/allcont', async (ctx) => {
-		ctx.body = await cont.getAllCont(ctx);
+	router.post('/allcont', async (ctx) => {
+		ctx.body = await cont.postAllCont(ctx);
 	});
-	router.get('/almostcont', async (ctx) => {
-		ctx.body = await cont.getAlmostCont(ctx);
+	router.post('/almostcont', async (ctx) => {
+		ctx.body = await cont.postAlmostCont(ctx);
 	});
 	router.post('/addnodecont', async (ctx) => {
 		ctx.body = await cont.addNodeCont(ctx);

@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="homemain">
     <div class="carousel">
       <el-carousel :interval="5000" v-if="imgUrlList.length !== 0">
         <el-carousel-item v-for="(item, index) in imgUrlList" :key="index">
@@ -25,7 +25,7 @@ import { ImgClient } from '../../util/clientHelper';
 import { baseUrl } from "../../config";
 
 @Component
-export default class Main extends Vue {
+export default class HomeMain extends Vue {
   imgUrlList: any[] = [];
 
   mounted() {
@@ -45,7 +45,7 @@ export default class Main extends Vue {
 </script>
 
 <style lang="less">
-  .main {
+  .homemain {
     height: 100%;
     .carousel {
       max-width: 960px; // 走马灯宽度

@@ -1,5 +1,5 @@
 <template>
-  <header class="nav">
+  <header class="mynav">
     <!-- 展示版 -->
     <div v-if="type === 'home'">
       <div class="leftside">
@@ -22,8 +22,10 @@
             slot="suffix">
           </i>
           <template slot-scope="{ item }">
-            <div class="label">{{ item.label }}</div>
-            <span class="flabel">{{ item.flabel }}</span>
+            <div :title="item.flabel + ' -> ' + item.label">
+              <div class="label">{{ item.label }}</div>
+              <span class="flabel">{{ item.flabel }}</span>
+            </div>
           </template>
         </el-autocomplete>
         <!-- 右边的 tabs 们 -->
@@ -88,7 +90,7 @@ interface TreeType {
 }
 
 @Component
-export default class Nav extends Vue {
+export default class MyNav extends Vue {
   @Prop() type: any;
   titlehome: string = 'XIAXIAZheng';
   titleadmin: string = 'XIAXIAZheng';
@@ -137,9 +139,9 @@ export default class Nav extends Vue {
       let keywords: string[] = queryString.split(' '); // 去掉空格
       keywords = keywords.filter(item => item !== ""); // 去掉连续空格造成的东西
       results = this.tree;
-      if(keywords.length !== 0) { // 没关键字就跳过
-        for(let keyword of keywords) {
-          results = results.filter(this.createFilter(keyword))
+      if (keywords.length !== 0) { // 没关键字就跳过
+        for (let keyword of keywords) {
+          results = results.filter(this.createFilter(keyword));
         }
       }
     }
@@ -178,7 +180,7 @@ export default class Nav extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less">
-  .nav {
+  .mynav {
     height: 3.6rem;
     padding: .7rem 1.5rem;
     line-height: 2.2rem;

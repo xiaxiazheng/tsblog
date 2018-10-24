@@ -47,43 +47,83 @@ exports.getNodeCont = async (ctx) => {
 };
 
 // 查所有
-exports.getAllCont = async (ctx) => {
-  let sql = "SELECT c_id, title, cont FROM cont";
-  let array = [];
-  let results = await query(sql, array);
-  return { 
+exports.postAllCont = async (ctx) => {
+  let keywords = ctx.request.body.keywords;
+  let pageNo = ctx.request.body.pageNo;
+  let pageSize = ctx.request.body.pageSize;
+
+  let sql1 = `SELECT c_id, title, cont, mtime FROM cont WHERE `;
+  let sql2 = `SELECT COUNT(*) FROM cont WHERE `;
+
+  // 装载搜索字段
+  for(let i = 0; i < keywords.length; i++) {
+    if(i !== 0) {
+      sql1 += ' && ';
+      sql2 += ' && ';
+    }
+    sql1 += `(title LIKE '%${keywords[i]}%' || cont LIKE '%${keywords[i]}%')`;
+    sql2 += `(title LIKE '%${keywords[i]}%' || cont LIKE '%${keywords[i]}%')`;
+  }
+  // 装载分页
+  sql1 += `LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`;
+
+  let array1 = [];
+  let res1 = await query(sql1, array1);
+  let array2 = [];
+  let res2 = await query(sql2, array2);
+  return {
     resultsCode: 'success',
     message: '获取所有 cont 数据成功', 
-    data: results
+    data: {
+      totalNumber: res2[0]["COUNT(*)"],
+      list: res1
+    }
   };
 };
 
 // 查所有，除了 secret place
-exports.getAlmostCont = async (ctx) => {
+exports.postAlmostCont = async (ctx) => {
+  let keywords = ctx.request.body.keywords;
+  let pageNo = ctx.request.body.pageNo;
+  let pageSize = ctx.request.body.pageSize;
   let sql1 = "SELECT category_id FROM category WHERE label='My Secret Place'";
   let array1 = [];
   let res1 = await query(sql1, array1);
 
-  let sql3;
+  let sql3, sql4;
   if(res1.length !== 0) {
     let categoryid = res1[0].category_id;
     let sql2 = "SELECT c_id FROM tree WHERE category_id=?";
     let array2 = [categoryid];
     let res2 = await query(sql2, array2);
-    sql3 = "SELECT c_id, title, cont FROM cont WHERE c_id!='" + res2[0].c_id + "'";
+    sql3 = `SELECT c_id, title, cont, mtime FROM cont WHERE c_id!='${res2[0].c_id}'`;
+    sql4 = `SELECT COUNT(*) FROM cont WHERE c_id!='${res2[0].c_id}'`;
     for(let i = 1; i < res2.length; i++) {
-      sql3 += "&&c_id!='" + res2[i].c_id + "'";
+      sql3 += `&&c_id!='${res2[i].c_id}'`;
+      sql4 += `&&c_id!='${res2[i].c_id}'`;
     }
-  } else {
-    sql3 = "SELECT c_id, title, cont FROM cont";
-  }
 
+    // 装载搜索字段
+    for(let item of keywords) {
+      sql3 += `&& (title LIKE '%${item}%' || cont LIKE '%${item}%')`;
+      sql4 += `&& (title LIKE '%${item}%' || cont LIKE '%${item}%')`;
+    }
+    // 装载分页
+    sql3 += `LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`;
+  } else {
+    sql3 = "SELECT c_id, title, cont, mtime FROM cont";
+  }
   let array3 = [];
-  let results = await query(sql3, array3);
+  let res3 = await query(sql3, array3);
+  let array4 = [];
+  let res4 = await query(sql4, array4);
   return {
     resultsCode: 'success',
     message: '获取几乎所有 cont 数据成功', 
-    data: results
+    data: {
+      totalNumber: res4[0]["COUNT(*)"],
+      list: res3
+    }
   };
 }; 
 

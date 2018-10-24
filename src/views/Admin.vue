@@ -1,6 +1,6 @@
 <template>
   <div class="admin">
-    <Nav type="admin"></Nav>
+    <MyNav type="admin"></MyNav>
     <router-view class="adminrouter"></router-view>
   </div>
 </template>
@@ -8,11 +8,11 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { UserClient } from '../util/clientHelper';
-import Nav from '@/components/Nav.vue';
+import MyNav from '@/components/MyNav.vue';
 
 @Component({
   components: {
-    Nav
+    MyNav
   },
 })
 export default class Admin extends Vue {

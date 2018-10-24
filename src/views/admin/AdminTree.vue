@@ -56,14 +56,14 @@
 			</el-tree>
 		</div>
 		<!-- 右边的子组件 -->
-		<div class="rightcont">
+		<div class="rightcont" ref="rightcont">
 			<el-switch
 				v-model="isEdit"
 				title="是否编辑">
 			</el-switch>
 			<!-- 切换以下两个 -->
-      <AdminTreeCont v-if="isEdit" :propsname="propsname"></AdminTreeCont>
-			<TreeCont v-if="!isEdit" :propsname="propsname"></TreeCont>
+      <AdminTreeCont v-if="isEdit" :propsname="propsname" @scrollToTop="scrollToTop"></AdminTreeCont>
+			<TreeCont v-if="!isEdit" :propsname="propsname" @scrollToTop="scrollToTop"></TreeCont>
 		</div>
 		<!-- 修改节点名称的dialog -->
 		<el-dialog
@@ -156,6 +156,12 @@ export default class AdminTree extends Vue {
   onRouteChange() {
     this.saveFathExpend(null); // 这里要在刷新前保存节点
     this.init();
+  }
+
+  // 滚动到顶部，给子组件调用的
+  scrollToTop() {
+    let div = this.$refs["rightcont"] as HTMLDivElement;
+    div["scrollTop"] = 0;
   }
 
   async init() {
