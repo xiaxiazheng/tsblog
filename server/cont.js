@@ -64,8 +64,10 @@ exports.postAllCont = async (ctx) => {
     sql1 += `(title LIKE '%${keywords[i]}%' || cont LIKE '%${keywords[i]}%')`;
     sql2 += `(title LIKE '%${keywords[i]}%' || cont LIKE '%${keywords[i]}%')`;
   }
+  // 装载排序
+  sql3 += ' ORDER BY mtime DESC ';
   // 装载分页
-  sql1 += `LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`;
+  sql1 += ` LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`;
 
   let array1 = [];
   let res1 = await query(sql1, array1);
@@ -108,11 +110,24 @@ exports.postAlmostCont = async (ctx) => {
       sql3 += `&& (title LIKE '%${item}%' || cont LIKE '%${item}%')`;
       sql4 += `&& (title LIKE '%${item}%' || cont LIKE '%${item}%')`;
     }
-    // 装载分页
-    sql3 += `LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`;
-  } else {
-    sql3 = "SELECT c_id, title, cont, mtime FROM cont";
+  } else { // 不存在'my secret place'的情况
+    sql3 = "SELECT c_id, title, cont, mtime FROM cont WHERE ";
+    sql4 = "SELECT COUNT(*) FROM cont WHERE ";
+    // 装载搜索字段
+    for(let i = 0; i < keywords.length; i++) {
+      if(i !== 0) {
+        sql3 += " && ";
+        sql4 += " && ";
+      }
+      sql3 += `(title LIKE '%${keywords[i]}%' || cont LIKE '%${keywords[i]}%')`;
+      sql4 += `(title LIKE '%${keywords[i]}%' || cont LIKE '%${keywords[i]}%')`;
+    }
   }
+  // 装载排序
+  sql3 += ' ORDER BY mtime DESC ';
+  // 装载分页
+  sql3 += ` LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`;
+
   let array3 = [];
   let res3 = await query(sql3, array3);
   let array4 = [];

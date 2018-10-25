@@ -5,7 +5,7 @@ let Common = require('./common.js');
 /** 获取上传的图片保存到本地，并将文件名保存到数据库 */
 // 主页的，main
 exports.saveMainImg = async (ctx) => {
-  // console.log(ctx.req.file);  /* 上传的文件信息 */
+  console.log(ctx.req.file);  /* 上传的文件信息 */
   let img_id = Common.getRandomNum();
   let filename = Common.getImageName(ctx.req.file.originalname, img_id);
   let saveTo = __dirname + "/img/main/" + filename; /* 这里要注意，因为这个文件已经在server里了，所以这里的__dirname是有server的 */

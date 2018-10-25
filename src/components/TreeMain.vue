@@ -16,10 +16,12 @@
         </el-input>
         <!-- 搜索结果 -->
         <div class="resultTitle" v-if="searchkeyword">
-          搜索结果：
-          <span>第 {{pageNo}} / {{ Math.ceil(totalNumber / pageSize) }} 页</span>
+          搜索结果：(默认按修改时间倒序排列)
+          <span v-if="!isSeaching">第 {{pageNo}} / {{ Math.ceil(totalNumber / pageSize) }} 页</span>
         </div>
-        <div class="resultNo" v-if="searchkeyword && (!nowContList || nowContList.length === 0)">暂无搜索结果</div>
+        <div class="resultWait" v-if="searchkeyword && isSeaching">正在搜索中，请稍后</div>
+        <div class="resultNo" v-if="searchkeyword && !isSeaching && (!nowContList || nowContList.length === 0)">暂无搜索结果</div>
+        <!-- 结果列表 -->
         <div class="searchResult" v-for="(item, index) in nowContList" :key="index">
           <div class="item" @click="handleSelect(item)">
             <h2>
@@ -56,10 +58,12 @@
         </el-input>
         <!-- 搜索结果 -->
         <div class="resultTitle" v-if="searchkeyword">
-          搜索结果：
-          <span>第 {{pageNo}} / {{ Math.ceil(totalNumber / pageSize) }} 页</span>
+          搜索结果：(默认按修改时间倒序排列)
+          <span v-if="!isSeaching">第 {{pageNo}} / {{ Math.ceil(totalNumber / pageSize) }} 页</span>
         </div>
-        <div class="resultNo" v-if="searchkeyword && (!nowContList || nowContList.length === 0)">暂无搜索结果</div>
+        <div class="resultWait" v-if="searchkeyword && isSeaching">正在搜索中，请稍后</div>
+        <div class="resultNo" v-if="searchkeyword && !isSeaching && (!nowContList || nowContList.length === 0)">暂无搜索结果</div>
+        <!-- 结果列表 -->
         <div class="searchResult" v-for="(item, index) in nowContList" :key="index">
           <div class="item" @click="handleSelect(item)">
             <h2>
@@ -109,9 +113,11 @@ export default class TreeMain extends Vue {
   pageNo: number = 1;  // 当前页码
   pageSize: number = 7;
   nowContList: TreeType[] = [];  // 当前页面的数组
-  totalNumber: number = 100;  // 符合当前搜索条件的所有个数
+  totalNumber: number = 1;  // 符合当前搜索条件的所有个数
   searchkeyword: string = '';  // 用户输入的关键字们
   keywords: string[] = [];  // 处理后的关键字数组（去掉空格并拆分后的）
+  timer: number = 0;  // 防抖定时器
+  isSeaching: boolean = false;
 
   mounted() {
     this.$nextTick(function () {
@@ -126,17 +132,35 @@ export default class TreeMain extends Vue {
     }
   }
 
-  // 处理是否搜索   TODO,这里需要做一下防抖才行
+  // 处理搜索
   @Watch("searchkeyword")
   handleSearch() {
     if (this.searchkeyword) {
-      this.keywords = this.searchkeyword.split(' ').filter(item => item !== "");  // 去掉空格并去掉连续空格造成的东西
+      this.isSeaching = true;
+      /* 先进行防抖操作 */
+      if (this.timer) clearTimeout(this.timer);
+      this.timer = setTimeout(
+        () => { 
+          this.handleKeyWord.apply(this);
+        },
+        500
+      );
+    } else {
+      this.nowContList = [];
+    }
+  }
+
+  // 处理关键字
+  handleKeyWord() {
+    this.keywords = this.searchkeyword.split(' ').filter(item => item !== "");  // 去掉空格并去掉连续空格造成的东西
+    if (this.keywords.length !== 0) {
       if (this.pageNo !== 1) {
         this.pageNo = 1;  // 页码变化就会去拿数据
       } else {
-        this.getNowContList();
+        this.getNowContList(); // 若页码始终为1则直接请求数据
       }
-    } else {
+    } else { // 这里是为了分隔出只输入空格以致于没有关键字的情况
+      this.isSeaching = false;
       this.nowContList = [];
     }
   }
@@ -183,6 +207,7 @@ export default class TreeMain extends Vue {
         item.cont = item.cont.replace(re, `<span class='keyword'>${jtem}</span>`);
       }
     }
+    this.isSeaching = false;
     this.nowContList = list;
     // 调用父组件的方法，使父组件回到页面顶部
     this.$emit('scrollToTop');
@@ -232,9 +257,9 @@ export default class TreeMain extends Vue {
             font-size: .8rem;
           }
         }
-        .resultNo {
+        .resultWait, .resultNo {
           color: #ccc;
-          margin: 1rem 0 0 2rem;
+          margin: 1rem 0 1rem 2rem;
         }
         .searchBox {
           width: 80%;
@@ -261,7 +286,7 @@ export default class TreeMain extends Vue {
               box-sizing: border-box;
               .time {
                 position: absolute;
-                top: 0;
+                top: 5px;
                 right: 10px;
                 font-size: 12px;
                 color: rgb(228, 222, 222);

@@ -554,9 +554,10 @@ export default class AdminTree extends Vue {
 		}
 		.rightcont {
 			.el-switch {
-				position: fixed;
+        position: fixed;
         right: 3rem;
         top: 5rem;
+        z-index: 2;
 			}
 		}
   }

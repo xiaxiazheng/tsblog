@@ -9,7 +9,7 @@ app.use(static(path.join( __dirname, staticPath)));
 const bodyParser = require('koa-bodyparser');  // 使用 ctx.body 解析中间件
 app.use(bodyParser());
 
-const cors = require('koa-cors');  // 跨域访问组件，允许跨域访问
+const cors = require('koa2-cors');  // 跨域访问组件，允许跨域访问
 app.use(cors());
 
 let routerjs = require('./server/router.js');  // 调用路由的配置
