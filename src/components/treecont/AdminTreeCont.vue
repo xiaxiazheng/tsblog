@@ -7,7 +7,7 @@
 					<el-input v-model="item.title" placeholder="请输入内容"></el-input>
           <el-input
 						type="textarea"
-						:autosize="{ minRows: 3, maxRows: 15}"
+						:autosize="{ minRows: 3, maxRows: 15 }"
 						placeholder="请输入内容"
 						v-model="item.cont">
 					</el-input>
@@ -70,7 +70,7 @@
         <el-button type="primary" @click="addCont" icon="el-icon-plus"></el-button>
 			</div>
 			<div class="save">
-				<el-button type="primary" @click="judge" :disabled="!isModify" icon="el-icon-check"></el-button>
+				<el-button type="primary" @click="saveText" :disabled="!isModify" icon="el-icon-check"></el-button>
 			</div>
 			<!-- 查看大图的 dialog -->
 			<el-dialog width="40%" :visible.sync="dialogVisible" :title="dialogImageName">
@@ -239,8 +239,8 @@ export default class AdminTreeCont extends Vue {
     this.init();
   }
 
-  // 先判断判断
-  judge() {
+  // 保存页面文本
+  async saveText() {
     for (let item of this.contObj['list']) {
       if (item.cont === '') {
         this['$message']({
@@ -250,11 +250,6 @@ export default class AdminTreeCont extends Vue {
         return;
       }
     }
-    this.saveModify();
-  }
-
-  // 再保存修改
-  async saveModify() {
     let params: any = this.contObj;
     let res: any = await ContClient.modifyNodeCont(this.contObj);
     if (!res) return;
