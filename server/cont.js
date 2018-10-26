@@ -52,7 +52,7 @@ exports.postAllCont = async (ctx) => {
   let pageNo = ctx.request.body.pageNo;
   let pageSize = ctx.request.body.pageSize;
 
-  let sql1 = `SELECT c_id, title, cont, mtime FROM cont WHERE `;
+  let sql1 = `SELECT cont.c_id, title, cont, mtime, f_label, c_label FROM cont LEFT JOIN tree ON cont.c_id=tree.c_id WHERE `;
   let sql2 = `SELECT COUNT(*) FROM cont WHERE `;
 
   // 装载搜索字段
@@ -65,7 +65,7 @@ exports.postAllCont = async (ctx) => {
     sql2 += `(title LIKE '%${keywords[i]}%' || cont LIKE '%${keywords[i]}%')`;
   }
   // 装载排序
-  sql3 += ' ORDER BY mtime DESC ';
+  sql1 += ' ORDER BY mtime DESC ';
   // 装载分页
   sql1 += ` LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`;
 
@@ -83,7 +83,7 @@ exports.postAllCont = async (ctx) => {
   };
 };
 
-// 查所有，除了 secret place
+// 查所有，除了 my secret place
 exports.postAlmostCont = async (ctx) => {
   let keywords = ctx.request.body.keywords;
   let pageNo = ctx.request.body.pageNo;
@@ -98,11 +98,15 @@ exports.postAlmostCont = async (ctx) => {
     let sql2 = "SELECT c_id FROM tree WHERE category_id=?";
     let array2 = [categoryid];
     let res2 = await query(sql2, array2);
-    sql3 = `SELECT c_id, title, cont, mtime FROM cont WHERE c_id!='${res2[0].c_id}'`;
-    sql4 = `SELECT COUNT(*) FROM cont WHERE c_id!='${res2[0].c_id}'`;
-    for(let i = 1; i < res2.length; i++) {
-      sql3 += `&&c_id!='${res2[i].c_id}'`;
-      sql4 += `&&c_id!='${res2[i].c_id}'`;
+    sql3 = `SELECT cont.c_id, title, cont, mtime, f_label, c_label FROM cont LEFT JOIN tree ON cont.c_id=tree.c_id WHERE `;
+    sql4 = `SELECT COUNT(*) FROM cont WHERE `;
+    for(let i = 0; i < res2.length; i++) {
+      if(i !== 0) {
+        sql3 += " && ";
+        sql4 += " && ";
+      }
+      sql3 += `cont.c_id!='${res2[i].c_id}'`;
+      sql4 += `c_id!='${res2[i].c_id}'`;
     }
 
     // 装载搜索字段
@@ -111,7 +115,7 @@ exports.postAlmostCont = async (ctx) => {
       sql4 += `&& (title LIKE '%${item}%' || cont LIKE '%${item}%')`;
     }
   } else { // 不存在'my secret place'的情况
-    sql3 = "SELECT c_id, title, cont, mtime FROM cont WHERE ";
+    sql3 = "SELECT cont.c_id, title, cont, mtime FROM cont LEFT JOIN tree ON cont.c_id=tree.c_id WHERE ";
     sql4 = "SELECT COUNT(*) FROM cont WHERE ";
     // 装载搜索字段
     for(let i = 0; i < keywords.length; i++) {

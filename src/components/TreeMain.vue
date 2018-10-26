@@ -26,6 +26,7 @@
           <div class="item" @click="handleSelect(item)">
             <h2>
               <span v-html="item.title" v-highlight></span>
+              <span class="fatherlabel">( {{item.f_label}} -> {{item.c_label}} )</span>
               <span class="time">修改时间：{{item.mtime}}</span>
             </h2>
             <p v-html="item.cont" v-highlight></p>
@@ -68,6 +69,7 @@
           <div class="item" @click="handleSelect(item)">
             <h2>
               <span v-html="item.title" v-highlight></span>
+              <span class="fatherlabel">( {{item.f_label}} -> {{item.c_label}} )</span>
               <span class="time">修改时间：{{item.mtime}}</span>
             </h2>
             <p v-html="item.cont" v-highlight></p>
@@ -284,6 +286,10 @@ export default class TreeMain extends Vue {
               font-size: 1rem;
               border-bottom: 1px solid #eaecef;
               box-sizing: border-box;
+              .fatherlabel {
+                margin-left: .5rem;
+                color: #d2d2e2;
+              }
               .time {
                 position: absolute;
                 top: 5px;
