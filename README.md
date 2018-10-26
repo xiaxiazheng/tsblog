@@ -2,25 +2,29 @@
 
 ## Project setup
 ```
-npm install
+cnpm install
 ```
 
-### Compiles and hot-reloads for development
+### run in local
 ```
 npm run serve
+node server.js
 ```
 
-### Compiles and minifies for production
+### run in local (/dist)
+```
+npm run buildfront
+node server.js
+```
+
+### run in server (/dist)
 ```
 npm run build
+npm start
 ```
 
-### Run your tests
+### run in server (/dist) for pig
 ```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
+npm run buildPig
+npm run startPig
 ```
