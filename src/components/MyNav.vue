@@ -3,7 +3,7 @@
     <!-- 展示版 -->
     <div v-if="type === 'home'">
       <div class="leftside">
-        <span @click="clickTabs('Main')">
+        <span @click="clickTabs('HomeMain')">
           {{ titlehome }}
         </span>
       </div>
