@@ -2,13 +2,13 @@
 let url: string = "";
 let env: string = "";
 if (process.env.NODE_ENV.match('productionPig')) {
-  url = 'http://123.207.5.131:518';
+  url = 'http://123.207.5.131:518/back';
   env = "productionPig";
 } else if (process.env.NODE_ENV.match('production')) {
-  url = 'http://123.207.5.131:80';
+  url = 'http://123.207.5.131:80/back';
   env = "production";
 } else {
-  url = 'http://localhost:3000';
+  url = 'http://localhost:3000/back';
   env = "development";
 }
 console.log(process.env.NODE_ENV, url);

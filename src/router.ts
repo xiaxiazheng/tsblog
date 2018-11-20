@@ -51,6 +51,6 @@ export default new VueRouter({
           component: () => import('@/views/admin/AdminPhotoWall.vue'),
         }
       ]
-    },
+    }
   ],
 });
