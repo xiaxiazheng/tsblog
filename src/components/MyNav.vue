@@ -29,6 +29,7 @@
           </template>
         </el-autocomplete>
         <!-- 右边的 tabs 们 -->
+        <span class="tabItem" @click="clickTabs('Login')">登录</span>
         <span class="tabItem" :class="{'active': activeTab === 'Tree'}" @click="clickTabs('Tree')">知识树</span>
         <span class="tabItem" :class="{'active': activeTab === 'PhotoWall'}" @click="clickTabs('PhotoWall')">图片墙</span>
         <a href="https://github.com/xiaxiazheng/myblog">

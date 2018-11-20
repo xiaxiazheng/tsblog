@@ -16,6 +16,8 @@ let routerjs = require('./server/router.js');  // 调用路由的配置
 app.use(routerjs.router.routes());
 app.use(routerjs.router.allowedMethods());
 
+const historyApiFallback = require('koa2-connect-history-api-fallback');
+app.use(historyApiFallback());
 
 // 起服务
 console.log("环境:", process.env.NODE_ENV);
