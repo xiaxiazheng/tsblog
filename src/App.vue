@@ -13,9 +13,9 @@ ul,ol {list-style-type:none;}
 select,input,img,select {vertical-align:middle;} 
   
 a {text-decoration:none;} 
-a:link {color:#009;} 
-a:visited {color:#800080;} 
-a:hover,a:active,a:focus {color:#c00;text-decoration:underline;}
+a:link {color: #2c3e50;} 
+a:visited {color: #2c3e50;} 
+a:hover,a:active,a:focus {color:#409eff;}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

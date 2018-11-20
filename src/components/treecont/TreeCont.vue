@@ -5,7 +5,7 @@
       <ul>
         <li v-for="(item, index) in contObj.list" :key="index">
           <h2>
-            {{item.title}}
+            <a :href="'#' + item.title + item.sort" :name="item.title + item.sort">{{item.title}}</a>
             <span v-if="contObj.list">
               修改时间：
               <span>{{item.motifytime}}</span>
@@ -18,6 +18,10 @@
           </div>
         </li>
       </ul>
+      <!-- 右边的锚点们 -->
+      <div class="mao">
+        <a v-for="(item, index) in contObj.list" :key="index" :href="'#' + item.title + item.sort">{{item.title}}</a>
+      </div>
       <!-- 查看大图的 dialog -->
       <el-dialog width="40%" :visible.sync="dialogVisible" :title="dialogImageName">
         <img width="100%" :src="dialogImageUrl" :alt="dialogImageName" :title="dialogImageName">
@@ -136,9 +140,14 @@ export default class TreeCont extends Vue {
         padding-right: 20px;
       }
       h2 {
-        padding-bottom: 0.3rem;
-        border-bottom: 1px solid #eaecef;
         position: relative;
+        border-bottom: 1px solid #eaecef;
+        box-sizing: border-box;
+        > a {
+          display: inline-block;
+          height: 40px;
+          line-height: 40px;
+        }
         > span {
           position: absolute;
           right: 0;
@@ -173,6 +182,21 @@ export default class TreeCont extends Vue {
         font-size: 1rem;
         line-height: 1.7;
         margin-bottom: 0.6rem;
+      }
+
+      .mao {
+        position: fixed;
+        top: 70px;
+        right: 12px;
+        text-align: right;
+        opacity: 0.3;
+        >a {
+          display: block;
+          margin: 2px;
+        }
+      }
+      .mao:hover {
+        opacity: 1;
       }
     
       pre {
