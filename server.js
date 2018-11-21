@@ -4,7 +4,7 @@ const path = require('path');
 
 const static = require('koa-static');  // 配置静态资源目录
 const staticPath = './server/img';
-app.use(static(path.join( __dirname, staticPath)));
+app.use(static(path.join(__dirname, staticPath)));
 
 const bodyParser = require('koa-bodyparser');  // 使用 ctx.body 解析中间件
 app.use(bodyParser());
@@ -33,7 +33,7 @@ if (!process.env.NODE_ENV) {  // 本地
 		console.log('Graduation app listening at http://123.207.5.131:%s', port);
 	});
 } else {
-	let server = app.listen(80, function () {
+	let server = app.listen(3000, function () {
 		let port = server.address().port;
 		console.log('Graduation app listening at http://123.207.5.131:%s', port);
 	});

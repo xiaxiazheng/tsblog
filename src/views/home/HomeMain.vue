@@ -22,7 +22,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { ImgClient } from '../../util/clientHelper';
-import { baseUrl } from "../../config";
+import { baseImgUrl } from "../../config";
 
 @Component
 export default class HomeMain extends Vue {
@@ -38,7 +38,7 @@ export default class HomeMain extends Vue {
     let res = await ImgClient.getImgList('main');
     if (!res) return;
     for (let item of res.data) {
-      this.imgUrlList.push(`${baseUrl}/main/${item.filename}`);
+      this.imgUrlList.push(`${baseImgUrl}/main/${item.filename}`);
     }
   }
 }

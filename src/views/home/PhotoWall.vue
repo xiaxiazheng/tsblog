@@ -39,7 +39,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { ImgClient } from '../../util/clientHelper';
-import { baseUrl } from "../../config";
+import { baseImgUrl } from "../../config";
 
 interface ImgListType {
   img_id: string;
@@ -73,7 +73,7 @@ export default class PhotoWall extends Vue {
           imgname: item.imgname,
           filename: item.filename,
           cTime: item.cTime,
-          url: `${baseUrl}/wall/${item.filename}`
+          url: `${baseImgUrl}/wall/${item.filename}`
         });
       }
     }

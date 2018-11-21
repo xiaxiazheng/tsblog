@@ -37,7 +37,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { TreeClient, ContClient } from '../../util/clientHelper';
-import { baseUrl } from "../../config";
+import { baseImgUrl } from "../../config";
 import TreeMain from '@/components/TreeMain.vue';
 
 interface ContType {
@@ -57,7 +57,7 @@ export default class TreeCont extends Vue {
   contObj: ContType = {
     list: []
   };
-  baseImgUrl: string = `${baseUrl}/treecont/`;
+  baseImgUrl: string = `${baseImgUrl}/treecont/`;
   dialogVisible: boolean = false;
   dialogImageName: string = "";
   dialogImageUrl: string = "";
@@ -188,15 +188,18 @@ export default class TreeCont extends Vue {
         position: fixed;
         top: 70px;
         right: 12px;
+        max-width: 220px;
         text-align: right;
         opacity: 0.3;
         >a {
           display: block;
+          min-height: 20px;
           margin: 2px;
+          border-bottom: 1px solid rgba(0,0,0,0.1);
         }
       }
       .mao:hover {
-        opacity: 1;
+        opacity: 0.9;
       }
     
       pre {
