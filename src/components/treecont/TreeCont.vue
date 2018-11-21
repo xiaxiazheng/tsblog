@@ -186,7 +186,7 @@ export default class TreeCont extends Vue {
 
       .mao {
         position: fixed;
-        top: 70px;
+        top: 115px;
         right: 12px;
         max-width: 220px;
         text-align: right;

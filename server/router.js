@@ -99,7 +99,6 @@ const backUrl = '/back';  /* 绕开前端的 history 模式，不然路径叠加
 // 放在最后，用于传递文件
 router.get('*', async (ctx) => {
 	let filedata;
-	console.log(ctx.path);
 	try {
 		filedata = await Common.readFile(path.join(__dirname, "../dist" + ctx.path));
 	} catch (err) {
