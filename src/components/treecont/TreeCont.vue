@@ -162,7 +162,7 @@ export default class TreeCont extends Vue {
         li {
           margin: 20px 0;
           .imgbox {
-            height: 314px;
+            max-height: 314px;
             margin: 0 auto;
             overflow: hidden;
             text-align: center;
