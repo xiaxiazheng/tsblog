@@ -86,7 +86,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { TreeClient, ContClient, ImgClient } from '../../util/clientHelper';
-import { baseUrl } from '../../config';
+import { baseUrl, baseImgUrl } from '../../config';
 import TreeMain from '@/components/TreeMain.vue';
 
 interface ContType {
@@ -177,7 +177,7 @@ export default class AdminTreeCont extends Vue {
           filelist: item.filename ? [{
             filename: item.filename || '',
             imgname: imgname || '',
-            url: item.filename ? `${baseUrl}/treecont/${item.filename}` : ''
+            url: item.filename ? `${baseImgUrl}/treecont/${item.filename}` : ''
           }] : [],
         });
       }

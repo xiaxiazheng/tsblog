@@ -22,7 +22,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { ImgClient } from '../util/clientHelper';
-import { baseUrl } from '../config';
+import { baseUrl, baseImgUrl } from '../config';
 
 @Component
 export default class UploadPhotoWall extends Vue {
@@ -54,7 +54,7 @@ export default class UploadPhotoWall extends Vue {
           imgname: item.imgname,
           filename: item.filename,
           cTime: item.cTime,
-          url: `${baseUrl}/${this.type}/${item.filename}`
+          url: `${baseImgUrl}/${this.type}/${item.filename}`
         });
       }
     }
