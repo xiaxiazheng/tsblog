@@ -141,6 +141,7 @@ export default class TreeCont extends Vue {
       }
       h2 {
         position: relative;
+        margin-bottom: 5px;
         border-bottom: 1px solid #eaecef;
         box-sizing: border-box;
         > a {
@@ -167,7 +168,7 @@ export default class TreeCont extends Vue {
             text-align: center;
             img {
               display: inherit;
-              height: calc(100% - 14px);
+              max-height: calc(100% - 14px);
               margin: 0 auto;
               cursor: pointer;
             }
@@ -181,13 +182,13 @@ export default class TreeCont extends Vue {
       p {
         font-size: 1rem;
         line-height: 1.7;
-        margin-bottom: 0.6rem;
+        margin: 0 0 0.6rem 1px;;
       }
 
       .mao {
         position: fixed;
         top: 115px;
-        right: 12px;
+        right: 16px;
         max-width: 220px;
         text-align: right;
         opacity: 0.3;
