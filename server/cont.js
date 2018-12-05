@@ -52,11 +52,15 @@ exports.postAllCont = async (ctx) => {
   let pageNo = ctx.request.body.pageNo;
   let pageSize = ctx.request.body.pageSize;
 
-  let sql1 = `SELECT cont.c_id, title, cont, mtime, f_label, c_label FROM cont LEFT JOIN tree ON cont.c_id=tree.c_id WHERE `;
-  let sql2 = `SELECT COUNT(*) FROM cont WHERE `;
+  let sql1 = `SELECT cont.c_id, title, cont, mtime, f_label, c_label FROM cont LEFT JOIN tree ON cont.c_id=tree.c_id`;
+  let sql2 = `SELECT COUNT(*) FROM cont`;
 
   // 装载搜索字段
   for(let i = 0; i < keywords.length; i++) {
+    if(i === 0) {
+      sql1 += ' WHERE ';
+      sql2 += ' WHERE ';
+    }
     if(i !== 0) {
       sql1 += ' && ';
       sql2 += ' && ';
@@ -115,10 +119,14 @@ exports.postAlmostCont = async (ctx) => {
       sql4 += `&& (title LIKE '%${item}%' || cont LIKE '%${item}%')`;
     }
   } else { // 不存在'my secret place'的情况
-    sql3 = "SELECT cont.c_id, title, cont, mtime FROM cont LEFT JOIN tree ON cont.c_id=tree.c_id WHERE ";
-    sql4 = "SELECT COUNT(*) FROM cont WHERE ";
+    sql3 = "SELECT cont.c_id, title, cont, mtime FROM cont LEFT JOIN tree ON cont.c_id=tree.c_id";
+    sql4 = "SELECT COUNT(*) FROM cont";
     // 装载搜索字段
     for(let i = 0; i < keywords.length; i++) {
+      if(i === 0) {
+        sql3 += " WHERE ";
+        sql4 += " WHERE ";
+      }
       if(i !== 0) {
         sql3 += " && ";
         sql4 += " && ";

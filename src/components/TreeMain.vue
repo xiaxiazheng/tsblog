@@ -68,6 +68,10 @@
         </div>
         <div class="resultWait" v-if="searchkeyword && isSeaching">正在搜索中，请稍后</div>
         <div class="resultNo" v-if="searchkeyword && !isSeaching && (!nowContList || nowContList.length === 0)">暂无搜索结果</div>
+        <!-- 树首页的默认展示 -->
+        <div class="resultTitle" v-if="!searchkeyword">
+          最近更新的五个节点：
+        </div>
         <!-- 结果列表 -->
         <div class="searchResult" v-for="(item, index) in nowContList" :key="index">
           <div class="item" @click="handleSelect(item)">
