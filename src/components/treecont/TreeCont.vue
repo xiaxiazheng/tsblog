@@ -23,7 +23,7 @@
         <a v-for="(item, index) in contObj.list" :key="index" :href="'#' + item.title + item.sort">{{item.title}}</a>
       </div>
       <!-- 查看大图的 dialog -->
-      <el-dialog width="40%" :visible.sync="dialogVisible" :title="dialogImageName">
+      <el-dialog width="45%" :visible.sync="dialogVisible" :title="dialogImageName">
         <img width="100%" :src="dialogImageUrl" :alt="dialogImageName" :title="dialogImageName">
       </el-dialog>
     </div>
@@ -162,13 +162,13 @@ export default class TreeCont extends Vue {
         li {
           margin: 20px 0;
           .imgbox {
-            max-height: 314px;
+            max-width: 70%;
             margin: 0 auto;
             overflow: hidden;
             text-align: center;
             img {
+              max-width: 100%;
               display: inherit;
-              max-height: calc(100% - 14px);
               margin: 0 auto;
               cursor: pointer;
             }
@@ -211,7 +211,7 @@ export default class TreeCont extends Vue {
         white-space: pre;
         word-wrap: normal;
         border: 1px solid black;
-        border-radius: 0.5rem;
+        border-radius: 4px;
         font-size: 0.859rem;
         font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console",
           "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono",
@@ -242,6 +242,9 @@ export default class TreeCont extends Vue {
     .el-dialog {
       max-width: 800px;
       min-width: 400px;
+      img {
+        max-width: 100%;
+      }
     }
   }
 </style>

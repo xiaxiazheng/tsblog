@@ -21,6 +21,10 @@
         </div>
         <div class="resultWait" v-if="searchkeyword && isSeaching">正在搜索中，请稍后</div>
         <div class="resultNo" v-if="searchkeyword && !isSeaching && (!nowContList || nowContList.length === 0)">暂无搜索结果</div>
+        <!-- 树首页的默认展示 -->
+        <div class="resultTitle" v-if="!searchkeyword">
+          最近修改的五个节点：
+        </div>
         <!-- 结果列表 -->
         <div class="searchResult" v-for="(item, index) in nowContList" :key="index">
           <div class="item" @click="handleSelect(item)">
@@ -38,7 +42,7 @@
           :page-size="pageSize"
           layout="total, prev, pager, next"
           :total="totalNumber"
-          v-if="nowContList && nowContList.length !== 0">
+          v-if="nowContList && nowContList.length !== 0 && totalNumber !== 0">
         </el-pagination>
       </div>
     </div>
@@ -132,11 +136,37 @@ export default class TreeMain extends Vue {
       this.title = "盛兴中英文学校";
       this.cont = "孩子要成才，请到盛兴来！";
     }
+
+    /* 下面这一块实现的是 默认树首页显示最近修改的5个节点 */
+    let params = {
+      keywords: '',
+      pageNo: 1,
+      pageSize: 5
+    };
+    let res;
+    if (this.type === "home") {
+      res = await ContClient.postAlmostCont(params);
+    }
+    if (this.type === 'admin') {
+      res = await ContClient.postAllCont(params);
+    }
+    let list = res.data.list;
+    for (let item of list) {
+      item.cont = item.cont.replace(/<br\/>/g, "\n");
+      item.cont = item.cont.replace(/</g, "&lt;"); // html标签的<转成实体字符,让所有的html标签失效
+      item.cont = item.cont.replace(/&lt;pre/g, "<pre"); // 把pre标签转回来
+      item.cont = item.cont.replace(/pre>\n/g, "pre>"); // 把pre后面的空格去掉
+      item.cont = item.cont.replace(/&lt;\/pre>/g, "</pre>"); // 把pre结束标签转回来
+      item.cont = item.cont.replace(/  /g, "&nbsp;&nbsp;"); // 把空格转成实体字符，以防多空格被合并
+      item.cont = item.cont.replace(/\n|\r\n/g, "<br/>"); // 把换行转成br标签
+    }
+    this.nowContList = list;
+    this.totalNumber = 0;
   }
 
   // 处理搜索
   @Watch("searchkeyword")
-  handleSearch() {
+  async handleSearch() {
     if (this.searchkeyword) {
       this.isSeaching = true;
       /* 先进行防抖操作 */
@@ -148,7 +178,7 @@ export default class TreeMain extends Vue {
         500
       );
     } else {
-      this.nowContList = [];
+      await this.init();
     }
   }
 
@@ -271,7 +301,7 @@ export default class TreeMain extends Vue {
         .searchResult {
           .item {
             position: relative;
-            max-height: 225px;
+            max-height: 230px;
             overflow: hidden; 
             margin-bottom: 1rem;
             padding: 2px;
@@ -301,6 +331,7 @@ export default class TreeMain extends Vue {
             >p {
               overflow-y: auto;
               max-height: 178px;
+              margin-top: 5px;
               padding: 5px;
               font-size: .9rem;
             }
