@@ -18,7 +18,8 @@
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
     "koa2-cors": "^2.0.6",
-    "mysql": "^2.16.0"
+    "mysql": "^2.16.0",
+    "vue2-editor": "^2.6.6"
   },
   "devDependencies": {
     "@types/highlight.js": "^9.12.3",

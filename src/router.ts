@@ -49,6 +49,11 @@ export default new VueRouter({
           path: 'adminphotowall',
           name: 'AdminPhotoWall',
           component: () => import('@/views/admin/AdminPhotoWall.vue'),
+        },
+        {
+          path: 'adminlog',
+          name: 'AdminLog',
+          component: () => import('@/views/admin/AdminLog.vue'),
         }
       ]
     }

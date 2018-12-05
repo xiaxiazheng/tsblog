@@ -119,7 +119,7 @@ export default class AdminTreeCont extends Vue {
     this.$nextTick(async function () {
       this.init();
       if (this['$route'].query.id && this['$route'].query.id !== '') {
-        let id: any = decodeURIComponent(atob(this['$route'].query.id));
+        let id: any = decodeURIComponent(atob(<string>this['$route'].query.id));
         let res0: any = await TreeClient.getChildName(id);
         this.title = res0.data[0].c_label;
       }
@@ -147,7 +147,7 @@ export default class AdminTreeCont extends Vue {
   
   async init() {
     if (this['$route'].query.id && this['$route'].query.id !== '') {
-      let id: any = decodeURIComponent(atob(this['$route'].query.id)); // 子节点的id
+      let id: any = decodeURIComponent(atob(<string>this['$route'].query.id)); // 子节点的id
       let res0: any = await TreeClient.getChildName(id);
       this.title = res0.data[0].c_label;
       let res: any = await ContClient.getNodeCont(id);
@@ -163,7 +163,7 @@ export default class AdminTreeCont extends Vue {
           let list = item.filename.split('.');
           let filetype = list[list.length - 1]; // 文件类型
           let randomNum = list[list.length - 2];
-          let originname = item.filename.substr(0, item.filename.length - filetype.length - randomNum.length - 2 - decodeURIComponent(atob(this['$route'].query.id)).length);
+          let originname = item.filename.substr(0, item.filename.length - filetype.length - randomNum.length - 2 - decodeURIComponent(atob(<string>this['$route'].query.id)).length);
           imgname = `${originname}.${filetype}`;
         }
         this.contObj['list'].push({
@@ -186,7 +186,7 @@ export default class AdminTreeCont extends Vue {
 
   // 新增节点
   async addCont() {
-    let id = decodeURIComponent(atob(this['$route'].query.id)); // 子节点的id
+    let id = decodeURIComponent(atob(<string>this['$route'].query.id)); // 子节点的id
     let sort = this.contObj['list'][this.contObj['list'].length - 1].sort;
     let res: any = await ContClient.addNodeCont(id, sort);
     if (!res) return;
@@ -201,7 +201,7 @@ export default class AdminTreeCont extends Vue {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(async () => { 
-      let id = decodeURIComponent(atob(this['$route'].query.id)); // 子节点的id
+      let id = decodeURIComponent(atob(<string>this['$route'].query.id)); // 子节点的id
       let sort = item.sort;
       let res: any = await ContClient.deleteNodeCont(id, sort);
       if (!res) return;

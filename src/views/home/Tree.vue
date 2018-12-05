@@ -91,7 +91,7 @@ export default class Tree extends Vue {
   async init() {
     if (this["$route"].query.id) {  // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
       this.defaultExpandedKeys = []; // 前台展示的话直接清空
-      this.defaultExpandedKeys.push(parseInt(atob(this["$route"].query.id), 10));
+      this.defaultExpandedKeys.push(parseInt(atob(<string>this["$route"].query.id), 10));
     }
     let res: any = await TreeClient.getTree('home');
     if (!res) return;
