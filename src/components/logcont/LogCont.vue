@@ -6,15 +6,21 @@
       <span>创建时间: {{cTime}}</span>
       <span>修改时间：{{mTime}}</span>
     </div>
-    <p class="logcont" v-html="logcont"></p>
+    <!-- <div class="logcont" v-html="logcont"></div> -->
+    <vue-editor v-model="logcont" disabled></vue-editor>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { LogClient } from '@/util/clientHelper';
+import { VueEditor } from 'vue2-editor';
 
-@Component
+@Component({
+  components: {
+    VueEditor
+  },
+})
 export default class LogCont extends Vue {
   logid: string = '';
   title: string = '';
@@ -70,6 +76,14 @@ export default class LogCont extends Vue {
     .logcont {
       font-size: 1rem;
       text-align: left;
+    }
+
+    // 无奈之举23333
+    .ql-container.ql-snow {
+      border-color: transparent;
+    }
+    .ql-toolbar {
+      display: none;
     }
   }
 </style>
