@@ -93,6 +93,7 @@ export namespace TreeClient {
   }
 }
 
+/** 操作节点 */
 export namespace ContClient {
   /** 操作子节点内容 */
   export function getNodeCont(id: any) {
@@ -131,6 +132,7 @@ export namespace ContClient {
   }
 }
 
+/** 操作图片 */
 export namespace ImgClient {
   /** 获取某个类型的图片名称列表 */
   export function getImgList(type: string) {
@@ -143,6 +145,35 @@ export namespace ImgClient {
   }
   export function deleteTreeContImg(filename: string) {
     let url = `${baseUrl}/deletetreecontimg?filename=${filename}`;
+    return axiosGetHelper(url);
+  }
+}
+
+/** 操作日志 */
+export namespace LogClient {
+  export function getLogListByCTime(pageNo: number, pageSize: number) {
+    let url = `${baseUrl}/loglistbyctime?pageNo=${pageNo}&pageSize=${pageSize}`;
+    return axiosGetHelper(url);
+  }
+  export function getLogListByMTime(pageNo: number, pageSize: number) {
+    let url = `${baseUrl}/loglistbymtime?pageNo=${pageNo}&pageSize=${pageSize}`;
+    return axiosGetHelper(url);
+  }
+  export function getLogCont(id: string) {
+    let url = `${baseUrl}/logcont?id=${id}`;
+    return axiosGetHelper(url);
+  }
+  export function addLogCont() {
+    let url = `${baseUrl}/addlogcont`;
+    return axiosGetHelper(url);
+  }
+  export function modifyLogCont(obj: any) {
+    let params = obj;
+    let url = `${baseUrl}/modifylogcont`;
+    return axiosPostHelper(url, params);
+  }
+  export function deleteLogCont(id: string) {
+    let url = `${baseUrl}/deletelogcont?id=${id}`;
     return axiosGetHelper(url);
   }
 }

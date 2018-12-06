@@ -23,6 +23,11 @@ export default new VueRouter({
           path: 'photowall',
           name: 'PhotoWall',
           component: () => import('@/views/home/PhotoWall.vue'),
+        },
+        {
+          path: 'log',
+          name: 'Log',
+          component: () => import('@/views/home/Log.vue'),
         }
       ]
     },

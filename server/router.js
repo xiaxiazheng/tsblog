@@ -94,6 +94,26 @@ const backUrl = '/back';  /* 绕开前端的 history 模式，不然路径叠加
 	router.get(backUrl + '/deletetreecontimg', async (ctx) => { // 删除treecont的
 		ctx.body = await image.deleteTreeContImg(ctx);
 	});
+	// 操作日志
+	let log = require('./log.js');
+	router.get(backUrl + '/loglistbyctime', async (ctx) => {
+		ctx.body = await log.getAllLogListByCTime(ctx);
+	});
+	router.get(backUrl + '/loglistbymtime', async (ctx) => {
+		ctx.body = await log.getAllLogListByMTime(ctx);
+	});
+	router.get(backUrl + '/logcont', async (ctx) => {
+    ctx.body = await log.getLogCont(ctx);
+	});
+	router.get(backUrl + '/addlogcont', async (ctx) => {
+		ctx.body = await log.addLogCont(ctx);
+	});
+	router.post(backUrl + '/modifylogcont', async (ctx) => {
+		ctx.body = await log.modifyLogCont(ctx);
+	});
+	router.get(backUrl + '/deletelogcont', async (ctx) => {
+    ctx.body = await log.deleteLogCont(ctx);
+	});
 /* 结束 */
 
 // 放在最后，用于传递文件

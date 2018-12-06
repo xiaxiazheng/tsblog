@@ -30,6 +30,7 @@
         </el-autocomplete>
         <!-- 右边的 tabs 们 -->
         <span class="tabItem" :class="{'active': activeTab === 'Tree'}" @click="clickTabs('Tree')">知识树</span>
+        <span class="tabItem" :class="{'active': activeTab === 'Log'}" @click="clickTabs('Log')">日志</span>
         <span class="tabItem" :class="{'active': activeTab === 'PhotoWall'}" @click="clickTabs('PhotoWall')">图片墙</span>
         <a href="https://github.com/xiaxiazheng/myblog">
           GitHub
@@ -68,8 +69,8 @@
         </el-autocomplete>
         <!-- 右边的 tabs 们 -->
         <span class="tabItem" :class="{'active': activeTab === 'AdminTree'}" @click="clickTabs('AdminTree')">知识树</span>
-        <span class="tabItem" :class="{'active': activeTab === 'AdminPhotoWall'}" @click="clickTabs('AdminPhotoWall')">图片墙</span>
         <span class="tabItem" :class="{'active': activeTab === 'AdminLog'}" @click="clickTabs('AdminLog')">日志</span>
+        <span class="tabItem" :class="{'active': activeTab === 'AdminPhotoWall'}" @click="clickTabs('AdminPhotoWall')">图片墙</span>
         <a href="https://github.com/xiaxiazheng/myblog">
           GitHub
           <i class="el-icon-star-off"></i>

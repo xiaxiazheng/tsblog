@@ -1,27 +1,21 @@
 <template>
-  <div class="adminlogcont">
-    <el-button class="savebutton" type="primary" icon="el-icon-check" @click="saveLog"></el-button>
-    <el-input class="title" v-model="title" placeholder="请输入标题"></el-input>
-    <el-input class="author" v-model="author" placeholder="请输入作者"></el-input>
+  <div class="logcont">
+    <h2 class="title">{{title}}</h2>
+    <h3 class="author">{{author}}</h3>
     <div class="time">
       <span>创建时间: {{cTime}}</span>
       <span>修改时间：{{mTime}}</span>
     </div>
-    <vue-editor v-model="logcont"></vue-editor>
+    <p class="logcont" v-html="logcont"></p>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { VueEditor } from 'vue2-editor';
 import { LogClient } from '@/util/clientHelper';
 
-@Component({
-  components: {
-    VueEditor
-  },
-})
-export default class AdminLogCont extends Vue {
+@Component
+export default class LogCont extends Vue {
   log_id: string = '';
   title: string = '';
   author: string = '';
@@ -33,6 +27,11 @@ export default class AdminLogCont extends Vue {
     this.$nextTick(function() {
       this.init();
     });
+  }
+
+  @Watch('$route')
+  onRouteChanged() { // 路由变化要监听
+    this.init();
   }
 
   async init() {
@@ -47,53 +46,30 @@ export default class AdminLogCont extends Vue {
       this.logcont = res.data.logcont;
     }
   }
-
-  async saveLog() {
-    let params = {
-      id: this.log_id,
-      title: this.title,
-      author: this.author,
-      logcont: this.logcont
-    };
-    let res = await LogClient.modifyLogCont(params);
-    this["$message"]({
-      type: res.resultsCode,
-      message: res.message
-    });
-  }
 }
 </script>
 
 <style lang="less">
-  .adminlogcont {
+  .logcont {
     width: 90%;
     height: 100%;
     margin: 0 auto;
     .title {
-      width: 50%;
-      .el-input__inner {
-        text-align: center;
-      }
+      font-size: 16px;
     }
     .author {
-      display: block;
-      width: 30%;
-      margin: 10px auto;
-      .el-input__inner {
-        text-align: center;
-      }
+      margin: 10px 0;
     }
     .time {
       margin-bottom: 10px;
+      color: #ccc;
       >span {
         margin: 0 3px;
-        color: #ccc;
       }
     }
-    .savebutton {
-      position: fixed;
-      right: 5%;
-      bottom: 80px;
+    .logcont {
+      font-size: 1rem;
+      text-align: left;
     }
   }
 </style>

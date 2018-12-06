@@ -3,7 +3,6 @@
     <!-- 日志列表 -->
     <div class="loglist" v-if="!showCont">
       <h3>所有日志</h3>
-      <el-button class="addbutton" type="info" icon="el-icon-plus" plain @click="addNewLog"></el-button>
       <div class="option">
         <div class="tabs">
           <span :class="{'active': sortType === 'create'}" @click="sortType='create'">按创建时间</span>
@@ -27,7 +26,6 @@
           <div>
             <span class="time" v-if="sortType === 'create'">创建时间：{{item.cTime}}</span>
             <span class="time" v-if="sortType === 'modify'">修改时间：{{item.mTime}}</span>
-            <i class="el-icon-circle-close-outline" @click.stop="deleteLog(item.title, item.author, item.log_id)"></i>
           </div>
         </li>
       </ul>
@@ -35,13 +33,7 @@
     <!-- 日志详情 -->
     <div class="logdetail" v-if="showCont">
       <el-button class="backbutton" type="info" icon="el-icon-back" plain @click="backLogList"></el-button>
-      <el-switch
-        v-model="isEdit"
-        title="是否编辑">
-      </el-switch>
-      <!-- 切换以下两个 -->
-      <LogCont v-if="!isEdit"></LogCont>
-      <AdminLogCont v-if="isEdit"></AdminLogCont>
+      <LogCont></LogCont>
     </div>
   </div>
 </template>
@@ -49,19 +41,16 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import LogCont from '@/components/logcont/LogCont.vue';
-import AdminLogCont from '@/components/logcont/AdminLogCont.vue';
 import { LogClient } from '@/util/clientHelper';
 
 @Component({
   components: {
     LogCont,
-    AdminLogCont
   },
 })
 export default class AdminLog extends Vue {
   list: object[] = [];
   showCont: boolean = false;
-  isEdit: boolean = false;
   sortType: 'create' | 'modify' = 'modify';
   // 分页
   totalNumber: number = 0;
@@ -101,21 +90,6 @@ export default class AdminLog extends Vue {
     this.init();
   }
 
-  // 新建一篇日志
-  async addNewLog() {
-    let res = await LogClient.addLogCont();
-    this["$message"]({
-      type: res.resultsCode,
-      message: res.message
-    });
-    this["$router"].push({
-      query: {
-        id: btoa(encodeURIComponent(res.data.newid))
-      }
-    });
-    this.showCont = true;
-  }
-
   // 选择一篇日志
   choiceLog(id: string) {
     this["$router"].push({ // 点击节点就改路由
@@ -124,28 +98,6 @@ export default class AdminLog extends Vue {
       }
     });
     this.showCont = true;
-  }
-
-  // 删除一篇日志
-  deleteLog(title: string, author: string, id: string) {
-    this['$confirm'](`你将删除“ ${author} ” 写的 “ ${title} ”, 你确定?'`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }).then(async () => {
-      let res: any = await LogClient.deleteLogCont(id);
-      if (!res) return;
-      this['$message']({
-        type: res.resultsCode,
-        message: res.message
-      });
-      this.init();
-    }).catch(() => {
-      this['$message']({
-        type: 'info',
-        message: '已取消删除'
-      });
-    });
   }
 
   // 返回日志列表
@@ -210,12 +162,6 @@ export default class AdminLog extends Vue {
           >div {
             >span {
               margin: 0 15px;
-            }
-            i {
-              font-size: 14px;
-            }
-            i:hover {
-              color: red;
             }
           }
           .title {

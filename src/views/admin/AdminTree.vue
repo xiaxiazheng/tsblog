@@ -15,40 +15,40 @@
 						<el-button
 							type="text"
 							size="mini"
-							@click="() => upordown(node, data, 'up')"
+							@click.stop="() => upordown(node, data, 'up')"
 							v-if="node.previousSibling">
 							<i class="el-icon-arrow-up"></i>
 						</el-button>
 						<el-button
 							type="text"
 							size="mini"
-							@click="() => upordown(node, data, 'down')"
+							@click.stop="() => upordown(node, data, 'down')"
 							v-if="node.nextSibling">
 							<i class="el-icon-arrow-down"></i>
 						</el-button>
 						<el-button
 							type="text"
 							size="mini"
-							@click="() => motify(node, data)">
+							@click.stop="() => motify(node, data)">
 							<i class="el-icon-edit-outline"></i>
 						</el-button>
 						<el-button
 							type="text"
 							size="mini"
-							@click="() => append(node, data)">
+							@click.stop="() => append(node, data)">
 							<i class="el-icon-circle-plus-outline"></i>
 						</el-button>
 						<el-button
 							type="text"
 							size="mini"
-							@click="() => shuttle(node, data)"
+							@click.stop="() => shuttle(node, data)"
 							v-if="node.level !== 1">
 							<i class="el-icon-upload"></i>
 						</el-button>
 						<el-button
 							type="text"
 							size="mini"
-							@click="() => remove(node, data)">
+							@click.stop="() => remove(node, data)">
 							<i class="el-icon-delete"></i>	
 						</el-button>
 					</span>
