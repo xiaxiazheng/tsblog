@@ -69,7 +69,7 @@ export default class AdminLog extends Vue {
   pageSize: number = 15;
 
   mounted() {
-    this.$nextTick(function() {
+    this.$nextTick(function () {
       this.init();
     });
   }

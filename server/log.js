@@ -80,7 +80,11 @@ exports.modifyLogCont = async (ctx) => {
   let sql1 = `SELECT * FROM log WHERE log_id=?`;
   let array1 = [ctx.request.body.id];
   let res1 = await query(sql1, array1);
-  if(res1[0].logcont === ctx.request.body.logcont) {
+  if (
+    res1[0].logcont === ctx.request.body.logcont && 
+    res1[0].title === ctx.request.body.title && 
+    res1[0].author === ctx.request.body.author
+  ) {
     return {
       resultsCode: 'success',
       message: '当前页面无修改'

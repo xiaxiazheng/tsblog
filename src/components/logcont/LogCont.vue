@@ -16,7 +16,7 @@ import { LogClient } from '@/util/clientHelper';
 
 @Component
 export default class LogCont extends Vue {
-  log_id: string = '';
+  logid: string = '';
   title: string = '';
   author: string = '';
   cTime: string = '';
@@ -24,7 +24,7 @@ export default class LogCont extends Vue {
   logcont: string = '';
 
   mounted() {
-    this.$nextTick(function() {
+    this.$nextTick(function () {
       this.init();
     });
   }
@@ -38,7 +38,7 @@ export default class LogCont extends Vue {
     if (this["$route"].query.id) {
       let id = decodeURIComponent(atob(<string>this["$route"].query.id));
       let res = await LogClient.getLogCont(id);
-      this.log_id = res.data.log_id;
+      this.logid = res.data.log_id;
       this.title = res.data.title;
       this.author = res.data.author;
       this.cTime = res.data.cTime;
