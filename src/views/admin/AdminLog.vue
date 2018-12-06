@@ -78,6 +78,7 @@ export default class AdminLog extends Vue {
     if (this["$route"].query.id) {
       this.showCont = true;
     } else {
+      this.showCont = false;
       let res: any;
       if (this.sortType === 'create') {
         res = await LogClient.getLogListByCTime(this.pageNo, this.pageSize);
@@ -87,6 +88,11 @@ export default class AdminLog extends Vue {
       this.totalNumber = res.data.totalNumber;
       this.list = res.data.list;
     }
+  }
+
+  @Watch('$route')
+  onRouteChanged() { // 路由变化要监听
+    this.init();
   }
 
   // 切换排序方式
@@ -152,7 +158,6 @@ export default class AdminLog extends Vue {
   async backLogList() {
     this['$router'].push({ query: {} });
     await this.init();
-    this.showCont = false;
   }
 }
 </script>
