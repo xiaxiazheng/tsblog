@@ -6,9 +6,9 @@
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
     "buildfront": "SET NODE_ENV=development && npm run build",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --mode build",
     "start": "SET NODE_ENV=production && node server.js",
-    "buildPig": "SET NODE_ENV=productionPig && npm run build",
+    "buildPig": "vue-cli-service build --mode buildPig",
     "startPig": "SET NODE_ENV=productionPig && node server.js"
   },
   "dependencies": {
