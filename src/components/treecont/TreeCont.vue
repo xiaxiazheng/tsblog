@@ -130,6 +130,10 @@ export default class TreeCont extends Vue {
 </script>
 
 <style lang="less">
+@splitWidth: 500px;
+
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .treecont {
     padding: 10px;
     text-align: left;
@@ -247,4 +251,85 @@ export default class TreeCont extends Vue {
       }
     }
   }
+}
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .treecont {
+    padding: 10px;
+    text-align: left;
+    line-height: 1.5;
+    .treecontent {
+      h1 {
+        font-size: 17px;
+        margin-bottom: 2px;
+        padding-right: 20px;
+      }
+      h2 {
+        font-size: 14px;
+        padding: 7px 0 2px;
+        margin-bottom: 5px;
+        border-bottom: 1px solid #eaecef;
+        box-sizing: border-box;
+        > span {
+          display: none;
+        }
+      }
+      ul {
+        margin-top: 5px;
+        li {
+          margin: 5px 0;
+          .imgbox {
+            max-width: 70%;
+            margin: 0 auto;
+            overflow: hidden;
+            text-align: center;
+            img {
+              max-width: 100%;
+              display: inherit;
+              margin: 0 auto;
+              cursor: pointer;
+            }
+            span {
+              font-size: 12px;
+              color: #ccc;
+            }
+          }
+        }
+      }
+      p {
+        font-size: 12px;
+        line-height: 1.7;
+        margin: 0 0 0.6rem 1px;;
+      }
+
+      .mao {
+        display: none;
+      }
+    
+      pre {
+        margin: 0;
+        font-size: 12px !important;
+        overflow-x: auto;
+        padding: 6px;
+        white-space: pre;
+        word-wrap: normal;
+        border: 1px solid black;
+        border-radius: 4px;
+        font-size: 0.859rem;
+        font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console",
+          "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono",
+          "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier,
+          monospace;
+      }
+    }
+    
+    .el-dialog {
+      max-width: 800px;
+      min-width: 400px;
+      img {
+        max-width: 100%;
+      }
+    }
+  }
+}
 </style>

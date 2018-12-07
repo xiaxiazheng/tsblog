@@ -45,6 +45,10 @@ export default class HomeMain extends Vue {
 </script>
 
 <style lang="less">
+@splitWidth: 500px;
+
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .homemain {
     height: 100%;
     .carousel {
@@ -78,5 +82,43 @@ export default class HomeMain extends Vue {
         }
       }
     }
-  }
+  } 
+}
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .homemain {
+    height: 100%;
+    .carousel {
+      max-width: 500px; // 走马灯宽度
+      margin: 0 auto;
+      .el-carousel__container {
+        height: 203px !important;  // 走马灯高度 
+      }
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    footer {
+      display: flex;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 1.5rem;
+      line-height: 1rem;
+      border-top: 1px solid #ccc;
+      box-sizing: border-box;
+      a {
+        img {
+          vertical-align: middle;
+          margin-right: .2rem;
+        }
+        span {
+          vertical-align: middle;
+          color:#939393;
+        }
+      }
+    }
+  } 
+}
 </style>

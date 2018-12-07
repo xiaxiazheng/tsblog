@@ -20,6 +20,6 @@ export default class AdminMain extends Vue {
 
 <style lang="less">
   .adminmain {
-    height: 100%;
+    padding-top: 15px;
   }
 </style>

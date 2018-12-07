@@ -271,6 +271,10 @@ export default class TreeMain extends Vue {
 </script>
 
 <style lang="less">
+@splitWidth: 500px;
+
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .treemain {
     height: 100%;
     .home, .admin {
@@ -388,5 +392,129 @@ export default class TreeMain extends Vue {
         color: #b4b4b4;
       }
     }
+  }  
+}
+
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .treemain {
+    height: 100%;
+    .home, .admin {
+      h1 {
+        font-size: 17px;
+      }
+      >div>h2 {
+        border: none;
+      }
+      .common {
+        .el-input {
+          margin-top: .5rem;
+        }
+        .resultTitle {
+          position: relative;
+          margin: 14px 0 6px 0;
+          font-size: 14px;
+          color: #ccc;
+          >span {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            font-size: .8rem;
+          }
+        }
+        .resultWait, .resultNo {
+          color: #ccc;
+          margin: 1rem 0 1rem 2rem;
+        }
+        .searchBox {
+          width: 80%;
+          display: block;
+          margin: 3rem auto 0;
+        }
+        .searchResult {
+          .item {
+            position: relative;
+            max-height: 230px;
+            overflow: hidden; 
+            margin-bottom: 8px;
+            padding: 2px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            cursor: pointer;
+            >h2 {
+              height: 26px;
+              line-height: 25px;
+              padding-left: 4px;
+              font-size: 14px;
+              overflow: hidden;
+              border-bottom: 1px solid #eaecef;
+              box-sizing: border-box;
+              .fatherlabel {
+                font-size: 12px;
+                margin-left: .5rem;
+                color: #d2d2e2;
+              }
+              .time {
+                display: none;
+              }
+            }
+            >p {
+              overflow-y: auto;
+              max-height: 178px;
+              margin-top: 5px;
+              padding: 5px;
+              font-size: 12px;
+            }
+            >p::-webkit-scrollbar {
+              /*滚动条整体样式*/
+              width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
+              height: 7px;
+            }
+            >p::-webkit-scrollbar-thumb {
+              /*滚动条里面小方块*/
+              border-radius: 0.5rem;
+              box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+              -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+              background: #dcdfe6;
+            }
+            >p::-webkit-scrollbar-track {
+              /*滚动条里面轨道*/
+              box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+              -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+              border-radius: 0.5rem;
+              background: white;
+            }
+            .keyword {  // 关键字高亮
+              background-color: yellow;
+              color: black !important;
+            }
+          }
+          .item:hover {
+            border: 1px solid #409EFF;
+            box-shadow: 0 0 5px #409EFF; 
+          }
+        }
+        .el-pagination {
+          text-align: right;
+        }
+      }
+    }
   }
+  // 这个搜索的弹出框在比较全局的地方
+  .searchBoxPopper {
+    li {
+      line-height: normal;
+      padding: 7px;
+      .title {
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      .cont {
+        font-size: 12px;
+        color: #b4b4b4;
+      }
+    }
+  }
+}
 </style>

@@ -1,46 +1,23 @@
 <template>
   <div class="tree">
-    <!-- PC端 -->
-    <div v-if="isPC" class="PC">
-      <div class="lefttree">
-        <el-tree
-          :data="tree"
-          :props="defaultProps"
-          node-key="id"
-          :default-expanded-keys="defaultExpandedKeys"
-          :highlight-current="true"
-          @node-click="handleClick"
-          accordion>
-        </el-tree>
-      </div>
-      <div class="rightcont" ref="rightcont">
-        <TreeCont @scrollToTop="scrollToTop"></TreeCont>
-      </div>
+    <div class="lefttree" v-if="showTree || isPC">
+      <el-tree
+        :data="tree"
+        :props="defaultProps"
+        node-key="id"
+        :default-expanded-keys="defaultExpandedKeys"
+        :highlight-current="true"
+        @node-click="handleClick"
+        accordion>
+      </el-tree>
     </div>
-    <!-- 移动端 -->
-    <div v-else class="Mobile">
-      <div class="topMobile">
-        <h1>{{ title }}</h1>
-      </div>
-      <div>
-        <el-button 
-          type="primary" 
-          icon="el-icon-tickets"
-          @click="isShowTree">
-        </el-button>
-      </div>
-      <div class="leftMobile" v-show="showTree">
-        <el-tree
-          :data="tree"
-          :props="defaultProps"
-          @node-click="handleClick"
-          node-key="id"
-          accordion>
-        </el-tree>
-      </div>
-      <div class="rightMobile">
-        <TreeCont :isPC="isPC"></TreeCont>
-      </div>
+    <!-- 给移动端隐藏树用的 -->
+    <div class="hidetree" @click="isShowTree" v-if="!isPC">
+      <i v-if="showTree" class="el-icon-arrow-left"></i>
+      <i v-if="!showTree" class="el-icon-arrow-right"></i>
+    </div>
+    <div class="rightcont" v-if="!showTree || isPC" ref="rightcont">
+      <TreeCont @scrollToTop="scrollToTop"></TreeCont>
     </div>
   </div>
 </template>
@@ -49,7 +26,6 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { TreeClient } from '../../util/clientHelper';
-import { isPC } from '../../config';
 import TreeCont from '@/components/treecont/TreeCont.vue';
 
 @Component({
@@ -58,21 +34,22 @@ import TreeCont from '@/components/treecont/TreeCont.vue';
   },
 })
 export default class Tree extends Vue {
-  // 移动端相关
-  isPC: boolean = isPC;
-  showTree: boolean = false;
-
   tree: any[] = [];
   defaultProps = {
     children: 'children',
     label: 'label'
   };
   defaultExpandedKeys: any = [];
-  title: string = '虾虾郑的个人空间';
-
+  // 移动端相关
+  splitWidth: number = 500;
+  showTree: boolean = true;
+  isPC: boolean = true;
 
   mounted() {
     this.$nextTick(function () {
+      this.isPC = window.innerWidth <= this.splitWidth ? false : true;
+      console.log("isPC:", this.isPC);
+      this.onWidthChange();
       this.init();
     });
   }
@@ -109,10 +86,18 @@ export default class Tree extends Vue {
 
       // 移动端
       this.showTree = false;
-      this.title = node.data.label;
     }
   }
 
+  // 浏览器窗口变化触发事件，一变化就触发
+  onWidthChange() {
+    window.onresize = () => {
+      this.isPC = window.innerWidth <= this.splitWidth ? false : true;
+      console.log("isPC:", this.isPC);
+    };
+  }
+
+  // 移动端隐藏树
   isShowTree() {
     this.showTree = !this.showTree;
   }
@@ -120,49 +105,35 @@ export default class Tree extends Vue {
 </script>
 
 <style lang="less" scoped>
+@splitWidth: 500px;
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .tree {
-    .PC {
-      height: 100%;
+    height: 100%;
+    .hiddentree {
+      display: none;
     }
-    // 移动端样式
-    .Mobile {
-      .topMobile {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        height: 2.5rem;
-        border-bottom: 1px solid #ccc;
-        background-color: white;
-        text-align: left;
-        .el-button {
-          width: 3.5rem;
-          height: 2.5rem;
-          margin-right: .4rem;
-          text-align: center;
-          vertical-align: middle;
-        }
-        h1 {
-          display: inline-block;
-          vertical-align: middle;
-        }
-      }
-      .leftMobile {
-        height: calc(100% - 2rem);
-        position: fixed;
-        top: 2.5rem;
-        width: 65%;
-        background-color: white;
-        border: 1px solid #ccc;
-        z-index: 2;
-        overflow-y: auto;
-      }
-      .rightMobile {
-        position: fixed;
-        top: 2.5rem;
-        height: calc(100% - 2rem);
-        width: 100%;
-        overflow-y: auto;
-      }
+  } 
+}
+
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .tree {
+    position: relative;
+    height: 100%;
+    .lefttree, .rightcont {
+      width: 100%;
+    }
+    .hidetree {
+      position: absolute;
+      bottom: 5px;
+      right: 9px;
+      z-index: 2;
+      padding: 10px;
+      background-color: white;
+      border-radius: 3px;
+      border: 1px solid #ccc;
     }
   }
+}
 </style>

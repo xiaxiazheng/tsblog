@@ -1,6 +1,8 @@
 <template>
   <div class="adminwait">
-    <UploadPhotoWall type="wall"></UploadPhotoWall>
+    <div>
+      <UploadPhotoWall type="wall"></UploadPhotoWall>      
+    </div>
   </div>
 </template>
 
@@ -20,6 +22,9 @@ export default class AdminPhotoWall extends Vue {
 
 <style lang="less">
   .adminwait {
-    height: 100%;
+    overflow-y: auto;
+    >div {
+      padding: 15px;
+    }
   }
 </style>

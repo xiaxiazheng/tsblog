@@ -89,26 +89,57 @@ export default class PhotoWall extends Vue {
 </script>
 
 <style lang="less">
+@splitWidth: 500px;
 
-.photowall {
-  height: 100%;
-  .el-upload-list__item.is-success .el-upload-list__item-status-label {
-    // 去掉右上角的绿勾勾
-    display: none !important;
+// PC 端
+@media screen and (min-width: @splitWidth) {
+  .photowall {
+    height: 100%;
+    .el-upload-list__item.is-success .el-upload-list__item-status-label {
+      // 去掉右上角的绿勾勾
+      display: none !important;
+    }
+    .el-upload-list--picture-card
+      .el-upload-list__item-actions
+      .el-upload-list__item-delete {
+      // 去掉删除图片的字体图标
+      display: none !important;
+    }
+    .el-upload--picture-card {
+      // 去掉上传图片的框
+      display: none !important;
+    }
+    .el-dialog {
+      max-width: 800px;
+      min-width: 400px;
+    }
   }
-  .el-upload-list--picture-card
-    .el-upload-list__item-actions
-    .el-upload-list__item-delete {
-    // 去掉删除图片的字体图标
-    display: none !important;
-  }
-  .el-upload--picture-card {
-    // 去掉上传图片的框
-    display: none !important;
-  }
-  .el-dialog {
-    max-width: 800px;
-    min-width: 400px;
+}
+
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .photowall {
+    overflow-y: auto;
+    >div {
+      padding-top: 15px;
+    }
+    .el-upload-list__item.is-success .el-upload-list__item-status-label {
+      // 去掉右上角的绿勾勾
+      display: none !important;
+    }
+    .el-upload-list--picture-card
+      .el-upload-list__item-actions
+      .el-upload-list__item-delete {
+      // 去掉删除图片的字体图标
+      display: none !important;
+    }
+    .el-upload--picture-card {
+      // 去掉上传图片的框
+      display: none !important;
+    }
+    .el-dialog {
+      width: 99% !important;
+    }
   }
 }
 </style>

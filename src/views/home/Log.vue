@@ -115,6 +115,10 @@ export default class AdminLog extends Vue {
 </script>
 
 <style lang="less">
+@splitWidth: 500px;
+
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .adminlog {
     width: 90%;
     height: 100%;
@@ -200,4 +204,90 @@ export default class AdminLog extends Vue {
       }
     }
   }
+}
+
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .adminlog {
+    width: 90%;
+    height: 100%;
+    margin: 0 auto;
+    .loglist {
+      width: 100%;
+      margin: 0 auto;
+      padding-top: 11px;
+      >h3 {
+        font-size: 17px;
+      }
+      .option {
+        position: fixed;
+        bottom: 5px;
+        right: 5px;
+        .tabs {
+          display: none;
+        }
+      }
+      .addbutton {
+        position: fixed;
+        left: 5%;
+        top: 80px;
+        z-index: 2;
+      }
+      >ul {
+        margin-top: 15px;
+        border-top: 1px solid rgba(204,204,204,0.4);
+        border-bottom: 1px solid rgba(204,204,204,0.4);
+        box-sizing: border-box;
+        >li {
+          display: flex;
+          justify-content: space-between;
+          height: 2rem;
+          line-height: 2rem;
+          border-bottom: 1px solid rgba(204,204,204,0.4);
+          box-sizing: border-box;
+          text-align: left;
+          cursor: pointer;
+          >div {
+            >span {
+              margin: 0 15px;
+            }
+          }
+          .title {
+            font-size: 14px;
+          }
+          .author {
+            color: #ccc;
+          }
+          .time {
+            display: none;
+          }
+        }
+        >li:hover {
+          color: #409EFF;
+        }
+        >li:last-child {
+          border-color: transparent;
+        }
+      }
+    }
+    .logdetail {
+      padding-top: 22px;
+      .backbutton {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        position: fixed;
+        right: 5px;
+        bottom: 5px;
+        z-index: 2;
+      }
+      .el-switch {
+        position: fixed;
+        right: 5%;
+        top: 80px;
+        z-index: 2;
+      }
+    }
+  } 
+}
 </style>

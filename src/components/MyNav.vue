@@ -182,6 +182,10 @@ export default class MyNav extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less">
+@splitWidth: 500px;
+
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .mynav {
     height: 3.6rem;
     padding: .7rem 1.5rem;
@@ -242,4 +246,48 @@ export default class MyNav extends Vue {
       }
     }
   }
+}
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .mynav {
+    height: 38px;
+    line-height: 38px;
+    padding: 0 7px;
+    background-color: #fff;
+    box-sizing: border-box;
+    border-bottom: 1px solid #eaecef;
+    >div {
+      display: flex;
+      justify-content: space-between;
+      .leftside {
+        >span {
+          font-size: 1.3rem;
+          font-weight: 600;
+          color: #2c3e50;
+          cursor: pointer;
+        }
+      }
+      .rightside {
+        .el-autocomplete {
+          display: none;
+        }
+        .tabItem {
+          display: inline-block;
+          line-height: 24px;
+          margin: 0 5px;
+          font-size: 0.9rem;
+        }
+        .tabItem:hover {
+          border-bottom: 2px solid #409eff;
+        }
+        .active {
+          border-bottom: 2px solid #409eff;
+        }
+        >a {
+          display: none;
+        }
+      }
+    }
+  }
+}
 </style>

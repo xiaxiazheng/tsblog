@@ -120,11 +120,23 @@ export default class UploadPhotoWall extends Vue {
 </script>
 
 <style lang="less">
+@splitWidth: 500px;
+
+@media screen and (min-width: @splitWidth) {
   .uploadphotowall {
     height: 100%;
     .el-dialog {
       max-width: 800px;
       min-width: 400px;
     }
-  }
+  } 
+}
+@media screen and (max-width: @splitWidth) {
+  .uploadphotowall {
+    height: 100%;
+    .el-dialog {
+      width: 100%;
+    }
+  } 
+}
 </style>

@@ -4,9 +4,8 @@
     <h3 class="author">{{author}}</h3>
     <div class="time">
       <span>创建时间: {{cTime}}</span>
-      <span>修改时间：{{mTime}}</span>
+      <span>修改时间: {{mTime}}</span>
     </div>
-    <!-- <div class="logcont" v-html="logcont"></div> -->
     <vue-editor v-model="logcont" disabled></vue-editor>
   </div>
 </template>
@@ -56,6 +55,10 @@ export default class LogCont extends Vue {
 </script>
 
 <style lang="less">
+@splitWidth: 500px;
+
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .logcont {
     width: 90%;
     height: 100%;
@@ -85,5 +88,38 @@ export default class LogCont extends Vue {
     .ql-toolbar {
       display: none;
     }
-  }
+  }  
+}
+
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .logcont {
+    width: 100%;
+    height: 100%;
+    .title {
+      font-size: 16px;
+    }
+    .author {
+      margin: 10px 0;
+    }
+    .time {
+      margin-bottom: 10px;
+      color: #ccc;
+      >span {
+        display: block;
+      }
+    }
+
+    // 无奈之举23333
+    .ql-editor {
+      padding: 12px 0;
+    }
+    .ql-container.ql-snow {
+      border-color: transparent;
+    }
+    .ql-toolbar {
+      display: none;
+    }
+  }  
+}
 </style>

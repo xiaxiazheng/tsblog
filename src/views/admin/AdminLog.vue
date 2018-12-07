@@ -163,6 +163,10 @@ export default class AdminLog extends Vue {
 </script>
 
 <style lang="less">
+@splitWidth: 500px;
+
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .adminlog {
     width: 90%;
     height: 100%;
@@ -254,4 +258,95 @@ export default class AdminLog extends Vue {
       }
     }
   }
+}
+
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .adminlog {
+    width: 100%;
+    height: 100%;
+    .loglist {
+      width: 100%;
+      margin: 0 auto;
+      padding-top: 22px;
+      >h3 {
+        font-size: 17px;
+      }
+      .option {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        .tabs {
+          display: none;
+        }
+      }
+      .addbutton {
+        position: fixed;
+        bottom: 5px;
+        right: 5px;
+        z-index: 2;
+        padding: 0;
+        width: 34px;
+        height: 36px;
+      }
+      >ul {
+        margin: 10px 50px;
+        >li {
+          display: flex;
+          justify-content: space-between;
+          height: 2rem;
+          line-height: 2rem;
+          border-bottom: 1px solid rgba(204,204,204,0.4);
+          box-sizing: border-box;
+          text-align: left;
+          cursor: pointer;
+          >div {
+            >span {
+              margin: 0 15px;
+            }
+            i {
+              font-size: 14px;
+            }
+            i:hover {
+              color: red;
+            }
+          }
+          .title {
+            font-size: 14px;
+          }
+          .author {
+            color: #ccc;
+          }
+          .time {
+            display: none;
+          }
+        }
+        >li:hover {
+          color: #409EFF;
+        }
+        >li:last-child {
+          border-color: transparent;
+        }
+      }
+    }
+    .logdetail {
+      padding: 10px;
+      .backbutton {
+        position: fixed;
+        right: 5px;
+        bottom: 5px;
+        z-index: 2;
+        width: 34px;
+        height: 36px;
+        padding: 0;
+      }
+      .el-switch {
+        position: fixed;
+        right: 17px;
+        top: 50px;
+        z-index: 2;
+      }
+    }
+  }
+}
 </style>

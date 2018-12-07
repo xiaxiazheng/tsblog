@@ -89,6 +89,10 @@ export default class Login extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
+@splitWidth: 500px;
+
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .login {
     height: 100%;
     .loginCont {
@@ -143,4 +147,65 @@ export default class Login extends Vue {
       z-index: 2;
     }
   }
+}
+
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .login {
+    height: 100%;
+    .loginCont {
+      height: 100%;
+      background: url('~@/assets/login.jpg') no-repeat fixed;
+      background-size: 100% 100%;
+      .loginBox {
+        width: 300px;
+        height: 300px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-left: -165px;
+        margin-top: -165px;
+        border-radius: 10px;
+        padding: 30px 15px 0px;
+        background-color:rgba(181, 182, 181, 0.5);
+        z-index: 3;
+        > span {
+          position: absolute;
+          font-size: 20px;
+          font-weight: rgba(38, 39, 38, 0.5);
+        }
+        .el-input {
+          margin-top: 30px;
+          // .el-input__inner {
+          //   BACKGROUND-COLOR: transparent;
+          // }
+          .eye {
+            cursor: pointer;
+            margin-right: 5px;
+            line-height: 40px;
+            font-size: 20px;
+          }
+        }
+        .elinput1 {
+          margin-top: 60px;
+        }
+        .el-button {
+          width: 100%;
+          margin-top: 50px;
+        }
+      }
+    }
+    .loginCont:after{
+      content: "";
+      width:100%;
+      height:100%;
+      position: absolute;
+      left:0;
+      top:0;
+      background: inherit;
+      filter: blur(10px);
+      z-index: 2;
+    }
+  }
+}
 </style>

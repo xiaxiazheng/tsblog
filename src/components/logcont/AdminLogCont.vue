@@ -65,6 +65,10 @@ export default class AdminLogCont extends Vue {
 </script>
 
 <style lang="less">
+@splitWidth: 500px;
+
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .adminlogcont {
     width: 90%;
     height: 100%;
@@ -96,4 +100,43 @@ export default class AdminLogCont extends Vue {
       bottom: 80px;
     }
   }
+}
+
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .adminlogcont {
+    width: 100%;
+    height: 100%;
+    .title {
+      width: 50%;
+      .el-input__inner {
+        text-align: center;
+      }
+    }
+    .author {
+      display: block;
+      width: 30%;
+      margin: 10px auto;
+      .el-input__inner {
+        text-align: center;
+      }
+    }
+    .time {
+      margin-bottom: 10px;
+      color: #ccc;
+      >span {
+        display: block;
+      }
+    }
+    .savebutton {
+      position: fixed;
+      right: 5px;
+      bottom: 49px;
+      width: 34px;
+      height: 36px;
+      padding: 0;
+      z-index: 2;
+    }
+  }
+}
 </style>

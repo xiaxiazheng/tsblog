@@ -1,7 +1,7 @@
 <template>
   <div class="admintree">
 	  <!-- 左边的树 -->
-	  <div class="lefttree">
+	  <div class="lefttree" v-if="showTree || isPC">
       <el-tree
 				:data="tree"
 				:props="defaultProps"
@@ -55,8 +55,13 @@
 				</span>
 			</el-tree>
 		</div>
+    <!-- 给移动端隐藏树用的 -->
+    <div class="hidetree" @click="isShowTree" v-if="!isPC">
+      <i v-if="showTree" class="el-icon-arrow-left"></i>
+      <i v-if="!showTree" class="el-icon-arrow-right"></i>
+    </div>
 		<!-- 右边的子组件 -->
-		<div class="rightcont" ref="rightcont">
+		<div v-if="!showTree || isPC" class="rightcont" ref="rightcont">
 			<el-switch
 				v-model="isEdit"
 				title="是否编辑">
@@ -145,9 +150,16 @@ export default class AdminTree extends Vue {
   choiceFathId: string = '';
   shuttleChildId: string = '';
   shuttleChildLabel: string = '';
+  // 移动端相关
+  isPC: boolean = true;
+  splitWidth: number =  500;
+  showTree: boolean = true;
 
   mounted() {
     this.$nextTick(function () {
+      this.isPC = window.innerWidth <= this.splitWidth ? false : true;
+      console.log("isPC:", this.isPC);
+      this.onWidthChange();
       this.init();
     });
   }
@@ -204,6 +216,9 @@ export default class AdminTree extends Vue {
         }
       });
       this.propsname = node.data.label;
+
+      // 移动端
+      this.showTree = false;
     }
     this.saveFathExpend(node);
   }
@@ -531,12 +546,32 @@ export default class AdminTree extends Vue {
       message: res.message
     });
   }
+
+  // 浏览器窗口变化触发事件，一变化就触发
+  onWidthChange() {
+    window.onresize = () => {
+      this.isPC = window.innerWidth <= this.splitWidth ? false : true;
+      console.log("isPC:", this.isPC);
+    };
+  }
+
+  // 移动端隐藏树
+  isShowTree() {
+    this.showTree = !this.showTree;
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less">
+@splitWidth: 500px;
+
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .admintree {
+    .hiddentree {
+      display: none;
+    }
 		.custom-tree-node {
 			flex: 1;
 			display: flex;
@@ -561,4 +596,47 @@ export default class AdminTree extends Vue {
 			}
 		}
   }
+}
+
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .admintree {
+		.custom-tree-node {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			font-size: 14px;
+			padding-right: 8px;
+			.iconBox {
+				position: absolute;
+				right: 13px;
+				padding-left: 6px;
+				background-color: #f5f7fa;
+				z-index: 2;
+			}
+		}
+		.rightcont {
+			.el-switch {
+        position: fixed;
+        right: 17px;
+        top: 50px;
+        z-index: 2;
+			}
+    }
+    .lefttree, .rightcont {
+      width: 100%;
+    }
+    .hidetree {
+      position: absolute;
+      bottom: 5px;
+      right: 9px;
+      z-index: 2;
+      padding: 10px;
+      background-color: white;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+  }
+}
 </style>

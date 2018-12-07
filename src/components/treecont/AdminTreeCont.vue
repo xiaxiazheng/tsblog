@@ -315,6 +315,10 @@ export default class AdminTreeCont extends Vue {
 </script>
 
 <style lang="less">
+@splitWidth: 500px;
+
+// PC 端
+@media screen and (min-width: @splitWidth) {
   .admincont {
 		text-align: left;
 		padding: 10px;
@@ -374,4 +378,71 @@ export default class AdminTreeCont extends Vue {
       min-width: 400px;
     }
   }
+}
+
+// 移动端
+@media screen and (max-width: @splitWidth) {
+  .admincont {
+		text-align: left;
+		padding: 10px;
+    h1 {
+      font-size: 17px;
+      margin-bottom: 10px;
+		}
+		>div >ul {
+			li {
+				position: relative;
+				text-align: right;
+				margin-top: 5px;
+				.el-input {  /* 标题 */
+					margin-top: 10px;
+				}
+				.el-textarea {  /* 内容 */
+					margin-top: 10px;
+				}
+				.ctrlbox {  /* 控制栏 */
+					position: relative;
+					overflow: hidden;
+					.iconbox {
+						position: absolute;
+						left: 0;
+						top: -5px;
+					}
+					.time {
+						float: right;
+						color: #ccc;
+					}
+				}
+        .uploadtreecontimg {  /* 上传图片 */
+          text-align: left;
+					.alreadyhasone {
+						width: 148px;
+						.el-upload--picture-card {
+						  display: none;
+						}
+					}
+				}
+			}
+		}
+		.button {
+			margin-top: 20px;
+			text-align: center;
+		}
+		.save {
+			position: fixed;
+			text-align: center;
+			right: 9px;
+      bottom: 50px;
+      .el-button--primary {
+        width: 34px;
+        height: 36px;
+        padding: 0;
+      }
+    }
+    .el-dialog {
+      max-width: 800px;
+      min-width: 400px;
+    }
+  }
+}
 </style>
