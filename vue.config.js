@@ -17,6 +17,7 @@ module.exports = {
       'vue-router': 'VueRouter',
       'axios': "axios",
       "vuex": "Vuex",
+      "vue2-editor": "Vue2Editor",
     },
   }
 }
