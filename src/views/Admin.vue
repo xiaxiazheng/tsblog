@@ -50,7 +50,7 @@ export default class Admin extends Vue {
   .admin {
 		height: 100%;
 		.adminrouter {
-      height: calc(100% - 3.6rem);
+      height: calc(100% - 3.6rem - 1px);
       padding-top: 58px;
 		}
   }  
