@@ -51,7 +51,7 @@ import { LogClient } from '@/util/clientHelper';
 export default class AdminLog extends Vue {
   list: object[] = [];
   showCont: boolean = false;
-  sortType: 'create' | 'modify' = 'modify';
+  sortType: 'create' | 'modify' = 'create';
   // 分页
   totalNumber: number = 0;
   pageNo: number = 1;
@@ -124,7 +124,7 @@ export default class AdminLog extends Vue {
     height: 100%;
     margin: 0 auto;
     .loglist {
-      width: 90%;
+      width: 80%;
       margin: 0 auto;
       padding-top: 22px;
       >h3 {
@@ -209,12 +209,11 @@ export default class AdminLog extends Vue {
 // 移动端
 @media screen and (max-width: @splitWidth) {
   .adminlog {
-    width: 90%;
+    width: 100%;
     height: 100%;
-    margin: 0 auto;
     .loglist {
       width: 100%;
-      margin: 0 auto;
+      height: 92%;
       padding-top: 11px;
       >h3 {
         font-size: 17px;
@@ -234,25 +233,28 @@ export default class AdminLog extends Vue {
         z-index: 2;
       }
       >ul {
+        height: 93%;
+        overflow-y: auto;
         margin-top: 15px;
+        padding: 0 10px;
         border-top: 1px solid rgba(204,204,204,0.4);
         border-bottom: 1px solid rgba(204,204,204,0.4);
         box-sizing: border-box;
         >li {
           display: flex;
           justify-content: space-between;
-          height: 2rem;
-          line-height: 2rem;
+          align-items: center;
           border-bottom: 1px solid rgba(204,204,204,0.4);
           box-sizing: border-box;
           text-align: left;
           cursor: pointer;
           >div {
             >span {
-              margin: 0 15px;
+              display: block;
             }
           }
           .title {
+            margin: 3px 0;
             font-size: 14px;
           }
           .author {
@@ -271,13 +273,13 @@ export default class AdminLog extends Vue {
       }
     }
     .logdetail {
-      padding-top: 22px;
+      padding: 22px 5px 0;
       .backbutton {
         width: 40px;
         height: 40px;
         padding: 0;
         position: fixed;
-        right: 5px;
+        left: 5px;
         bottom: 5px;
         z-index: 2;
       }

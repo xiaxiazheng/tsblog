@@ -70,14 +70,19 @@ export default class AdminLogCont extends Vue {
 // PC 端
 @media screen and (min-width: @splitWidth) {
   .adminlogcont {
-    width: 90%;
+    width: 75%;
     height: 100%;
     margin: 0 auto;
+    padding-bottom: 40px;
     .title {
       width: 50%;
       .el-input__inner {
         text-align: center;
       }
+    }
+    .quillWrapper .ql-container {
+      max-height: 674px !important;
+      overflow-y: auto;
     }
     .author {
       display: block;
@@ -97,7 +102,7 @@ export default class AdminLogCont extends Vue {
     .savebutton {
       position: fixed;
       right: 5%;
-      bottom: 80px;
+      bottom: 40px;
     }
   }
 }
@@ -108,7 +113,7 @@ export default class AdminLogCont extends Vue {
     width: 100%;
     height: 100%;
     .title {
-      width: 50%;
+      width: 60%;
       .el-input__inner {
         text-align: center;
       }

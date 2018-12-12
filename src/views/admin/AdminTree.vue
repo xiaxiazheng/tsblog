@@ -630,7 +630,7 @@ export default class AdminTree extends Vue {
     .hidetree {
       position: absolute;
       bottom: 5px;
-      right: 9px;
+      left: 9px;
       z-index: 2;
       padding: 10px;
       background-color: white;

@@ -19,7 +19,5 @@ export default class AdminMain extends Vue {
 </script>
 
 <style lang="less">
-  .adminmain {
-    padding-top: 15px;
-  }
+  
 </style>

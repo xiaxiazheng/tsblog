@@ -187,6 +187,11 @@ export default class MyNav extends Vue {
 // PC 端
 @media screen and (min-width: @splitWidth) {
   .mynav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 2;
     height: 3.6rem;
     padding: .7rem 1.5rem;
     line-height: 2.2rem;

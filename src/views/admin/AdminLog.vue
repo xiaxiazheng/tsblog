@@ -62,7 +62,7 @@ export default class AdminLog extends Vue {
   list: object[] = [];
   showCont: boolean = false;
   isEdit: boolean = false;
-  sortType: 'create' | 'modify' = 'modify';
+  sortType: 'create' | 'modify' = 'create';
   // 分页
   totalNumber: number = 0;
   pageNo: number = 1;
@@ -172,7 +172,7 @@ export default class AdminLog extends Vue {
     height: 100%;
     margin: 0 auto;
     .loglist {
-      width: 90%;
+      width: 80%;
       margin: 0 auto;
       padding-top: 22px;
       >h3 {
@@ -267,6 +267,7 @@ export default class AdminLog extends Vue {
     height: 100%;
     .loglist {
       width: 100%;
+      height: 100%;
       margin: 0 auto;
       padding-top: 22px;
       >h3 {
@@ -290,19 +291,20 @@ export default class AdminLog extends Vue {
         height: 36px;
       }
       >ul {
-        margin: 10px 50px;
+        height: 81%;
+        overflow-y: auto;
+        padding: 10px;
         >li {
           display: flex;
           justify-content: space-between;
-          height: 2rem;
-          line-height: 2rem;
+          align-items: center;
           border-bottom: 1px solid rgba(204,204,204,0.4);
           box-sizing: border-box;
           text-align: left;
           cursor: pointer;
           >div {
             >span {
-              margin: 0 15px;
+              display: block;
             }
             i {
               font-size: 14px;
@@ -312,6 +314,7 @@ export default class AdminLog extends Vue {
             }
           }
           .title {
+            margin: 3px 0;
             font-size: 14px;
           }
           .author {
@@ -330,10 +333,10 @@ export default class AdminLog extends Vue {
       }
     }
     .logdetail {
-      padding: 10px;
+      padding: 10px 5px;
       .backbutton {
         position: fixed;
-        right: 5px;
+        left: 5px;
         bottom: 5px;
         z-index: 2;
         width: 34px;
