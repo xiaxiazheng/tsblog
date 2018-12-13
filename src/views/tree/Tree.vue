@@ -1,6 +1,6 @@
 <template>
   <div class="tree">
-    <div class="lefttree" v-if="showTree || isPC">
+    <div class="lefttree ScrollBar" v-if="showTree || isPC">
       <el-tree
         :data="tree"
         :props="defaultProps"
@@ -16,7 +16,7 @@
       <i v-if="showTree" class="el-icon-arrow-left"></i>
       <i v-if="!showTree" class="el-icon-arrow-right"></i>
     </div>
-    <div class="rightcont" v-if="!showTree || isPC" ref="rightcont">
+    <div class="rightcont ScrollBar" v-if="!showTree || isPC" ref="rightcont">
       <TreeCont @scrollToTop="scrollToTop"></TreeCont>
     </div>
   </div>
@@ -110,6 +110,29 @@ export default class Tree extends Vue {
 @media screen and (min-width: @splitWidth) {
   .tree {
     height: 100%;
+    .lefttree {
+      width: 20rem;
+      vertical-align: top;
+      .el-tree {
+        padding: 10px 5px;
+      }
+    }
+    .rightcont {
+      width: calc(100% - 20rem);
+      border-left: 1px solid #eaecef;
+      box-sizing: border-box;
+      vertical-align: top;
+      .admincont {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 2.5rem;
+      }
+      .treecont {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 2.5rem;
+      }
+    }
     .hiddentree {
       display: none;
     }
@@ -120,9 +143,21 @@ export default class Tree extends Vue {
 @media screen and (max-width: @splitWidth) {
   .tree {
     position: relative;
-    height: 100%;
     .lefttree, .rightcont {
       width: 100%;
+    }
+    .lefttree {
+      width: 100%;
+      vertical-align: top;
+      .el-tree {
+        padding: 10px 5px;
+      }
+    }
+    .rightcont {
+      width: 100%;
+      border-left: 1px solid #eaecef;
+      box-sizing: border-box;
+      vertical-align: top;
     }
     .hidetree {
       position: absolute;

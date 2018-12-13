@@ -28,6 +28,7 @@
     "body-parser": "^1.18.3",
     "element-ui": "^2.4.8",
     "file-loader": "^2.0.0",
+    "gojs": "^1.8.35",
     "highlight.js": "^9.13.1",
     "less": "^3.8.1",
     "less-loader": "^4.1.0",

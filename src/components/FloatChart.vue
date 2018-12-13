@@ -338,7 +338,7 @@ export default class FloatChart extends Vue {
       // the link path shape
       $(go.Shape,
         { isPanelMain: true, stroke: "gray", strokeWidth: 2 },
-        new go.Binding("stroke", "isSelected", (sel) => { return sel ? "dodgerblue" : "gray"; }).ofObject()
+        new go.Binding("stroke", "isSelected", (sel: any) => { return sel ? "dodgerblue" : "gray"; }).ofObject()
       ),
       // the arrowhead
       $(go.Shape, { toArrow: "standard", strokeWidth: 0, fill: "gray" }),
@@ -399,23 +399,24 @@ export default class FloatChart extends Vue {
       $(go.TextBlock, text),
       { click: action },
       // don't bother with binding GraphObject.visible if there's no predicate
-      visiblePredicate ? new go.Binding("visible", "", function(o, e) { return o.diagram ? visiblePredicate(o, e) : false; }).ofObject() : {}
+      visiblePredicate ? new go.Binding("visible", "", (o: any, e: any) => { return o.diagram ? visiblePredicate(o, e) : false; }).ofObject() : {}
     );
   }
 
   // 辅助节点模板的删除
   nodeInfo(d: any) {  // Tooltip info for a node data object
-    var str = "Node " + d.key + ": " + d.text + "\n";
-    if (d.group)
-      str += "member of " + d.group;
-    else
+    let str = `Node ${d.key}: ${d.text}\n`;
+    if (d.group) {
+      str += `member of ${d.group}`;      
+    } else {
       str += "top-level node";
+    }
     return str;
   }
 
   // 辅助连接线的删除
   linkInfo(d: any) {  // Tooltip info for a link data object
-    return "Link:\nfrom " + d.from + " to " + d.to;
+    return `Link:\nfrom ${d.from} to ${d.to}`;
   }
 
   // 保存图表数据成 JSON
@@ -520,7 +521,7 @@ export default class FloatChart extends Vue {
 
 <style lang="less">
   #floatchartbox {
-    height: 871px;
+    height: 100%;
     .chartbox {
       display: flex;
       #myPaletteDiv {

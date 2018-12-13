@@ -103,6 +103,26 @@ export default class AdminLogCont extends Vue {
     // 编辑器
     .vueeditor {
       height: 660px;
+      // 在这里写里面进度条的样式
+      .ql-editor::-webkit-scrollbar {
+        /*滚动条整体样式*/
+        width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
+        height: 7px;
+      }
+      .ql-editor::-webkit-scrollbar-thumb {
+        /*滚动条里面小方块*/
+        border-radius: .5rem;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        background: #dcdfe6;
+      }
+      .ql-editor::-webkit-scrollbar-track {
+        /*滚动条里面轨道*/
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        border-radius: .5rem;
+        background: white;
+      }
     }
   }
 }

@@ -12,22 +12,27 @@ export default new VueRouter({
         {
           path: '',
           name: 'HomeMain',
-          component: () => import('@/views/home/HomeMain.vue'),
+          component: () => import('@/views/main/Main.vue'),
         },
         {
           path: 'tree',
           name: 'Tree',
-          component: () => import('@/views/home/Tree.vue'),
+          component: () => import('@/views/tree/Tree.vue'),
         },
         {
           path: 'photowall',
           name: 'PhotoWall',
-          component: () => import('@/views/home/PhotoWall.vue'),
+          component: () => import('@/views/photowall/PhotoWall.vue'),
         },
         {
           path: 'log',
           name: 'Log',
-          component: () => import('@/views/home/Log.vue'),
+          component: () => import('@/views/log/Log.vue'),
+        },
+        {
+          path: 'chart',
+          name: 'Chart',
+          component: () => import('@/views/chart/chart.vue'),
         }
       ]
     },
@@ -43,22 +48,27 @@ export default new VueRouter({
         {
           path: '',
           name: 'AdminMain',
-          component: () => import('@/views/admin/AdminMain.vue'),
+          component: () => import('@/views/main/AdminMain.vue'),
         },
         {
           path: 'admintree',
           name: 'AdminTree',
-          component: () => import('@/views/admin/AdminTree.vue'),
+          component: () => import('@/views/tree/AdminTree.vue'),
         },
         {
           path: 'adminphotowall',
           name: 'AdminPhotoWall',
-          component: () => import('@/views/admin/AdminPhotoWall.vue'),
+          component: () => import('@/views/photowall/AdminPhotoWall.vue'),
         },
         {
           path: 'adminlog',
           name: 'AdminLog',
-          component: () => import('@/views/admin/AdminLog.vue'),
+          component: () => import('@/views/log/AdminLog.vue'),
+        },
+        {
+          path: 'adminchart',
+          name: 'AdminChart',
+          component: () => import('@/views/chart/chart.vue'),
         }
       ]
     }

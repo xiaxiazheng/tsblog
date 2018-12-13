@@ -1,7 +1,7 @@
 <template>
   <div class="admintree">
 	  <!-- 左边的树 -->
-	  <div class="lefttree" v-if="showTree || isPC">
+	  <div class="lefttree ScrollBar" v-if="showTree || isPC">
       <el-tree
 				:data="tree"
 				:props="defaultProps"
@@ -61,7 +61,7 @@
       <i v-if="!showTree" class="el-icon-arrow-right"></i>
     </div>
 		<!-- 右边的子组件 -->
-		<div v-if="!showTree || isPC" class="rightcont" ref="rightcont">
+		<div v-if="!showTree || isPC" class="rightcont ScrollBar" ref="rightcont">
 			<el-switch
 				v-model="isEdit"
 				title="是否编辑">
@@ -569,6 +569,29 @@ export default class AdminTree extends Vue {
 // PC 端
 @media screen and (min-width: @splitWidth) {
   .admintree {
+    .lefttree {
+      width: 20rem;
+      vertical-align: top;
+      .el-tree {
+        padding: 10px 5px;
+      }
+    }
+    .rightcont {
+      width: calc(100% - 20rem);
+      border-left: 1px solid #eaecef;
+      box-sizing: border-box;
+      vertical-align: top;
+      .admincont {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 2.5rem;
+      }
+      .treecont {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 2.5rem;
+      }
+    }
     .hiddentree {
       display: none;
     }

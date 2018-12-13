@@ -26,9 +26,10 @@ export default class Home extends Vue {
 @media screen and (min-width: @splitWidth) {
   .home {
     height: 100%;
+    overflow: hidden;
     .homerouter {
-      height: calc(100% - 3.6rem - 1px);
-      padding-top: 58px;
+      height: calc(100% - 3.6rem - 2px);
+      margin-top: 58px;
     }
   }
 }

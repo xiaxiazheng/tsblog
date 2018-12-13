@@ -13,7 +13,7 @@ let hlfunc = function (el: any) {
 };
 Vue.directive('highlight', hlfunc);
 
-console.log(window);
+// console.log(window);
 import {
   Message,
   MessageBox

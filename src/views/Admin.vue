@@ -48,7 +48,8 @@ export default class Admin extends Vue {
 // PC 端
 @media screen and (min-width: @splitWidth) {
   .admin {
-		height: 100%;
+    height: 100%;
+    overflow: hidden;
 		.adminrouter {
       height: calc(100% - 3.6rem - 1px);
       padding-top: 58px;
