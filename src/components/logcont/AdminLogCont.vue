@@ -7,7 +7,7 @@
       <span>创建时间: {{cTime}}</span>
       <span>修改时间：{{mTime}}</span>
     </div>
-    <vue-editor v-model="logcont"></vue-editor>
+    <vue-editor class="vueeditor" v-model="logcont"></vue-editor>
   </div>
 </template>
 
@@ -73,16 +73,12 @@ export default class AdminLogCont extends Vue {
     width: 75%;
     height: 100%;
     margin: 0 auto;
-    padding-bottom: 40px;
+    padding-bottom: 70px;
     .title {
       width: 50%;
       .el-input__inner {
         text-align: center;
       }
-    }
-    .quillWrapper .ql-container {
-      max-height: 674px !important;
-      overflow-y: auto;
     }
     .author {
       display: block;
@@ -103,6 +99,10 @@ export default class AdminLogCont extends Vue {
       position: fixed;
       right: 5%;
       bottom: 40px;
+    }
+    // 编辑器
+    .vueeditor {
+      height: 660px;
     }
   }
 }

@@ -27,7 +27,7 @@ export default class Home extends Vue {
   .home {
     height: 100%;
     .homerouter {
-      height: calc(100% - 3.6rem);
+      height: calc(100% - 3.6rem - 1px);
       padding-top: 58px;
     }
   }
