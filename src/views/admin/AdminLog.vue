@@ -1,7 +1,7 @@
 <template>
   <div class="adminlog">
     <!-- 日志列表 -->
-    <div class="loglist ScrollBar" v-if="!showCont">
+    <div class="loglist" v-if="!showCont">
       <h3>所有日志</h3>
       <el-button class="addbutton" type="info" icon="el-icon-plus" plain @click="addNewLog"></el-button>
       <div class="option">
@@ -33,7 +33,7 @@
       </ul>
     </div>
     <!-- 日志详情 -->
-    <div class="logdetail ScrollBar" v-if="showCont">
+    <div class="logdetail" v-if="showCont">
       <el-button class="backbutton" type="info" icon="el-icon-back" plain @click="backLogList"></el-button>
       <el-switch
         v-model="isEdit"
@@ -168,7 +168,9 @@ export default class AdminLog extends Vue {
 // PC 端
 @media screen and (min-width: @splitWidth) {
   .adminlog {
-    width: 100%;
+    width: 90%;
+    height: 100%;
+    margin: 0 auto;
     .loglist {
       width: 80%;
       margin: 0 auto;
@@ -241,9 +243,7 @@ export default class AdminLog extends Vue {
       }
     }
     .logdetail {
-      width: 100%;
-      height: calc(100% - 44px);
-      padding: 22px 0;
+      padding-top: 22px;
       .backbutton {
         position: fixed;
         left: 5%;
