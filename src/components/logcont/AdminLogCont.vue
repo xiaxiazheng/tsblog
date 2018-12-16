@@ -71,9 +71,7 @@ export default class AdminLogCont extends Vue {
 @media screen and (min-width: @splitWidth) {
   .adminlogcont {
     width: 75%;
-    height: 100%;
     margin: 0 auto;
-    padding-bottom: 70px;
     .title {
       width: 50%;
       .el-input__inner {
@@ -103,6 +101,7 @@ export default class AdminLogCont extends Vue {
     // 编辑器
     .vueeditor {
       height: 660px;
+      margin-bottom: 45px;
       // 在这里写里面进度条的样式
       .ql-editor::-webkit-scrollbar {
         /*滚动条整体样式*/

@@ -61,7 +61,6 @@ export default class LogCont extends Vue {
 @media screen and (min-width: @splitWidth) {
   .logcont {
     width: 70%;
-    height: 100%;
     margin: 0 auto;
     .title {
       font-size: 16px;
