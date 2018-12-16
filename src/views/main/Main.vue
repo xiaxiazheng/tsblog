@@ -51,14 +51,16 @@ export default class Main extends Vue {
 @media screen and (min-width: @splitWidth) {
   .main {
     .carousel {
-      max-width: 960px; // 走马灯宽度
-      margin: 0 auto;
-      .el-carousel__container {
-        height: 540px !important;  // 走马灯高度，960*540比例16:9   
-      }
-      img {
-        width: 100%;
+      height: calc(100% - 3.6rem);
+      .el-carousel {
         height: 100%;
+        .el-carousel__container {
+          height: 100% !important;   
+        }
+        img {
+          width: 100%;
+          height: 100%;
+        }
       }
     }
     footer {
