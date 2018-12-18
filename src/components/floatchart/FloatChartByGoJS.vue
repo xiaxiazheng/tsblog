@@ -1,8 +1,3 @@
-/*
- *@author: 郑演彬
- *@date: 2018-12-13
- *@description: 应急资源管理系统 -> 应急预案 -> 流程配置 -> 流程图组件
- */
 <template>
   <div id="floatchartbox">
     <div class="chartbox">
@@ -34,7 +29,7 @@ let myDiagram: any;
   components: {
   }
 })
-export default class FloatChart extends Vue {
+export default class FloatChartByGoJS extends Vue {
   modeldata: any = {
     "class": "go.GraphLinksModel",
     "linkFromPortIdProperty": "fromPort",

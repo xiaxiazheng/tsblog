@@ -32,7 +32,7 @@
         <span class="tabItem" :class="{'active': activeTab === 'Tree'}" @click="clickTabs('Tree')">知识树</span>
         <span class="tabItem" :class="{'active': activeTab === 'Log'}" @click="clickTabs('Log')">日志</span>
         <span class="tabItem" :class="{'active': activeTab === 'PhotoWall'}" @click="clickTabs('PhotoWall')">图片墙</span>
-        <span class="tabItem" :class="{'active': activeTab === 'Chart'}" @click="clickTabs('Chart')">流程图</span>
+        <span class="tabItem" :class="{'active': activeTab === 'Chart'}" @click="clickTabs('Chart')">玩具</span>
         <a href="https://github.com/xiaxiazheng/myblog">
           GitHub
           <i class="el-icon-star-off"></i>
@@ -72,7 +72,7 @@
         <span class="tabItem" :class="{'active': activeTab === 'AdminTree'}" @click="clickTabs('AdminTree')">知识树</span>
         <span class="tabItem" :class="{'active': activeTab === 'AdminLog'}" @click="clickTabs('AdminLog')">日志</span>
         <span class="tabItem" :class="{'active': activeTab === 'AdminPhotoWall'}" @click="clickTabs('AdminPhotoWall')">图片墙</span>
-        <span class="tabItem" :class="{'active': activeTab === 'AdminChart'}" @click="clickTabs('AdminChart')">流程图</span>
+        <span class="tabItem" :class="{'active': activeTab === 'AdminChart'}" @click="clickTabs('AdminChart')">玩具</span>
         <a href="https://github.com/xiaxiazheng/myblog">
           GitHub
           <i class="el-icon-star-off"></i>
