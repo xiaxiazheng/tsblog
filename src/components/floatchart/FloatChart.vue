@@ -10,8 +10,7 @@ import { Component } from 'vue-property-decorator';
 import { Getter, Action } from 'vuex-class';
 import SVG from 'svg.js';
 import 'svg.draggable.js/dist/svg.draggable.js';
-// import 'svg.connectable.js/dist/svg.connectable.js';
-import 'svg.connectable.js/lib/index.js';
+import 'svg.connectable.js/dist/svg.connectable.js';
 
 @Component
 export default class FloatChart extends Vue {
@@ -83,53 +82,88 @@ export default class FloatChart extends Vue {
     group.on("mousedown", this.createCircle);
   }
 
-  // initText() {
-  //   let text: any = this.draw.text((add: any) => {
-  //     add.tspan('文本模板').fill('#fff').newLine();
-  //     // add.tspan('点我编辑').fill('#fff')
-  //   }).move(0, 100);
-  //   text.draggable(true);
-  //   text.on("mousedown", this.createText);
-  // }
-
   createRect(event: any) {
     this.initRect(); /* 当前的被拖走了，重新新建一个放在模板 */
-    let element = SVG.get(event.target.id); /* 直接通过 SVG.get(id) 获取该 svg 元素，而不是 dom 节点 */
-    element.off("mousedown", this.createRect); /* 解绑该事件，以实现只执行一次这个函数 */
-    let groupElement = SVG.get(event.target.parentElement.id);
-    groupElement.on("contextmenu", this.startLink);
-    groupElement.on("click", this.endLink);
-    groupElement.on("dblclick", this.doubleClick); /* 绑定新的事件 */
+    this.createElement(event, 'rect');
   }
 
   createCircle(event: any) {
     this.initCircle();
-    let element = SVG.get(event.target.id);
-    element.off("mousedown", this.createCircle);
+    this.createElement(event, 'circle');
+  }
+
+  // 被创建新元素的初始化
+  createElement(event: any, type: string) {
+    let element = SVG.get(event.target.id); /* 直接通过 SVG.get(id) 获取该 svg 元素，而不是 dom 节点 */
     let groupElement = SVG.get(event.target.parentElement.id);
-    groupElement.on("contextmenu", this.startLink);
-    groupElement.on("click", this.endLink);
-    groupElement.on("dblclick", this.doubleClick); /* 绑定新的事件 */
+     /* 解绑该事件，以实现只执行一次新建的函数 */
+    type === 'rect' && groupElement.off("mousedown", this.createRect);
+    type === 'circle' && groupElement.off("mousedown", this.createCircle);
+    // 绑定文本
+    let text = this.draw.text(function(add: any) {
+      add.tspan('双击编辑')
+    });
+    text.font({
+      x: 35,
+      y: 39,
+      family: 'Helvetica',
+      size: 14,
+      anchor: 'middle'
+    });
+    text.on("dblclick", this.doubleClick); /* 这个双击事件要单独绑定，否则会被共享并按 group 里的元素个数执行多次 */
+    groupElement.add(text);
+    groupElement.on("contextmenu", this.goLinking);
   }
 
-  // createText(event: any) {
-  //   this.initText();
-  //   let element = SVG.get(event.target.id);
-  //   element.off("mousedown", this.createText); /* 这里并没有 off 到，该事件依然在起作用 */
-  //   element.on("dblclick", this.doubleClick);
-  // }
-
-  // 开始连线
-  startLink(event: any) {
+  // 连线
+  goLinking(event: any) {
     event.preventDefault();
-    this.sourceId = event.target.parentElement.id; /* 保存所属 group 的 id */
-    this.islinking = true;
-    this.sourceX = event.clientX;  // 触发事件时鼠标的位置
-    this.sourceY = event.clientY;
-    this.draw.on("mousemove", this.tracingMouse);
+    /* 开始连线 */
+    if (!this.islinking) {
+      // 找出被操作的 group，并把它的id 存到 this.sourceId
+      let parentElement = SVG.get(event.target.parentElement.id);
+      if (parentElement.type === 'text') {
+        this.sourceId = event.target.parentElement.parentElement.id;
+      } else {
+        this.sourceId = event.target.parentElement.id;
+      }
+      // 记录触发事件时鼠标的位置
+      this.sourceX = event.clientX;
+      this.sourceY = event.clientY;
+      // 画跟踪的连接线
+      this.islinking = true;
+      this.draw.on("mousemove", this.tracingMouse);
+    } else { /* 结束连线 */
+      // "去掉"跟踪的连接线（只是让这条线不可见）
+      this.tracingLine.plot(0,0,0,0).fill("transparent"); /* 更新已创建好的直线用 plot */
+      this.tracingLine = undefined;
+      this.draw.off("mousemove", this.tracingMouse);
+      // 定位 group 的 id（因为 tspan 离 group 中间隔了一层 text，要找出来）
+      let parentElement = SVG.get(event.target.parentElement.id);
+      let parentId;
+      if (parentElement.type === 'text') {
+        parentId = event.target.parentElement.parentElement.id;
+      } else {
+        parentId = event.target.parentElement.id;
+      }
+      // 如果两次都点击了同一个 group，就取消本次连线（比较的是 group 的 id）
+      if (parentId === this.sourceId) {
+        this.islinking = false;
+        return;
+      }
+      // 连线
+      let source: any = SVG.get(this.sourceId);
+      let target = SVG.get(parentId);
+      let link = source.connectable({
+        container: this.links,
+        markers: this.markers,
+        padEllipse: true  /* 连接线带箭头 */
+      }, target).setLineColor("#5D4037");
+      this.islinking = false;
+    }
   }
 
-  // 做一条线并跟随鼠标
+  // 做一条跟踪线并跟随鼠标
   tracingMouse(event: any) {
     // console.log("from:", this.sourceX, this.sourceY);
     // console.log("to:  ", event.clientX, event.clientY);
@@ -144,30 +178,13 @@ export default class FloatChart extends Vue {
     }
   }
 
-  // 确认连线
-  endLink(event: any) {
-    if (this.islinking) {
-      this.tracingLine.plot(0,0,0,0).fill("transparent"); /* 更新已创建好的直线用 plot */
-      this.tracingLine = undefined;
-      // this.tracingGroup.remove(this.tracingLine);
-      if (event.target.parentElement.id === this.sourceId) {  // 如果两次都点击了同一个，就取消本次连线
-        this.islinking = false;
-        return;
-      }
-      let source = SVG.get(this.sourceId);
-      let target = SVG.get(event.target.parentElement.id);
-      let link = source.connectable({
-        container: this.links,
-        markers: this.markers,
-        padEllipse: true  /* 连接线带箭头 */
-      }, target).setLineColor("#5D4037");
-      this.islinking = false;
-    }
-  }
-
   // 双击，编辑文本
-  doubleClick() {
-    console.log("双击");
+  doubleClick(event: any) {
+    let tspan = SVG.get(event.target.id);
+    console.log(tspan);
+    let input = prompt("请输入节点名称：", ""); // 弹出窗口请求输入
+    tspan.clear();
+    tspan.text(input);
   }
 }
 </script>

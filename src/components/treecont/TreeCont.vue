@@ -193,7 +193,7 @@ export default class TreeCont extends Vue {
         position: fixed;
         top: 115px;
         right: 16px;
-        max-width: 220px;
+        max-width: 11%;
         text-align: right;
         opacity: 0.3;
         >a {

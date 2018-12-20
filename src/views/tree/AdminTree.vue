@@ -397,7 +397,10 @@ export default class AdminTree extends Vue {
     this.msgTips(res);
     this.showEditDialog = false;
     this.init();
-    this.propsname = this.motifyNode.newNodeName;  // 保证修改的值能直接传给子组件，因为改了值路由没变，子组件不会刷新
+    // 如果被改名的节点id与当前路由的id相同，就要传递修改的值
+    if (btoa(encodeURIComponent(id)) === this["$route"].query.id) {
+      this.propsname = this.motifyNode.newNodeName;  // 保证修改的值能直接传给子组件，因为改了值路由没变，子组件不会刷新
+    }
     this.motifyNode.newNodeName = '';
   }
 
