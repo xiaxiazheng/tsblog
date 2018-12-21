@@ -50,7 +50,7 @@ export default class FloatChart extends Vue {
     this.initTemplate();
   }
 
-  // 初始化模板
+  // 初始化左上角模板
   initTemplate() {
     // 模板边框
     this.draw.polyline([[10, 10], [360, 10], [360, 280], [10, 280], [10, 10]]).fill('none').stroke({ width: 1, color: 'rgba(23,152,214,0.3)' });
@@ -63,7 +63,6 @@ export default class FloatChart extends Vue {
       add.tspan('左键选中其他元素可建立连线。').newLine();
       add.tspan('双击编辑，编辑输入为空则删除该节点。').newLine();
     }).font({ size: 12 }).fill("white").move(15, 300);
-
     // 标题线
     this.draw.line(25, 55, 345, 55).stroke({ width: 1, color: 'rgba(23,152,214,1)' });
     // 具体模板名
@@ -85,7 +84,17 @@ export default class FloatChart extends Vue {
     let group: any = this.nodes.group().translate(25, 90).draggable(true);
     let rect = this.draw.rect(100, 30).fill("transparent").stroke({ width: 1, color: 'rgba(102,253,251,0.65)' });
     group.add(rect);  /* 后加入 group 的会显示在上层 */
-    group.on("mousedown", this.createRect);
+    group.on("mouseup", (event: any) => {
+      /* 虽然这里是 group 监听事件 */
+      if (event.clientX < (360 + this.offsetLeft) && event.clientY < (280 + this.offsetTop)) {
+        let ele = SVG.get(event.target.parentElement.id);
+        ele.remove();  /* 不合要求，销毁 */
+      } else {
+        this.createElement(event, 'rect');  /* 对被拖走的元素进行初始化 */
+      }
+      // 不管拖走的合不合要求，这里都要新建一个
+      this.initRect();
+    });
   }
 
   // 平行四边形
@@ -94,7 +103,17 @@ export default class FloatChart extends Vue {
     let rect = this.draw.rect(100, 30).fill("transparent").stroke({ width: 1, color: 'rgba(102,253,251,0.65)' });
     rect.transform({ skewX: -15 });
     group.add(rect);  /* 后加入 group 的会显示在上层 */
-    group.on("mousedown", this.createParallel);
+    group.on("mouseup", (event: any) => {
+      /* 虽然这里是 group 监听事件 */
+      if (event.clientX < (360 + this.offsetLeft) && event.clientY < (280 + this.offsetTop)) {
+        let ele = SVG.get(event.target.parentElement.id);
+        ele.remove();  /* 不合要求，销毁 */
+      } else {
+        this.createElement(event, 'parallel');  /* 对被拖走的元素进行初始化 */
+      }
+      // 不管拖走的合不合要求，这里都要新建一个
+      this.initParallel();
+    });
   }
 
   // 菱形
@@ -103,7 +122,17 @@ export default class FloatChart extends Vue {
     let rect = this.draw.rect(70, 58).fill("transparent").stroke({ width: 1, color: 'rgba(102,253,251,0.65)' });
     rect.transform({ rotation: 27 }).transform({ skewX: -35, relative: true });
     group.add(rect);  /* 后加入 group 的会显示在上层 */
-    group.on("mousedown", this.createDiamond);
+    group.on("mouseup", (event: any) => {
+      /* 虽然这里是 group 监听事件 */
+      if (event.clientX < (360 + this.offsetLeft) && event.clientY < (280 + this.offsetTop)) {
+        let ele = SVG.get(event.target.parentElement.id);
+        ele.remove();  /* 不合要求，销毁 */
+      } else {
+        this.createElement(event, 'diamond');  /* 对被拖走的元素进行初始化 */
+      }
+      // 不管拖走的合不合要求，这里都要新建一个
+      this.initDiamond();
+    });
   }
 
   // 圆形
@@ -111,7 +140,17 @@ export default class FloatChart extends Vue {
     let group: any = this.nodes.group().translate(40, 170).draggable(true);
     let circle = this.draw.circle(70).fill("transparent").stroke({ width: 1, color: 'rgba(102,253,251,0.65)' });
     group.add(circle);
-    group.on("mousedown", this.createCircle);
+    group.on("mouseup", (event: any) => {
+      /* 虽然这里是 group 监听事件 */
+      if (event.clientX < (360 + this.offsetLeft) && event.clientY < (280 + this.offsetTop)) {
+        let ele = SVG.get(event.target.parentElement.id);
+        ele.remove();  /* 不合要求，销毁 */
+      } else {
+        this.createElement(event, 'circle');  /* 对被拖走的元素进行初始化 */
+      }
+      // 不管拖走的合不合要求，这里都要新建一个
+      this.initCircle();
+    });
   }
 
   // 椭圆形
@@ -119,44 +158,24 @@ export default class FloatChart extends Vue {
     let group: any = this.nodes.group().translate(280, 92).draggable(true);
     let ellipse = this.draw.ellipse(40, 30).fill("transparent").stroke({ dx:5, width: 1, color: 'rgba(102,253,251,0.65)' });
     group.add(ellipse);
-    group.on("mousedown", this.createEllipse);
-  }
-
-  createRect(event: any) {
-    this.initRect(); /* 当前的被拖走了，重新新建一个放在模板 */
-    this.createElement(event, 'rect');
-  }
-
-  createParallel(event: any) {
-    this.initParallel();
-    this.createElement(event, 'parallel');
-  }
-
-  createDiamond(event: any) {
-    this.initDiamond();
-    this.createElement(event, 'diamond');
-  }
-
-  createCircle(event: any) {
-    this.initCircle();
-    this.createElement(event, 'circle');
-  }
-
-  createEllipse(event: any) {
-    this.initEllipse();
-    this.createElement(event, 'ellipse');
+    group.on("mouseup", (event: any) => {
+      /* 虽然这里是 group 监听事件 */
+      if (event.clientX < (360 + this.offsetLeft) && event.clientY < (280 + this.offsetTop)) {
+        let ele = SVG.get(event.target.parentElement.id);
+        ele.remove();  /* 不合要求，销毁 */
+      } else {
+        this.createElement(event, 'ellipse');  /* 对被拖走的元素进行初始化 */
+      }
+      // 不管拖走的合不合要求，这里都要新建一个
+      this.initEllipse();
+    });
   }
 
   // 被创建新元素的初始化
   createElement(event: any, type: string) {
     let element = SVG.get(event.target.id); /* 直接通过 SVG.get(id) 获取该 svg 元素，而不是 dom 节点 */
     let groupElement = SVG.get(event.target.parentElement.id);
-     /* 解绑该事件，以实现只执行一次新建的函数 */
-    type === 'rect' && groupElement.off("mousedown", this.createRect);
-    type === 'parallel' && groupElement.off("mousedown", this.createParallel);
-    type === 'diamond' && groupElement.off("mousedown", this.createDiamond);
-    type === 'circle' && groupElement.off("mousedown", this.createCircle);
-    type === 'ellipse' && groupElement.off("mousedown", this.createEllipse);
+    groupElement.off("mouseup"); /* 解绑该新建事件 */
     // 绑定文本
     let text = this.draw.text((add: any) => {
       if (type === 'circle') {
@@ -341,9 +360,19 @@ export default class FloatChart extends Vue {
   // 双击，编辑文本
   doubleClick(event: any) {
     let tspan = SVG.get(event.target.id);
-    let input = prompt("请输入节点名称：", ""); // 弹出窗口请求输入
+    let input = prompt("请输入节点名称：(节点名称为空时会删除该节点)", tspan.node.textContent); // 弹出窗口请求输入
     if (input === '') {
-      console.log("删除本节点所在的整个 group");
+      let groupId = event.target.parentElement.parentElement.id;
+      let group = SVG.get(groupId);
+      /* 删除的时候要把与他有关的线全都删了 */
+      for (let i = this.links.length - 1; i >= 0; i--) {
+        if (this.links[i].sourceId === groupId || this.links[i].targetId === groupId) { // 找出与该节点有关的线
+          let line = SVG.get(this.links[i].lineId);
+          line.remove();  // 先删除该线
+          this.links.splice(i, 1);  // 再删除该节点的连线记录
+        }
+      }
+      group.remove(); // 再删除该节点
     } else if (input !== null) {
       tspan.clear();
       tspan.text(input);
