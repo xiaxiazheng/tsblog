@@ -27,10 +27,10 @@ export default class FloatChart extends Vue {
   tracingLine: any;   // 连线时用的追踪线
   offsetTop: any;     // 整个 svg 盒子顶部偏移量
   offsetLeft: any;    // 整个 svg 盒子左边偏移量
-  linkButton: any;    // 工具栏的编辑按钮
-  editImg: any = require('@/static/img/edit.jpg');
+  linkButton: any;    // 工具栏的连线按钮
+  linkImg: any = require('@/static/img/link.png');
   removeButton: any;  // 工具栏的删除按钮
-  removeImg: any = require('@/static/img/edit.jpg');
+  removeImg: any = require('@/static/img/remove.png');
 
   mounted() {
     this.$nextTick(function () {
@@ -223,15 +223,33 @@ export default class FloatChart extends Vue {
     if (parentElement.type === 'text') {
       parentElement = SVG.get(event.target.parentElement.parentElement.id);
     }
-    // 添加连线按钮
-    let linkButton = this.draw.image(this.editImg, 50, 30);
+    // 添加连线和删除工具
+    let dom: any = document.getElementById(parentElement.node.id);
+    let width = dom.getBBox().width;
+    console.log(width);
+    let linkButton: any;
+    let removeButton: any;
+    if (width > 120) { // parallel
+      linkButton = this.draw.image(this.linkImg, 43, 45).move(-8, 5);
+      removeButton = this.draw.image(this.removeImg, 43, 45).move(35, 5);
+    } else if (width > 105) { // rect
+      linkButton = this.draw.image(this.linkImg, 50, 30).move(0, 0);
+      removeButton = this.draw.image(this.removeImg, 50, 30).move(50, 0);      
+    } else if (width > 99) { // diamond
+      linkButton = this.draw.image(this.linkImg, 50, 30).move(0, 0);
+      removeButton = this.draw.image(this.removeImg, 50, 30).move(50, 0);   
+    } else if (width > 65) { // circle
+      linkButton = this.draw.image(this.linkImg, 35, 40).move(0, 15);
+      removeButton = this.draw.image(this.removeImg, 35, 40).move(35, 15);   
+    } else { // ellipse
+      linkButton = this.draw.image(this.linkImg, 50, 30).move(-30, 0);
+      removeButton = this.draw.image(this.removeImg, 50, 30).move(20, 0);   
+    }
     linkButton.on("click", this.startLinking);
-    this.linkButton = linkButton;
-    parentElement.add(linkButton);
-    // 添加删除按钮
-    let removeButton = this.draw.image(this.removeImg, 50, 30).move(50, 0);
     removeButton.on("click", this.deleteNode);
+    this.linkButton = linkButton;
     this.removeButton = removeButton;
+    parentElement.add(linkButton);
     parentElement.add(removeButton);
     return;
   }
