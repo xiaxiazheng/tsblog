@@ -226,22 +226,21 @@ export default class FloatChart extends Vue {
     // 添加连线和删除工具
     let dom: any = document.getElementById(parentElement.node.id);
     let width = dom.getBBox().width;
-    console.log(width);
     let linkButton: any;
     let removeButton: any;
-    if (width > 120) { // parallel
+    if (width > 120) {          // parallel
       linkButton = this.draw.image(this.linkImg, 43, 45).move(-8, 5);
       removeButton = this.draw.image(this.removeImg, 43, 45).move(35, 5);
-    } else if (width > 105) { // rect
+    } else if (width > 105) {   // rect
       linkButton = this.draw.image(this.linkImg, 50, 30).move(0, 0);
       removeButton = this.draw.image(this.removeImg, 50, 30).move(50, 0);      
-    } else if (width > 99) { // diamond
+    } else if (width > 99) {    // diamond
       linkButton = this.draw.image(this.linkImg, 50, 30).move(0, 0);
       removeButton = this.draw.image(this.removeImg, 50, 30).move(50, 0);   
-    } else if (width > 65) { // circle
+    } else if (width > 65) {    // circle
       linkButton = this.draw.image(this.linkImg, 35, 40).move(0, 15);
       removeButton = this.draw.image(this.removeImg, 35, 40).move(35, 15);   
-    } else { // ellipse
+    } else {                    // ellipse
       linkButton = this.draw.image(this.linkImg, 50, 30).move(-30, 0);
       removeButton = this.draw.image(this.removeImg, 50, 30).move(20, 0);   
     }
@@ -266,6 +265,35 @@ export default class FloatChart extends Vue {
     }
   }
 
+  // 双击，编辑文本
+  doubleClick(event: any) {
+    let tspan = SVG.get(event.target.id);
+    let originCont: string = tspan.node.textContent;
+    let input = prompt("请输入节点名称：(节点名称不可为空)", originCont); // 弹出窗口请求输入
+    if (input !== null) {
+      tspan.clear();
+      tspan.text(input);
+    } else {
+      tspan.clear();
+      tspan.text(originCont);
+    }
+  }
+
+  // 删除节点，以及与它相关的线
+  deleteNode(event: any) {
+    let groupId = event.target.parentElement.id;
+    let group = SVG.get(groupId);
+    /* 删除的时候要把与他有关的线全都删了 */
+    for (let i = this.links.length - 1; i >= 0; i--) {
+      if (this.links[i].sourceId === groupId || this.links[i].targetId === groupId) { // 找出与该节点有关的线
+        let line = SVG.get(this.links[i].lineId);
+        line.remove();  // 先删除该线
+        this.links.splice(i, 1);  // 再删除该节点的连线记录
+      }
+    }
+    group.remove(); // 再删除该节点
+  }
+
   // 开始连线
   startLinking(event: any) {
     if (!this.islinking) {
@@ -283,7 +311,7 @@ export default class FloatChart extends Vue {
     }
   }
 
-  // 做一条跟踪线并跟随鼠标
+  // 开始连线后作一条跟随鼠标的跟踪线
   tracingMouse(event: any) {
     // console.log("from:", this.sourceX, this.sourceY);
     // console.log("to:  ", event.clientX, event.clientY);
@@ -343,6 +371,18 @@ export default class FloatChart extends Vue {
       source.on("dragmove", this.updateLink); /* 监听被连线的元素的拖动 */
       target.on("dragmove", this.updateLink); /* 热更新连接线 */
       this.islinking = false;
+    }
+  }
+
+  // 右键取消连线
+  cancelLinking(event: any) {
+    event.preventDefault();
+    if (this.islinking) {
+      this.tracingLine.plot(0, 0, 0, 0).fill("transparent"); /* 更新已创建好的直线用 plot */
+      this.tracingLine = undefined;
+      this.islinking = false;
+      this.draw.off("mousemove", this.tracingMouse);
+      this.draw.off("contextmenu", this.cancelLinking); // 取消连线要移除“取消连线”的监听
     }
   }
 
@@ -417,47 +457,6 @@ export default class FloatChart extends Vue {
         line.plot(sourceCenterX, sourceCenterY, targetCenterX, targetCenterY);
       }
     });
-  }
-
-  // 右键取消连线
-  cancelLinking(event: any) {
-    event.preventDefault();
-    if (this.islinking) {
-      this.tracingLine.plot(0, 0, 0, 0).fill("transparent"); /* 更新已创建好的直线用 plot */
-      this.tracingLine = undefined;
-      this.islinking = false;
-      this.draw.off("mousemove", this.tracingMouse);
-      this.draw.off("contextmenu", this.cancelLinking); // 取消连线要移除“取消连线”的监听
-    }
-  }
-
-  // 双击，编辑文本
-  doubleClick(event: any) {
-    let tspan = SVG.get(event.target.id);
-    let originCont: string = tspan.node.textContent;
-    let input = prompt("请输入节点名称：(节点名称不可为空)", originCont); // 弹出窗口请求输入
-    if (input !== null) {
-      tspan.clear();
-      tspan.text(input);
-    } else {
-      tspan.clear();
-      tspan.text(originCont);
-    }
-  }
-
-  // 删除节点，以及与它相关的线
-  deleteNode(event: any) {
-    let groupId = event.target.parentElement.id;
-    let group = SVG.get(groupId);
-    /* 删除的时候要把与他有关的线全都删了 */
-    for (let i = this.links.length - 1; i >= 0; i--) {
-      if (this.links[i].sourceId === groupId || this.links[i].targetId === groupId) { // 找出与该节点有关的线
-        let line = SVG.get(this.links[i].lineId);
-        line.remove();  // 先删除该线
-        this.links.splice(i, 1);  // 再删除该节点的连线记录
-      }
-    }
-    group.remove(); // 再删除该节点
   }
 }
 </script>
