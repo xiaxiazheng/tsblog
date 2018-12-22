@@ -51,6 +51,10 @@ export default class Tree extends Vue {
       console.log("isPC:", this.isPC);
       this.onWidthChange();
       this.init();
+      // 手机端如果打开分享的树节点的链接，就判断 id 并隐藏树
+      if (!this.isPC && this["$route"].query.id) {
+        this.showTree = false;
+      }
     });
   }
 

@@ -236,6 +236,14 @@ export default class FloatChart extends Vue {
           event.clientX - this.offsetLeft,
           event.clientY - this.offsetTop
         ).stroke({ width: 1, color: "rgba(255,255,255,0.3)" });
+        // 使用 Marker 标记画箭头
+        let arrow = this.draw.marker(12, 12, (add: any) => {
+          add.path('M2,2 L2,11 L10,6 L2,2');
+          add.style({
+            fill: 'rgba(255,255,255,0.3)'
+          });
+        });
+        this.tracingLine.marker('end', arrow);
         this.tracingGroup.add(this.tracingLine);
         this.draw.on("contextmenu", this.cancelLinking);
       } else {
@@ -307,6 +315,15 @@ export default class FloatChart extends Vue {
       targetCenterX,
       targetCenterY
     ).stroke({ width: 1, color: "rgba(255,255,255,0.3)" });
+    // 使用 Marker 标记画箭头
+    let arrow = this.draw.marker(12, 12, (add: any) => {
+      add.path('M2,2 L2,11 L10,6 L2,2');
+      add.style({
+        fill: 'rgba(255,255,255,0.3)'
+      });
+    });
+    line.marker('end', arrow);
+    // 保存该线信息
     this.links.push({
       sourceId: source.node.id,
       targetId: target.node.id,
