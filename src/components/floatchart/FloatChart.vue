@@ -13,22 +13,24 @@ import 'svg.draggable.js/dist/svg.draggable.js';
 
 @Component
 export default class FloatChart extends Vue {
-  draw: any;    // SVG 实例
-  nodes: any;   // 所有节点
-  links: {      // 所有线
+  draw: any;          // SVG 实例
+  nodes: any;         // 所有节点
+  links: {            // 所有线
     sourceId: any;
     targetId: any;
     lineId: any;
   }[] = [];
-  markers: any; // 这个未知
-  islinking: boolean = false;
-  sourceId: any;
+  islinking: boolean = false;  // 是否正在连接
+  sourceId: any;      // 开始连接后源对象的 id
   sourceX: any;
   sourceY: any;
-  tracingGroup: any;
-  tracingLine: any;
-  offsetTop: any;
-  offsetLeft: any;
+  tracingLine: any;   // 连线时用的追踪线
+  offsetTop: any;     // 整个 svg 盒子顶部偏移量
+  offsetLeft: any;    // 整个 svg 盒子左边偏移量
+  linkButton: any;    // 工具栏的编辑按钮
+  editImg: any = require('@/static/img/edit.jpg');
+  removeButton: any;  // 工具栏的删除按钮
+  removeImg: any = require('@/static/img/edit.jpg');
 
   mounted() {
     this.$nextTick(function () {
@@ -43,9 +45,7 @@ export default class FloatChart extends Vue {
     this.offsetLeft = dom.offsetLeft;
     /* 生成 svg */
     this.draw = SVG('drawing').size("100%", "100%");
-    this.markers = this.draw.group();
     this.nodes = this.draw.group();
-    this.tracingGroup = this.draw.group();
     /* 初始化模板 */
     this.initTemplate();
   }
@@ -58,10 +58,10 @@ export default class FloatChart extends Vue {
     this.draw.text("基本流程图形状").font({ size: 16 }).fill("white").move(25, 25);
     // 使用提示
     this.draw.text((add: any) => {
-      add.tspan('右键选中元素后开始连线，开始连线后，').newLine();
-      add.tspan('再次点击右键则取消本次连线，').newLine();
+      add.tspan('右键点开工具栏，左边是连线右边是删除节点。').newLine();
+      add.tspan('开始连线后，在空白处点击右键可取消本次连线，').newLine();
       add.tspan('左键选中其他元素可建立连线。').newLine();
-      add.tspan('双击编辑，编辑输入为空则删除该节点。').newLine();
+      add.tspan('双击文本可编辑，编辑输入为空则删除该节点。').newLine();
     }).font({ size: 12 }).fill("white").move(15, 300);
     // 标题线
     this.draw.line(25, 55, 345, 55).stroke({ width: 1, color: 'rgba(23,152,214,1)' });
@@ -198,29 +198,70 @@ export default class FloatChart extends Vue {
     if (type === 'ellipse') {
       text.font({ x: 20, y: 19, family: 'Helvetica', size: 14, anchor: 'middle' });     
     }
-    text.on("dblclick", this.doubleClick); /* 这个双击事件要单独绑定，否则会被共享并按 group 里的元素个数执行多次 */
+    text.on("dblclick", this.doubleClick); /* 这个右键事件要单独绑定，否则会被共享并按 group 里的元素个数执行多次 */
     groupElement.add(text);
-    groupElement.on("contextmenu", this.startLinking);
+    groupElement.on("contextmenu", this.openToolBar);
     groupElement.on("click", this.endLinking);
+  }
+
+  // 打开工具栏
+  openToolBar(event: any) {
+    event.preventDefault();
+    if (this.linkButton || this.removeButton) { // 若已存在打开的工具栏
+      // 若是再次点击工具栏，则移除并退出
+      if (event.target.id === this.linkButton.node.id || event.target.id === this.removeButton.node.id) {
+        this.removeToolBar();
+        return;
+      } else {
+        // 移除之前的
+        this.removeToolBar();
+        // 然后加新的
+      }
+    }
+    // 找出被操作的 group，并把它的id 存到 this.sourceId
+    let parentElement = SVG.get(event.target.parentElement.id);
+    if (parentElement.type === 'text') {
+      parentElement = SVG.get(event.target.parentElement.parentElement.id);
+    }
+    // 添加连线按钮
+    let linkButton = this.draw.image(this.editImg, 50, 30);
+    linkButton.on("click", this.startLinking);
+    this.linkButton = linkButton;
+    parentElement.add(linkButton);
+    // 添加删除按钮
+    let removeButton = this.draw.image(this.removeImg, 50, 30).move(50, 0);
+    removeButton.on("click", this.deleteNode);
+    this.removeButton = removeButton;
+    parentElement.add(removeButton);
+    return;
+  }
+
+  // 关闭工具栏
+  removeToolBar() {
+    if (this.linkButton) {
+      this.linkButton.off("click", this.startLinking);
+      this.linkButton.remove();
+    }
+    if (this.removeButton) {
+      this.removeButton.off("click", this.startLinking);
+      this.removeButton.remove();
+    }
   }
 
   // 开始连线
   startLinking(event: any) {
-    event.preventDefault();
     if (!this.islinking) {
-      // 找出被操作的 group，并把它的id 存到 this.sourceId
-      let parentElement = SVG.get(event.target.parentElement.id);
-      if (parentElement.type === 'text') {
-        this.sourceId = event.target.parentElement.parentElement.id;
-      } else {
-        this.sourceId = event.target.parentElement.id;
-      }
+      // 找出 group，并把它的id 存到 this.sourceId
+      let groupElement = SVG.get(event.target.parentElement.id);
+      this.sourceId = event.target.parentElement.id;
       // 记录触发事件时鼠标的位置
       this.sourceX = event.clientX;
       this.sourceY = event.clientY;
       // 画跟踪的连接线
       this.islinking = true;
       this.draw.on("mousemove", this.tracingMouse);
+      // 关闭工具栏
+      this.removeToolBar();
     }
   }
 
@@ -229,13 +270,15 @@ export default class FloatChart extends Vue {
     // console.log("from:", this.sourceX, this.sourceY);
     // console.log("to:  ", event.clientX, event.clientY);
     if (this.islinking) {
+      let sX = this.sourceX - this.offsetLeft;
+      let sY = this.sourceY - this.offsetTop;
+      let tX = event.clientX - this.offsetLeft;
+      let tY = event.clientY - this.offsetTop;
+      tX > sX? (tX = tX - 2) : (tX = tX + 2);
+      tY > sY? (tY = tY - 2) : (tY = tY + 2);
       if (!this.tracingLine) {
-        this.tracingLine = this.draw.line(
-          this.sourceX - this.offsetLeft,
-          this.sourceY - this.offsetTop,
-          event.clientX - this.offsetLeft,
-          event.clientY - this.offsetTop
-        ).stroke({ width: 1, color: "rgba(255,255,255,0.3)" });
+        // 创建线
+        this.tracingLine = this.draw.line(sX, sY, tX, tY).stroke({ width: 1, color: "rgba(255,255,255,0.3)" });
         // 使用 Marker 标记画箭头
         let arrow = this.draw.marker(12, 12, (add: any) => {
           add.path('M2,2 L2,11 L10,6 L2,2');
@@ -244,33 +287,24 @@ export default class FloatChart extends Vue {
           });
         });
         this.tracingLine.marker('end', arrow);
-        this.tracingGroup.add(this.tracingLine);
+        this.draw.add(this.tracingLine);
         this.draw.on("contextmenu", this.cancelLinking);
       } else {
-        this.tracingLine.plot(  /* 更新已创建好的直线用 plot */
-          this.sourceX - this.offsetLeft,
-          this.sourceY - this.offsetTop,
-          event.clientX - this.offsetLeft,
-          event.clientY - this.offsetTop
-        );
+        // 更新线
+        this.tracingLine.plot(sX, sY, tX, tY);
       }
     }
   }
 
-  // 结束连线
+  // 左键结束连线
   endLinking(event: any) {
-    event.preventDefault();
-    if (this.islinking) { /* 结束连线 */
-      // "去掉"跟踪的连接线（只是让这条线不可见）
-      this.tracingLine.plot(0, 0, 0, 0).fill("transparent"); /* 更新已创建好的直线用 plot */
-      this.tracingLine = undefined;
-      this.draw.off("mousemove", this.tracingMouse);
-      this.draw.off("contextmenu", this.cancelLinking);  // 连接成功要移除“取消连线”的监听
+    if (this.islinking && event.target.parentElement) { /* 结束连线 */
       // 定位 group 的 id（因为 tspan 离 group 中间隔了一层 text，要找出来）
       let parentElement = SVG.get(event.target.parentElement.id);
       let parentId;
       if (parentElement.type === 'text') {
         parentId = event.target.parentElement.parentElement.id;
+        parentElement = SVG.get(parentId);
       } else {
         parentId = event.target.parentElement.id;
       }
@@ -279,6 +313,11 @@ export default class FloatChart extends Vue {
         this.islinking = false;
         return;
       }
+      // "去掉"跟踪的连接线（只是让这条线不可见）
+      this.tracingLine.plot(0, 0, 0, 0).fill("transparent"); /* 更新已创建好的直线用 plot */
+      this.tracingLine = undefined;
+      this.draw.off("mousemove", this.tracingMouse);
+      this.draw.off("contextmenu", this.cancelLinking);  // 连接成功要移除“取消连线”的监听
       // 连线
       let source: any = SVG.get(this.sourceId);
       let target = SVG.get(parentId);
@@ -331,7 +370,7 @@ export default class FloatChart extends Vue {
     });
   }
 
-  // 更新已连接的连线
+  // 拖拉元素时更新该元素相关的已连接的连线
   updateLink(event: any) {
     this.links.forEach((item, index) => {
       /** 拖动的目标有连线存在，则该线要更新了 */
@@ -362,7 +401,7 @@ export default class FloatChart extends Vue {
     });
   }
 
-  // 取消连线
+  // 右键取消连线
   cancelLinking(event: any) {
     event.preventDefault();
     if (this.islinking) {
@@ -377,25 +416,30 @@ export default class FloatChart extends Vue {
   // 双击，编辑文本
   doubleClick(event: any) {
     let tspan = SVG.get(event.target.id);
-    let input = prompt("请输入节点名称：(节点名称为空时会删除该节点)", tspan.node.textContent); // 弹出窗口请求输入
-    if (input === '') {
-      let groupId = event.target.parentElement.parentElement.id;
-      let group = SVG.get(groupId);
-      /* 删除的时候要把与他有关的线全都删了 */
-      for (let i = this.links.length - 1; i >= 0; i--) {
-        if (this.links[i].sourceId === groupId || this.links[i].targetId === groupId) { // 找出与该节点有关的线
-          let line = SVG.get(this.links[i].lineId);
-          line.remove();  // 先删除该线
-          this.links.splice(i, 1);  // 再删除该节点的连线记录
-        }
-      }
-      group.remove(); // 再删除该节点
-    } else if (input !== null) {
+    let originCont: string = tspan.node.textContent;
+    let input = prompt("请输入节点名称：(节点名称不可为空)", originCont); // 弹出窗口请求输入
+    if (input !== null) {
       tspan.clear();
       tspan.text(input);
     } else {
-      // console.log("取消删除");
+      tspan.clear();
+      tspan.text(originCont);
     }
+  }
+
+  // 删除节点，以及与它相关的线
+  deleteNode(event: any) {
+    let groupId = event.target.parentElement.id;
+    let group = SVG.get(groupId);
+    /* 删除的时候要把与他有关的线全都删了 */
+    for (let i = this.links.length - 1; i >= 0; i--) {
+      if (this.links[i].sourceId === groupId || this.links[i].targetId === groupId) { // 找出与该节点有关的线
+        let line = SVG.get(this.links[i].lineId);
+        line.remove();  // 先删除该线
+        this.links.splice(i, 1);  // 再删除该节点的连线记录
+      }
+    }
+    group.remove(); // 再删除该节点
   }
 }
 </script>
