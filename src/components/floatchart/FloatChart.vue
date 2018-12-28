@@ -40,14 +40,20 @@ export default class FloatChart extends Vue {
 
   init() {
     /* 获取位置偏移 */
-    let dom: any = this.$refs.chart;
-    this.offsetTop = dom.offsetTop;
-    this.offsetLeft = dom.offsetLeft;
+    this.getOffset();
     /* 生成 svg */
     this.draw = SVG('drawing').size("100%", "100%");
     this.nodes = this.draw.group();
     /* 初始化模板 */
     this.initTemplate();
+  }
+
+  /* 获取位置偏移 */
+  getOffset() {
+    let dom: any = this.$refs.chart;
+    let viewportOffset = dom.getBoundingClientRect();
+    this.offsetTop = dom.getBoundingClientRect().top;
+    this.offsetLeft = dom.getBoundingClientRect().left;
   }
 
   // 初始化左上角模板
@@ -81,6 +87,7 @@ export default class FloatChart extends Vue {
 
   // 长方形
   initRect() {
+    this.getOffset();  // 获取最新页面位置偏移
     let group: any = this.nodes.group().translate(25, 90).draggable(true);
     let rect = this.draw.rect(100, 30).fill("transparent").stroke({ width: 1, color: 'rgba(102,253,251,0.65)' });
     group.add(rect);  /* 后加入 group 的会显示在上层 */
@@ -99,6 +106,7 @@ export default class FloatChart extends Vue {
 
   // 平行四边形
   initParallel() {
+    this.getOffset();  // 获取最新页面位置偏移
     let group: any = this.nodes.group().translate(155, 90).draggable(true);
     let rect = this.draw.rect(100, 30).fill("transparent").stroke({ width: 1, color: 'rgba(102,253,251,0.65)' });
     rect.transform({ skewX: -15 });
@@ -118,6 +126,7 @@ export default class FloatChart extends Vue {
 
   // 菱形
   initDiamond() {
+    this.getOffset();  // 获取最新页面位置偏移
     let group: any = this.nodes.group().translate(170, 175).draggable(true);
     let rect = this.draw.rect(70, 58).fill("transparent").stroke({ width: 1, color: 'rgba(102,253,251,0.65)' });
     rect.transform({ rotation: 27 }).transform({ skewX: -35, relative: true });
@@ -137,6 +146,7 @@ export default class FloatChart extends Vue {
 
   // 圆形
   initCircle() {
+    this.getOffset();  // 获取最新页面位置偏移
     let group: any = this.nodes.group().translate(40, 170).draggable(true);
     let circle = this.draw.circle(70).fill("transparent").stroke({ width: 1, color: 'rgba(102,253,251,0.65)' });
     group.add(circle);
@@ -155,6 +165,7 @@ export default class FloatChart extends Vue {
 
   // 椭圆形
   initEllipse() {
+    this.getOffset();  // 获取最新页面位置偏移
     let group: any = this.nodes.group().translate(280, 92).draggable(true);
     let ellipse = this.draw.ellipse(40, 30).fill("transparent").stroke({ dx:5, width: 1, color: 'rgba(102,253,251,0.65)' });
     group.add(ellipse);
@@ -297,6 +308,7 @@ export default class FloatChart extends Vue {
   // 开始连线
   startLinking(event: any) {
     if (!this.islinking) {
+      this.getOffset();  // 获取最新页面位置偏移
       // 找出 group，并把它的id 存到 this.sourceId
       let groupElement = SVG.get(event.target.parentElement.id);
       this.sourceId = event.target.parentElement.id;
@@ -316,6 +328,7 @@ export default class FloatChart extends Vue {
     // console.log("from:", this.sourceX, this.sourceY);
     // console.log("to:  ", event.clientX, event.clientY);
     if (this.islinking) {
+      this.getOffset(); // 获取最新鼠标位置偏移
       let sX = this.sourceX - this.offsetLeft;
       let sY = this.sourceY - this.offsetTop;
       let tX = event.clientX - this.offsetLeft;
@@ -457,6 +470,11 @@ export default class FloatChart extends Vue {
         line.plot(sourceCenterX, sourceCenterY, targetCenterX, targetCenterY);
       }
     });
+  }
+
+  // 处理 svg，并返回去掉了自定义模板后的 html 或者处理好的图片，此方法用来返回给父组件
+  uploadSVG() {
+    return "从子组件传来的处理好的东西";
   }
 }
 </script>
