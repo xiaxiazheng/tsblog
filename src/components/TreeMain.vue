@@ -251,15 +251,15 @@ export default class TreeMain extends Vue {
   
   // 点击搜索出来的待选
   handleSelect(item: any) {
-    if (this.type === 'home' && this["$route"]["path"].indexOf("admintree") === -1) {
-      this["$router"].replace({
+    if (this.type === 'home' && this.$route["path"].indexOf("admintree") === -1) {
+      this.$router.replace({
         name: "Tree",
         query: {
           id: btoa(encodeURIComponent(item.c_id))
         }
       });
     } else {
-      this["$router"].replace({
+      this.$router.replace({
         name: "AdminTree",
         query: {
           id: btoa(encodeURIComponent(item.c_id))

@@ -75,7 +75,7 @@ export default class AdminLog extends Vue {
   }
 
   async init() {
-    if (this["$route"].query.id) {
+    if (this.$route.query.id) {
       this.showCont = true;
     } else {
       this.showCont = false;
@@ -110,11 +110,11 @@ export default class AdminLog extends Vue {
   // 新建一篇日志
   async addNewLog() {
     let res = await LogClient.addLogCont();
-    this["$message"]({
+    this.$message({
       type: res.resultsCode,
       message: res.message
     });
-    this["$router"].push({
+    this.$router.push({
       query: {
         id: btoa(encodeURIComponent(res.data.newid))
       }
@@ -124,7 +124,7 @@ export default class AdminLog extends Vue {
 
   // 选择一篇日志
   choiceLog(id: string) {
-    this["$router"].push({ // 点击节点就改路由
+    this.$router.push({ // 点击节点就改路由
       query: {
         id: btoa(encodeURIComponent(id))
       }

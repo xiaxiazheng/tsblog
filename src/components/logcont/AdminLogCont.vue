@@ -36,8 +36,8 @@ export default class AdminLogCont extends Vue {
   }
 
   async init() {
-    if (this["$route"].query.id) {
-      let id = decodeURIComponent(atob(<string>this["$route"].query.id));
+    if (this.$route.query.id) {
+      let id = decodeURIComponent(atob(<string>this.$route.query.id));
       let res = await LogClient.getLogCont(id);
       this.logid = res.data.log_id;
       this.title = res.data.title;
@@ -56,7 +56,7 @@ export default class AdminLogCont extends Vue {
       logcont: this.logcont
     };
     let res = await LogClient.modifyLogCont(params);
-    this["$message"]({
+    this.$message({
       type: res.resultsCode,
       message: res.message
     });

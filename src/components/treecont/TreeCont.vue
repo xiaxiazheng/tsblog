@@ -88,8 +88,8 @@ export default class TreeCont extends Vue {
   }
 
   async init() {
-    if (this["$route"].query.id) {
-      let id = decodeURIComponent(atob(<string>this["$route"].query.id));
+    if (this.$route.query.id) {
+      let id = decodeURIComponent(atob(<string>this.$route.query.id));
 
       let res0 = await TreeClient.getChildName(id); // 获取当前节点的名称
       if (!res0) return;
@@ -115,7 +115,7 @@ export default class TreeCont extends Vue {
       let list = filename.split(".");
       let filetype = list[list.length - 1]; // 文件类型
       let randomNum = list[list.length - 2];
-      let originname = filename.substr(0, filename.length - filetype.length - randomNum.length - 2 - decodeURIComponent(atob(<string>this["$route"].query.id)).length);
+      let originname = filename.substr(0, filename.length - filetype.length - randomNum.length - 2 - decodeURIComponent(atob(<string>this.$route.query.id)).length);
       return originname;
     }
   }
@@ -297,7 +297,8 @@ export default class TreeCont extends Vue {
         }
       }
       p {
-        font-size: 12px;
+        font-size: 13px;
+        letter-spacing: 1px;
         line-height: 1.7;
         margin: 0 0 0.6rem 1px;;
       }

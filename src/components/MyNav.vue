@@ -32,7 +32,7 @@
         <span class="tabItem" :class="{'active': activeTab === 'Tree'}" @click="clickTabs('Tree')">知识树</span>
         <span class="tabItem" :class="{'active': activeTab === 'Log'}" @click="clickTabs('Log')">日志</span>
         <span class="tabItem" :class="{'active': activeTab === 'PhotoWall'}" @click="clickTabs('PhotoWall')">图片墙</span>
-        <span class="tabItem" :class="{'active': activeTab === 'Chart'}" @click="clickTabs('Chart')">玩具</span>
+        <!-- <span class="tabItem" :class="{'active': activeTab === 'Chart'}" @click="clickTabs('Chart')">玩具</span> -->
         <a href="https://github.com/xiaxiazheng/myblog">
           GitHub
           <i class="el-icon-star-off"></i>
@@ -72,7 +72,7 @@
         <span class="tabItem" :class="{'active': activeTab === 'AdminTree'}" @click="clickTabs('AdminTree')">知识树</span>
         <span class="tabItem" :class="{'active': activeTab === 'AdminLog'}" @click="clickTabs('AdminLog')">日志</span>
         <span class="tabItem" :class="{'active': activeTab === 'AdminPhotoWall'}" @click="clickTabs('AdminPhotoWall')">图片墙</span>
-        <span class="tabItem" :class="{'active': activeTab === 'AdminChart'}" @click="clickTabs('AdminChart')">玩具</span>
+        <!-- <span class="tabItem" :class="{'active': activeTab === 'AdminChart'}" @click="clickTabs('AdminChart')">玩具</span> -->
         <a href="https://github.com/xiaxiazheng/myblog">
           GitHub
           <i class="el-icon-star-off"></i>
@@ -130,7 +130,7 @@ export default class MyNav extends Vue {
   }
 
   clickTabs(tabName: any) {
-    this["$router"].push({ name: tabName });
+    this.$router.push({ name: tabName });
     this.activeTab = tabName;
   }
 
@@ -163,7 +163,7 @@ export default class MyNav extends Vue {
   // 点击搜索出来的待选
   handleSelect(item: any) {
     if (this.type === 'home') {
-      this["$router"].replace({
+      this.$router.replace({
         name: "Tree",
         query: {
           id: btoa(encodeURIComponent(item.id))
@@ -171,7 +171,7 @@ export default class MyNav extends Vue {
       });
     }
     if (this.type === 'admin') {
-      this["$router"].replace({
+      this.$router.replace({
         name: "AdminTree",
         query: {
           id: btoa(encodeURIComponent(item.id))
@@ -258,11 +258,10 @@ export default class MyNav extends Vue {
 @media screen and (max-width: @splitWidth) {
   .mynav {
     height: 38px;
-    line-height: 38px;
+    line-height: 40px;
     padding: 0 7px;
-    background-color: #fff;
-    box-sizing: border-box;
-    border-bottom: 1px solid #eaecef;
+    color: white;
+    background-color: #66b1ff;
     >div {
       display: flex;
       justify-content: space-between;
@@ -270,7 +269,7 @@ export default class MyNav extends Vue {
         >span {
           font-size: 1.3rem;
           font-weight: 600;
-          color: #2c3e50;
+          letter-spacing: 1px;
           cursor: pointer;
         }
       }

@@ -52,7 +52,7 @@ export default class Tree extends Vue {
       this.onWidthChange();
       this.init();
       // 手机端如果打开分享的树节点的链接，就判断 id 并隐藏树
-      if (!this.isPC && this["$route"].query.id) {
+      if (!this.isPC && this.$route.query.id) {
         this.showTree = false;
       }
     });
@@ -70,9 +70,9 @@ export default class Tree extends Vue {
   }
 
   async init() {
-    if (this["$route"].query.id) {  // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
+    if (this.$route.query.id) {  // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
       this.defaultExpandedKeys = []; // 前台展示的话直接清空
-      this.defaultExpandedKeys.push(parseInt(atob(<string>this["$route"].query.id), 10));
+      this.defaultExpandedKeys.push(parseInt(atob(<string>this.$route.query.id), 10));
     }
     let res: any = await TreeClient.getTree('home');
     if (!res) return;
@@ -82,7 +82,7 @@ export default class Tree extends Vue {
   handleClick(nodeObj: any, node: any, c: any) {
     let isLeaf = node.isLeaf;
     if (isLeaf) {
-      this["$router"].push({ // 点击节点就改路由
+      this.$router.push({ // 点击节点就改路由
         query: {
           id: btoa(encodeURIComponent(node.data.id))
         }
@@ -159,16 +159,15 @@ export default class Tree extends Vue {
     }
     .rightcont {
       width: 100%;
-      border-left: 1px solid #eaecef;
-      box-sizing: border-box;
       vertical-align: top;
     }
     .hidetree {
       position: absolute;
       bottom: 5px;
       left: 9px;
+      opacity: 0.7;
       z-index: 2;
-      padding: 10px;
+      padding: 15px 20px;
       background-color: white;
       border-radius: 3px;
       border: 1px solid #ccc;

@@ -29,11 +29,11 @@ export default new VueRouter({
           name: 'Log',
           component: () => import('@/views/log/Log.vue'),
         },
-        {
-          path: 'chart',
-          name: 'Chart',
-          component: () => import('@/views/chart/chart.vue'),
-        }
+        // {
+        //   path: 'chart',
+        //   name: 'Chart',
+        //   component: () => import('@/views/chart/chart.vue'),
+        // }
       ]
     },
     {

@@ -333,8 +333,8 @@ export default class FloatChart extends Vue {
       let sY = this.sourceY - this.offsetTop;
       let tX = event.clientX - this.offsetLeft;
       let tY = event.clientY - this.offsetTop;
-      tX > sX? (tX = tX - 2) : (tX = tX + 2);
-      tY > sY? (tY = tY - 2) : (tY = tY + 2);
+      tX > sX ? (tX = tX - 2) : (tX = tX + 2);
+      tY > sY ? (tY = tY - 2) : (tY = tY + 2);
       if (!this.tracingLine) {
         // 创建线
         this.tracingLine = this.draw.line(sX, sY, tX, tY).stroke({ width: 1, color: "rgba(255,255,255,0.3)" });

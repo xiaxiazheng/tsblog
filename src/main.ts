@@ -18,8 +18,8 @@ import {
   Message,
   MessageBox
 } from 'element-ui';
-Vue['prototype']['$message'] = Message;   // this["$message"]
-Vue['prototype']['$confirm'] = MessageBox.confirm; // this["$confirm"]
+Vue['prototype']['$message'] = Message;   // this.$message
+Vue['prototype']['$confirm'] = MessageBox.confirm; // this.$confirm
 
 Vue.config.productionTip = false;
 

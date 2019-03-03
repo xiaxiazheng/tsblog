@@ -40,8 +40,8 @@ export default class LogCont extends Vue {
   }
 
   async init() {
-    if (this["$route"].query.id) {
-      let id = decodeURIComponent(atob(<string>this["$route"].query.id));
+    if (this.$route.query.id) {
+      let id = decodeURIComponent(atob(<string>this.$route.query.id));
       let res = await LogClient.getLogCont(id);
       this.logid = res.data.log_id;
       this.title = res.data.title;
