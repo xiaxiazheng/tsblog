@@ -44,11 +44,12 @@ export default class Tree extends Vue {
   splitWidth: number = 500;
   showTree: boolean = true;
   isPC: boolean = true;
+  // 用于防抖
+  timer: number = 0;
 
   mounted() {
     this.$nextTick(function () {
       this.isPC = window.innerWidth <= this.splitWidth ? false : true;
-      console.log("isPC:", this.isPC);
       this.onWidthChange();
       this.init();
       // 手机端如果打开分享的树节点的链接，就判断 id 并隐藏树
@@ -56,6 +57,10 @@ export default class Tree extends Vue {
         this.showTree = false;
       }
     });
+  }
+
+  beforeDestroy() {
+    window.onresize = null;
   }
 
   @Watch("$route")
@@ -96,8 +101,11 @@ export default class Tree extends Vue {
   // 浏览器窗口变化触发事件，一变化就触发
   onWidthChange() {
     window.onresize = () => {
-      this.isPC = window.innerWidth <= this.splitWidth ? false : true;
-      console.log("isPC:", this.isPC);
+      if (this.timer) clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
+        this.isPC = window.innerWidth <= this.splitWidth ? false : true;
+        console.log("isPC:", this.isPC);
+      }, 500);
     };
   }
 
