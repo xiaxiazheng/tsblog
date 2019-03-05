@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { ImgClient } from '../util/clientHelper';
+import { ImgHelper } from '@/client/ImgHelper';
 import { baseUrl, baseImgUrl } from '../config';
 
 @Component
@@ -44,19 +44,16 @@ export default class UploadPhotoWall extends Vue {
   async init() {
     this.uploadUrl = `${baseUrl}/${this.type}_upload`;
     let type = this.type;
-    let res = await ImgClient.getImgList(type);
-    if (!res) return;
-    if (res.data.length !== 0) {
-      this.imgUrllist = [];
-      for (let item of res.data) {
-        this.imgUrllist.push({
-          img_id: item.img_id,
-          imgname: item.imgname,
-          filename: item.filename,
-          cTime: item.cTime,
-          url: `${baseImgUrl}/${this.type}/${item.filename}`
-        });
-      }
+    let res = await ImgHelper.getImgList(type);
+    this.imgUrllist = [];
+    for (let item of res) {
+      this.imgUrllist.push({
+        img_id: item.img_id,
+        imgname: item.imgname,
+        filename: item.filename,
+        cTime: item.cTime,
+        url: `${baseImgUrl}/${this.type}/${item.filename}`
+      });
     }
   }
 
@@ -70,19 +67,13 @@ export default class UploadPhotoWall extends Vue {
 
   // 上传成功后
   handleSuccess(response: any, file: any, fileList: any) {
-    this['$message']({
-      type: "success",
-      message: "上传成功"
-    });
+    this.$message.success("上传成功");
     this.init();
   }
 
   // 上传失败后
   handleError(err: any, file: any, fileList: any) {
-    this['$message']({
-      type: "error",
-      message: "上传失败"
-    });
+    this.$message.error("上传失败");
     this.init();
   }
 
@@ -93,26 +84,25 @@ export default class UploadPhotoWall extends Vue {
       return true;
     }
 
-    this['$confirm'](`此操作将永久删除该文件${file.imgname}, 是否继续?`, '提示', {
+    this.$confirm(`此操作将永久删除该文件${file.imgname}, 是否继续?`, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     }).then(async () => {
-      let type = this.type;
-      let img_id = file.img_id;
-      let filename = file.filename;
-      let res = await ImgClient.deleteImg(type, img_id, filename);
-      if (!res) return;
-      this['$message']({
-        type: res.resultsCode,
-        message: res.message
-      });
-      this.init();
+      let params = {
+        type: this.type,
+        img_id: file.img_id,
+        filename: file.filename
+      };
+      let res = await ImgHelper.deleteImg(params);
+      if (res) {
+        this.$message.success('删除成功');
+        this.init();
+      } else {
+        this.$message.error('删除失败');
+      }
     }).catch(() => {
-      this['$message']({
-        type: 'info',
-        message: '已取消删除'
-      });
+      this.$message.info('已取消删除');
     });
     return false;
   }

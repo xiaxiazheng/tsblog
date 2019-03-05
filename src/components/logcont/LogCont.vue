@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { LogClient } from '@/util/clientHelper';
+import { LogHelper } from '@/client/LogHelper';
 import { VueEditor } from 'vue2-editor';
 
 @Component({
@@ -42,13 +42,13 @@ export default class LogCont extends Vue {
   async init() {
     if (this.$route.query.id) {
       let id = decodeURIComponent(atob(<string>this.$route.query.id));
-      let res = await LogClient.getLogCont(id);
-      this.logid = res.data.log_id;
-      this.title = res.data.title;
-      this.author = res.data.author;
-      this.cTime = res.data.cTime;
-      this.mTime = res.data.mTime;
-      this.logcont = res.data.logcont;
+      let res = await LogHelper.getLogCont(id);
+      this.logid = res.log_id;
+      this.title = res.title;
+      this.author = res.author;
+      this.cTime = res.cTime;
+      this.mTime = res.mTime;
+      this.logcont = res.logcont;
     }
   }
 }

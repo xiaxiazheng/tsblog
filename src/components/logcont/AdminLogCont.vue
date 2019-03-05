@@ -14,7 +14,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { VueEditor } from 'vue2-editor';
-import { LogClient } from '@/util/clientHelper';
+import { LogHelper } from '@/client/LogHelper';
 
 @Component({
   components: {
@@ -38,13 +38,13 @@ export default class AdminLogCont extends Vue {
   async init() {
     if (this.$route.query.id) {
       let id = decodeURIComponent(atob(<string>this.$route.query.id));
-      let res = await LogClient.getLogCont(id);
-      this.logid = res.data.log_id;
-      this.title = res.data.title;
-      this.author = res.data.author;
-      this.cTime = res.data.cTime;
-      this.mTime = res.data.mTime;
-      this.logcont = res.data.logcont;
+      let res = await LogHelper.getLogCont(id);
+      this.logid = res.log_id;
+      this.title = res.title;
+      this.author = res.author;
+      this.cTime = res.cTime;
+      this.mTime = res.mTime;
+      this.logcont = res.logcont;
     }
   }
 
@@ -55,11 +55,8 @@ export default class AdminLogCont extends Vue {
       author: this.author,
       logcont: this.logcont
     };
-    let res = await LogClient.modifyLogCont(params);
-    this.$message({
-      type: res.resultsCode,
-      message: res.message
-    });
+    let res = await LogHelper.modifyLogCont(params);
+    res ? this.$message.success('保存成功') : this.$message.error('保存失败');
   }
 }
 </script>

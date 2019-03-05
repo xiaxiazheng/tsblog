@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { ImgClient } from '../../util/clientHelper';
+import { ImgHelper } from '@/client/ImgHelper';
 import { baseImgUrl } from "../../config";
 
 @Component
@@ -35,9 +35,8 @@ export default class Main extends Vue {
   }
 
   async init() {
-    let res = await ImgClient.getImgList('main');
-    if (!res) return;
-    for (let item of res.data) {
+    let res = await ImgHelper.getImgList('main');
+    for (let item of res) {
       this.imgUrlList.push(`${baseImgUrl}/main/${item.filename}`);
     }
   }

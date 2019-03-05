@@ -7,7 +7,6 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { TreeClient } from '../../util/clientHelper';
 import FloatChart from '@/components/floatchart/FloatChart.vue';
 
 @Component({

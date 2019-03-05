@@ -36,7 +36,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { TreeClient, ContClient } from '../../util/clientHelper';
+import { TreeHelper } from '@/client/TreeHelper';
+import { TreeContHelper } from '@/client/TreeContHelper';
 import { baseImgUrl } from "../../config";
 import TreeMain from '@/components/TreeMain.vue';
 
@@ -73,7 +74,7 @@ export default class TreeCont extends Vue {
     if (this.propsname !== "") {
       this.title = this.propsname;
     } else {
-      this['$router'].push({ query: {} });
+      this.$router.push({ query: {} });
     }
   }
 
@@ -91,13 +92,12 @@ export default class TreeCont extends Vue {
     if (this.$route.query.id) {
       let id = decodeURIComponent(atob(<string>this.$route.query.id));
 
-      let res0 = await TreeClient.getChildName(id); // 获取当前节点的名称
-      if (!res0) return;
-      this.title = res0.data[0].c_label;
+      let res0 = await TreeHelper.getChildName(id); // 获取当前节点的名称
+      this.title = res0.length !== 0 ? res0[0].c_label : '';
 
-      let res = await ContClient.getNodeCont(id);
+      let res = await TreeContHelper.getNodeCont(id);
       if (!res) return;
-      this.contObj = res.data;
+      this.contObj = res;
       for (let i in this.contObj["list"]) {
         this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/</g, "&lt;"); // html标签的<转成实体字符,让所有的html标签失效
         this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/&lt;pre/g, "<pre"); // 把pre标签转回来
@@ -186,7 +186,7 @@ export default class TreeCont extends Vue {
       p {
         font-size: 1rem;
         line-height: 1.7;
-        margin: 0 0 0.6rem 1px;;
+        margin: 0 0 0.6rem 1px;
       }
 
       .mao {
@@ -300,7 +300,7 @@ export default class TreeCont extends Vue {
         font-size: 13px;
         letter-spacing: 1px;
         line-height: 1.7;
-        margin: 0 0 0.6rem 1px;;
+        margin: 0 0 0.6rem 1px;
       }
 
       .mao {

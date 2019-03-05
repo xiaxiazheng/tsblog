@@ -4,8 +4,8 @@ const Common = require('./common.js');
 
 // 查所有，按创建时间倒序
 exports.getAllLogListByCTime = async (ctx) => {
-  let pageNo = ctx.query.pageNo;
-  let pageSize = ctx.query.pageSize;
+  let pageNo = ctx.request.body.pageNo;
+  let pageSize = ctx.request.body.pageSize;
 
   let sql1 = `SELECT log_id, title, author, cTime FROM log ORDER BY ctime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`;
   let sql2 = `SELECT COUNT(*) FROM log`;
@@ -26,8 +26,8 @@ exports.getAllLogListByCTime = async (ctx) => {
 
 // 查所有，按修改时间倒序
 exports.getAllLogListByMTime = async (ctx) => {
-  let pageNo = ctx.query.pageNo;
-  let pageSize = ctx.query.pageSize;
+  let pageNo = ctx.request.body.pageNo;
+  let pageSize = ctx.request.body.pageSize;
 
   let sql1 = `SELECT log_id, title, author, mTime FROM log ORDER BY mtime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`;
   let sql2 = `SELECT COUNT(*) FROM log`;

@@ -85,7 +85,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { TreeClient, ContClient, ImgClient } from '../../util/clientHelper';
+import { TreeHelper } from '@/client/TreeHelper';
+import { TreeContHelper } from '@/client/TreeContHelper';
+import { ImgHelper } from '@/client/ImgHelper';
 import { baseUrl, baseImgUrl } from '../../config';
 import TreeMain from '@/components/TreeMain.vue';
 
@@ -118,10 +120,10 @@ export default class AdminTreeCont extends Vue {
   mounted() {
     this.$nextTick(async function () {
       this.init();
-      if (this['$route'].query.id && this['$route'].query.id !== '') {
-        let id: any = decodeURIComponent(atob(<string>this['$route'].query.id));
-        let res0: any = await TreeClient.getChildName(id);
-        this.title = res0.data[0].c_label;
+      if (this.$route.query.id && this.$route.query.id !== '') {
+        let id: any = decodeURIComponent(atob(<string>this.$route.query.id));
+        let res: any = await TreeHelper.getChildName(id);
+        this.title = res.length !== 0 ? res[0].c_label : '';
       }
     });
   }
@@ -131,7 +133,7 @@ export default class AdminTreeCont extends Vue {
     if (this.propsname !== '') {
       this.title = this.propsname;
     } else {
-      this['$router'].push({ query: {} });
+      this.$router.push({ query: {} });
     }
   }
 
@@ -146,24 +148,24 @@ export default class AdminTreeCont extends Vue {
   }
   
   async init() {
-    if (this['$route'].query.id && this['$route'].query.id !== '') {
-      let id: any = decodeURIComponent(atob(<string>this['$route'].query.id)); // 子节点的id
-      let res0: any = await TreeClient.getChildName(id);
-      this.title = res0.data[0].c_label;
-      let res: any = await ContClient.getNodeCont(id);
+    if (this.$route.query.id && this.$route.query.id !== '') {
+      let id: any = decodeURIComponent(atob(<string>this.$route.query.id)); // 子节点的id
+      let res1: any = await TreeHelper.getChildName(id);
+      this.title = res1.length !== 0 ? res1[0].c_label : '';
+      let res: any = await TreeContHelper.getNodeCont(id);
       if (!res) return;
       this.contObj = {
-        id: res.data.id,
+        id: res.id,
         list: []
       };
-      for (let item of res.data.list) {
+      for (let item of res.list) {
         // 处理文件名，treecont的图片名有点特殊，‘原来的名字+id+'.'+一个随机数+'.'+图片类型
         let imgname: string = '';
         if (item.filename) {
           let list = item.filename.split('.');
           let filetype = list[list.length - 1]; // 文件类型
           let randomNum = list[list.length - 2];
-          let originname = item.filename.substr(0, item.filename.length - filetype.length - randomNum.length - 2 - decodeURIComponent(atob(<string>this['$route'].query.id)).length);
+          let originname = item.filename.substr(0, item.filename.length - filetype.length - randomNum.length - 2 - decodeURIComponent(atob(<string>this.$route.query.id)).length);
           imgname = `${originname}.${filetype}`;
         }
         this.contObj['list'].push({
@@ -186,83 +188,94 @@ export default class AdminTreeCont extends Vue {
 
   // 新增节点
   async addCont() {
-    let id = decodeURIComponent(atob(<string>this['$route'].query.id)); // 子节点的id
-    let sort = this.contObj['list'][this.contObj['list'].length - 1].sort;
-    let res: any = await ContClient.addNodeCont(id, sort);
-    if (!res) return;
-    this.msgTips(res);
-    this.init();
+    let params = {
+      id: decodeURIComponent(atob(<string>this.$route.query.id)), // 子节点的id
+      sort: this.contObj['list'][this.contObj['list'].length - 1].sort
+    };
+    let res: any = await TreeContHelper.addNodeCont(params);
+    if (res) {
+      this.$message.success('新增成功');
+      this.init();
+    } else {
+      this.$message.error('新增失败');
+    }
   }
 
   // 删除节点
   async deleteCont(item: any, index: any) {
-    this['$confirm'](`你将删除“ ${item.title} ”, 你确定?'`, '提示', {
+    this.$confirm(`你将删除“ ${item.title} ”, 你确定?'`, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     }).then(async () => { 
-      let id = decodeURIComponent(atob(<string>this['$route'].query.id)); // 子节点的id
+      let id = decodeURIComponent(atob(<string>this.$route.query.id)); // 子节点的id
       let sort = item.sort;
-      let res: any = await ContClient.deleteNodeCont(id, sort);
-      if (!res) return;
-      this.msgTips(res);
-      this.init();
+      let params = {
+        id: decodeURIComponent(atob(<string>this.$route.query.id)), // 子节点的id
+        sort: item.sort
+      };
+      let res: any = await TreeContHelper.deleteNodeCont(params);
+      if (res) {
+        this.$message.success('删除成功');
+        this.init();
+      } else {
+        this.$message.error('删除失败');
+      }
     }).catch(() => {
-      this['$message']({
-        type: 'info',
-        message: '已取消删除'
-      });
+      this.$message.info('已取消删除');
     });
   }
 
   // 上移节点
   async upCont(item: any, index: any) {
-    let thiscTime: any = item.createtime;
-    let thisSort: any = item.sort;
-    let othercTime: any = this.contObj['list'][index - 1].createtime;
-    let otherSort: any = this.contObj['list'][index - 1].sort;
-    let res: any = await ContClient.changeContSort(thiscTime, thisSort, othercTime, otherSort);
-    if (!res) return;
-    this.msgTips(res);
-    this.init();
+    let params = {
+      thiscTime: item.createtime,
+      thisSort: item.sort,
+      othercTime: this.contObj['list'][index - 1].createtime,
+      otherSort: this.contObj['list'][index - 1].sort,
+    };
+    let res: any = await TreeContHelper.changeContSort(params);
+    if (res) {
+      this.$message.success('上移成功');
+      this.init();
+    } else {
+      this.$message.error('上移失败');
+    }
   }
 
   // 下移节点
   async downCont(item: any, index: any) {
-    let thiscTime: any = item.createtime;
-    let thisSort: any = item.sort;
-    let othercTime: any = this.contObj['list'][index + 1].createtime;
-    let otherSort: any = this.contObj['list'][index + 1].sort;
-    let res: any = await ContClient.changeContSort(thiscTime, thisSort, othercTime, otherSort);
-    if (!res) return;
-    this.msgTips(res);
-    this.init();
+    let params = {
+      thiscTime: item.createtime,
+      thisSort: item.sort,
+      othercTime: this.contObj['list'][index + 1].createtime,
+      otherSort: this.contObj['list'][index + 1].sort,
+    };
+    let res: any = await TreeContHelper.changeContSort(params);
+    if (res) {
+      this.$message.success('上移成功');
+      this.init();
+    } else {
+      this.$message.error('上移失败');
+    }
   }
 
   // 保存页面文本
   async saveText() {
     for (let item of this.contObj['list']) {
       if (item.cont === '') {
-        this['$message']({
-          type: "warning",
-          message: '输入框可以为空，但文本域不能为空撒'
-        });
+        this.$message.warning('输入框可以为空，但文本域不能为空撒');
         return;
       }
     }
     let params: any = this.contObj;
-    let res: any = await ContClient.modifyNodeCont(this.contObj);
-    if (!res) return;
-    this.msgTips(res);
-    setTimeout(() => { this.init(); }, 1000);
-  }
-
-  // 弹框提示
-  msgTips(res: any) {
-    this['$message']({
-      type: res.resultsCode,
-      message: res.message
-    });
+    let res: any = await TreeContHelper.modifyNodeCont(params);
+    if (res) {
+      this.$message.success('编辑成功');
+      setTimeout(() => { this.init(); }, 1000);
+    } else {
+      this.$message.error('编辑失败');
+    }
   }
 
   /** 图片操作 */
@@ -274,18 +287,12 @@ export default class AdminTreeCont extends Vue {
   }
   // 上传成功后
   handleSuccess(response: any, file: any, fileList: any) {
-    this['$message']({
-      type: "success",
-      message: "上传成功"
-    });
+    this.$message.success("上传成功");
     this.init();
   }
   // 上传失败后
   handleError(err: any, file: any, fileList: any) {
-    this['$message']({
-      type: "error",
-      message: "上传失败"
-    });
+    this.$message.error("上传失败");
     this.init();
   }
   // 删除图片后
@@ -295,19 +302,22 @@ export default class AdminTreeCont extends Vue {
       return true;
     }
 
-    this['$confirm'](`此操作将永久删除该文件${file.imgname}, 是否继续?`, '提示', {
+    this.$confirm(`此操作将永久删除该文件${file.imgname}, 是否继续?`, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     }).then(async () => {
-      let res: any = await ImgClient.deleteTreeContImg(file.filename);
-      if (!res) return;
-      this.init();
+      let params = {
+        filename: file.filename
+      };
+      let res = await ImgHelper.deleteTreeContImg(params);
+      if (res) {
+        this.$message.success('删除成功');
+      } else {
+        this.$message.error('删除失败');
+      }
     }).catch(() => {
-      this['$message']({
-        type: 'info',
-        message: '已取消删除'
-      });
+      this.$message.info('已取消删除');
     });
     return false;
   }

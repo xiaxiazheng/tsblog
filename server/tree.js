@@ -84,11 +84,12 @@ exports.getChildName = async (ctx) => {
 exports.addTreeNode = async (ctx) => {
   let sql = '';
   let newchildId = Common.getRandomNum();
-  if (ctx.query.level === '1') { // 若为一个大类
+  let level = ctx.request.body.level;
+  if (level === '1') { // 若为一个大类
     let newfathId = Common.getRandomNum();
     let newcateId = Common.getRandomNum();
     sql = "INSERT INTO category VALUES (?, ?, ?)";
-    let array = [newcateId, 'newCategory', (parseInt(ctx.query.sort) + 1)];
+    let array = [newcateId, 'newCategory', (parseInt(ctx.request.body.sort) + 1)];
     await query(sql, array);
 
     sql = "INSERT INTO tree VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -96,7 +97,7 @@ exports.addTreeNode = async (ctx) => {
     await query(sql, array);
 
     let time = Common.getNowFormatDate();
-    sql = "INSERT INTO cont VALUES(" + newchildId + ", '" + time + "', '" + time + "', '标题', '内容', 1, '')";
+    sql = `INSERT INTO cont VALUES(${newchildId}, '${time}', '${time}', '标题', '内容', 1, '')`;
     array = [];
     await query(sql, array);
 
@@ -106,18 +107,18 @@ exports.addTreeNode = async (ctx) => {
     };
   }
   else {
-    if(ctx.query.level === '2') { // 若是父节点
+    if(level === '2') { // 若是父节点
       let newfathId = Common.getRandomNum();
-      sql = "INSERT INTO tree VALUES (" + newfathId + ", 'newNode', " + (parseInt(ctx.query.sort) + 1) + ", " + newchildId + ", 'newChildNode', " + 1 + ", " + ctx.query.category_id + ")";
+      sql = `INSERT INTO tree VALUES (${newfathId}, 'newNode', ${(parseInt(ctx.request.body.sort) + 1)}, ${newchildId}, 'newChildNode', 1, ${ctx.request.body.category_id})`;
     }
-    if(ctx.query.level === '3') { // 若是子节点
-      sql = "INSERT INTO tree VALUES (" + ctx.query.id + ", '" + ctx.query.label + "', " + ctx.query.f_sort + ", " + newchildId + ", 'newChildNode', " + (parseInt(ctx.query.c_sort) + 1) + ", " + ctx.query.category_id + ")";
+    if(level === '3') { // 若是子节点
+      sql = `INSERT INTO tree VALUES (${ctx.request.body.id}, '${ctx.request.body.label}', ${ctx.request.body.f_sort}, ${newchildId}, 'newChildNode', ${(parseInt(ctx.request.body.c_sort) + 1)}, ${ctx.request.body.category_id})`;
     }
     let array = [];
     await query(sql, array);
     
     let time = Common.getNowFormatDate();
-    let sql1 = "INSERT INTO cont VALUES(" + newchildId + ", '" + time + "', '" + time + "', '标题', '内容', 1, '')";
+    let sql1 = `INSERT INTO cont VALUES(${newchildId}, '${time}', '${time}', '标题', '内容', 1, '')`;
     await query(sql1, array);
 
     return {
@@ -129,9 +130,9 @@ exports.addTreeNode = async (ctx) => {
 
 // 改
 exports.modifyTreeNode = async (ctx) => {
-  if(ctx.query.level === '1') {
+  if(ctx.request.body.level === '1') {
     let sql = "UPDATE category SET label=? WHERE category_id=?";
-    let array = [ctx.query.label, ctx.query.id];
+    let array = [ctx.request.body.label, ctx.request.body.id];
     await query(sql, array);
 
     return {
@@ -140,14 +141,14 @@ exports.modifyTreeNode = async (ctx) => {
     };
   } else {
     let flag = '';
-    if(ctx.query.level === '3') {
+    if(ctx.request.body.level === '3') {
       flag = 'c';
     }
-    if(ctx.query.level === '2') {
+    if(ctx.request.body.level === '2') {
       flag = 'f';
     }
-    let sql = "UPDATE tree SET " + flag + "_label=? WHERE " + flag + "_id=?";
-    let array = [ctx.query.label, ctx.query.id];
+    let sql = `UPDATE tree SET ${flag}_label=? WHERE ${flag}_id=?`;
+    let array = [ctx.request.body.label, ctx.request.body.id];
     await query(sql, array);
     
     return { 
@@ -159,10 +160,12 @@ exports.modifyTreeNode = async (ctx) => {
 
   // 删
 exports.deleteTreeNode = async (ctx) => {
-  if(ctx.query.level === '1') { // 若为一级节点
+  const level = ctx.request.body.level;
+  const id = ctx.request.body.id;
+  if(level === '1') { // 若为一级节点
     // 先找到该一级节点的所有三级节点
     let sql1 = "SELECT c_id FROM tree WHERE category_id=?";
-    let array = [ctx.query.id];
+    let array = [id];
     let res1 = await query(sql1, array);
 
     // 再根据三级节点id逐个逐个删除三级节点的具体信息
@@ -185,10 +188,10 @@ exports.deleteTreeNode = async (ctx) => {
       message: '删除成功'
     };
   }
-  if(ctx.query.level === '2') { // 若为二级节点
+  if(level === '2') { // 若为二级节点
     // 先找到该二级节点的所有三级节点
     let sql1 = "SELECT c_id FROM tree WHERE f_id=?";
-    let array = [ctx.query.id];
+    let array = [id];
     let res1 = await(sql1, array);
 
     // 再根据三级节点id逐个逐个删除三级节点的具体信息
@@ -207,10 +210,10 @@ exports.deleteTreeNode = async (ctx) => {
       message: '删除成功'
     };
   }
-  if(ctx.query.level === '3') { // 若为三级节点
+  if(level === '3') { // 若为三级节点
     // 删除该子节点的具体信息
     let sql1 = "DELETE FROM cont WHERE c_id=?";
-    let array = [ctx.query.id];
+    let array = [id];
     await query(sql1, array);
 
     // 删除树上的点
@@ -226,13 +229,14 @@ exports.deleteTreeNode = async (ctx) => {
 
 // 交换顺序，上移或下移
 exports.changeSort = async (ctx) => {
-  if(ctx.query.level === '1') {
+  const level = ctx.request.body.level;
+  if(level === '1') {
     let sql1 = "UPDATE category SET sort=? WHERE category_id=?";
-    let array1 = [ctx.query.otherSort, ctx.query.thisId];
+    let array1 = [ctx.request.body.otherSort, ctx.request.body.thisId];
     await query(sql1, array1);
 
     let sql2 = "UPDATE category SET sort=? WHERE category_id=?";
-    let array2 = [ctx.query.thisSort, ctx.query.otherId];
+    let array2 = [ctx.request.body.thisSort, ctx.request.body.otherId];
     await query(sql2, array2);
 
     return {
@@ -241,18 +245,15 @@ exports.changeSort = async (ctx) => {
     };
   } else {
     let flag = '';
-    if(ctx.query.level === '3') {
-      flag = 'c';
-    }
-    if(ctx.query.level === '2') {
-      flag = 'f';
-    }
-    let sql1 = "UPDATE tree SET " + flag + "_sort=? WHERE " + flag + "_id=?";
-    let array1 = [ctx.query.otherSort, ctx.query.thisId];
+    level === '3' && (flag = 'c');
+    level === '2' && (flag = 'f');
+    
+    let sql1 = `UPDATE tree SET ${flag}_sort=? WHERE ${flag}_id=?`;
+    let array1 = [ctx.request.body.otherSort, ctx.request.body.thisId];
     await query(sql1, array1);
     
-    let sql2 = "UPDATE tree SET " + flag + "_sort=? WHERE " + flag + "_id=?";
-    let array2 = [ctx.query.thisSort, ctx.query.otherId];
+    let sql2 = `UPDATE tree SET ${flag}_sort=? WHERE ${flag}_id=?`;
+    let array2 = [ctx.request.body.thisSort, ctx.request.body.otherId];
     await query(sql2, array2);
         
     return {
@@ -265,13 +266,14 @@ exports.changeSort = async (ctx) => {
 // 穿梭，子节点改变父节点（加到别的树枝下）
 exports.changeFather = async (ctx) => {
   let sql = '', array = [];
-  if(ctx.query.shuttleLevel === '2') { // 二级节点要穿梭
+  let body = ctx.request.body;
+  if(body.shuttleLevel === '2') { // 二级节点要穿梭
     sql = "UPDATE tree SET category_id=?, f_sort=? WHERE f_id=?";
-    array = [ctx.query.category_id, ctx.query.f_sort, ctx.query.f_id];
+    array = [body.category_id, body.f_sort, body.f_id];
   }
-  if(ctx.query.shuttleLevel === '3') {  // 三级节点要穿梭
+  if(body.shuttleLevel === '3') {  // 三级节点要穿梭
     sql = "UPDATE tree SET f_id=?, f_label=?, f_sort=?, c_sort=? WHERE c_id=?";
-    array = [ctx.query.fatherid, ctx.query.fatherlabel, ctx.query.fathersort, ctx.query.newchildsort, ctx.query.childid];
+    array = [body.fatherid, body.fatherlabel, body.fathersort, body.newchildsort, body.childid];
   }
   await query(sql, array);
 

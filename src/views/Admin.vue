@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { UserClient } from '../util/clientHelper';
+import { UserHelper } from '@/client/UserHelper';
 import MyNav from '@/components/MyNav.vue';
 
 @Component({
@@ -20,11 +20,12 @@ export default class Admin extends Vue {
     if (sessionStorage.getItem("xia_username") && sessionStorage.getItem("xia_password")) {
       let username: any = sessionStorage.getItem("xia_username");
       let userpword: any = window.atob(<string>sessionStorage.getItem("xia_password"));
-      let res: any = await UserClient.postLogin(username, userpword);
+      let params = {
+        username,
+        userpword
+      };
+      let res: any = await UserHelper.postLogin(params);
       if (!res) {
-        this.$router.push('/login');
-      }
-      if (res.resultsCode !== "success") {
         this.$message.error("请重新登陆");
         this.$router.push('/login');
       }

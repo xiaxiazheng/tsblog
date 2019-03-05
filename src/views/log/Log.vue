@@ -41,7 +41,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import LogCont from '@/components/logcont/LogCont.vue';
-import { LogClient } from '@/util/clientHelper';
+import { LogHelper } from '@/client/LogHelper';
 
 @Component({
   components: {
@@ -68,14 +68,20 @@ export default class AdminLog extends Vue {
       this.showCont = true;
     } else {
       this.showCont = false;
-      let res: any;
+      let res: any = false;
+      let params = {
+        pageNo: this.pageNo,
+        pageSize: this.pageSize
+      };
       if (this.sortType === 'create') {
-        res = await LogClient.getLogListByCTime(this.pageNo, this.pageSize);
+        res = await LogHelper.getLogListByCTime(params);
       } else {
-        res = await LogClient.getLogListByMTime(this.pageNo, this.pageSize);
+        res = await LogHelper.getLogListByMTime(params);
       }
-      this.totalNumber = res.data.totalNumber;
-      this.list = res.data.list;
+      if (res) {
+        this.totalNumber = res.totalNumber;
+        this.list = res.list;
+      }
     }
   }
 
@@ -108,7 +114,7 @@ export default class AdminLog extends Vue {
 
   // 返回日志列表
   async backLogList() {
-    this['$router'].push({ query: {} });
+    this.$router.push({ query: {} });
     await this.init();
   }
 }

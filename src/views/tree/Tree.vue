@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { TreeClient } from '../../util/clientHelper';
+import { TreeHelper } from '@/client/TreeHelper';
 import TreeCont from '@/components/treecont/TreeCont.vue';
 
 @Component({
@@ -79,9 +79,7 @@ export default class Tree extends Vue {
       this.defaultExpandedKeys = []; // 前台展示的话直接清空
       this.defaultExpandedKeys.push(parseInt(atob(<string>this.$route.query.id), 10));
     }
-    let res: any = await TreeClient.getTree('home');
-    if (!res) return;
-    this.tree = res.data;
+    this.tree = await TreeHelper.getTree('home');
   }
 
   handleClick(nodeObj: any, node: any, c: any) {
@@ -101,11 +99,14 @@ export default class Tree extends Vue {
   // 浏览器窗口变化触发事件，一变化就触发
   onWidthChange() {
     window.onresize = () => {
-      if (this.timer) clearTimeout(this.timer)
-      this.timer = setTimeout(() => {
-        this.isPC = window.innerWidth <= this.splitWidth ? false : true;
-        console.log("isPC:", this.isPC);
-      }, 500);
+      if (this.timer) clearTimeout(this.timer);
+      this.timer = setTimeout(
+        () => {
+          this.isPC = window.innerWidth <= this.splitWidth ? false : true;
+          console.log("isPC:", this.isPC);
+        },
+        500
+      );
     };
   }
 

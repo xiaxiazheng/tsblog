@@ -50,7 +50,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import LogCont from '@/components/logcont/LogCont.vue';
 import AdminLogCont from '@/components/logcont/AdminLogCont.vue';
-import { LogClient } from '@/util/clientHelper';
+import { LogHelper } from '@/client/LogHelper';
 
 @Component({
   components: {
@@ -79,14 +79,20 @@ export default class AdminLog extends Vue {
       this.showCont = true;
     } else {
       this.showCont = false;
-      let res: any;
+      let res: any = false;
+      let params = {
+        pageNo: this.pageNo,
+        pageSize: this.pageSize
+      };
       if (this.sortType === 'create') {
-        res = await LogClient.getLogListByCTime(this.pageNo, this.pageSize);
+        res = await LogHelper.getLogListByCTime(params);
       } else {
-        res = await LogClient.getLogListByMTime(this.pageNo, this.pageSize);
+        res = await LogHelper.getLogListByMTime(params);
       }
-      this.totalNumber = res.data.totalNumber;
-      this.list = res.data.list;
+      if (res) {
+        this.totalNumber = res.totalNumber;
+        this.list = res.list;
+      }
     }
   }
 
@@ -109,17 +115,13 @@ export default class AdminLog extends Vue {
 
   // 新建一篇日志
   async addNewLog() {
-    let res = await LogClient.addLogCont();
-    this.$message({
-      type: res.resultsCode,
-      message: res.message
-    });
-    this.$router.push({
-      query: {
-        id: btoa(encodeURIComponent(res.data.newid))
-      }
-    });
-    this.showCont = true;
+    let res = await LogHelper.addLogCont();
+    if (res) {
+      this.$message.success('新建成功');
+      this.pageNo === 1 ? this.init() : this.pageNo = 1;
+    } else {
+      this.$message.error('新建失败');
+    }
   }
 
   // 选择一篇日志
@@ -134,29 +136,26 @@ export default class AdminLog extends Vue {
 
   // 删除一篇日志
   deleteLog(title: string, author: string, id: string) {
-    this['$confirm'](`你将删除“ ${author} ” 写的 “ ${title} ”, 你确定?'`, '提示', {
+    this.$confirm(`你将删除“ ${author} ” 写的 “ ${title} ”, 你确定?'`, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     }).then(async () => {
-      let res: any = await LogClient.deleteLogCont(id);
-      if (!res) return;
-      this['$message']({
-        type: res.resultsCode,
-        message: res.message
-      });
-      this.init();
+      let res: any = await LogHelper.deleteLogCont(id);
+      if (res) {
+        this.$message.success('删除成功');
+        this.init();
+      } else {
+        this.$message.error('删除失败');
+      }
     }).catch(() => {
-      this['$message']({
-        type: 'info',
-        message: '已取消删除'
-      });
+      this.$message.info('已取消删除');
     });
   }
 
   // 返回日志列表
   async backLogList() {
-    this['$router'].push({ query: {} });
+    this.$router.push({ query: {} });
     await this.init();
   }
 }

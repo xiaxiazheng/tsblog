@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { ImgClient } from '../../util/clientHelper';
+import { ImgHelper } from '@/client/ImgHelper';
 import { baseImgUrl } from "../../config";
 
 interface ImgListType {
@@ -64,10 +64,9 @@ export default class PhotoWall extends Vue {
   }
 
   async init() {
-    let res: any = await ImgClient.getImgList('wall');
-    if (!res) return;
-    if (res.data.length !== 0) {
-      for (let item of res.data) {
+    let res = await ImgHelper.getImgList('wall');
+    if (res) {
+      for (let item of res) {
         this.imgUrllist.push({
           img_id: item.img_id,
           imgname: item.imgname,
@@ -76,6 +75,7 @@ export default class PhotoWall extends Vue {
           url: `${baseImgUrl}/wall/${item.filename}`
         });
       }
+      console.log(this.imgUrllist);
     }
   }
 

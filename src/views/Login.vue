@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { UserClient } from '../util/clientHelper';
+import { UserHelper } from '../client/UserHelper';
 
 @Component
 export default class Login extends Vue {
@@ -30,10 +30,13 @@ export default class Login extends Vue {
     if (sessionStorage.getItem("xia_username") && sessionStorage.getItem("xia_password")) {
       let name = sessionStorage.getItem("xia_username");
       let pword = window.atob(<string>sessionStorage.getItem("xia_password"));
-      let res = await UserClient.postLogin(name, pword);
-      if (!res) return;
-      if (res.resultsCode === "success") {
-        this['$router'].replace({ path: 'admin' });
+      let params = {
+        username: name,
+        userpword: pword
+      };
+      let res = await UserHelper.postLogin(params);
+      if (res) {
+        this.$router.replace({ path: 'admin' });
       } else {
         this.$message.error("请重新登陆");
       }
@@ -44,18 +47,18 @@ export default class Login extends Vue {
     if (!this.checkEmpty()) {
       return;
     }
-    let res = await UserClient.postLogin(this.username, this.userpword);
-    if (!res) {
-      this.$message.error("密码错误，请重新输入密码");
-      this.userpword = '';
-      return;
-    }
-    if (res.resultsCode === "success") {
+    let params = {
+      username: this.username,
+      userpword: this.userpword
+    };
+    let res = await UserHelper.postLogin(params);
+    if (res) {
       this.$router.replace({ path: 'admin' });
       sessionStorage.setItem("xia_username", this.username);
       sessionStorage.setItem("xia_password", window.btoa(this.userpword));
     } else {
-      this.$message.error("用户不存在，请重新输入用户名");
+      this.$message.error("密码错误或用户不存在，请重新输入");
+      this.userpword = '';
     }
   }
 
@@ -65,10 +68,7 @@ export default class Login extends Vue {
       return true;
     }
     let warning = this.username === '' ? '账号' : '密码';
-    this.$message({
-      type: 'warning',
-      message: `${warning}不可为空`
-    });
+    this.$message.warning(`${warning}不可为空`);
     return false;
   }
 

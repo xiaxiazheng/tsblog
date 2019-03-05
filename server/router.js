@@ -23,12 +23,12 @@ router.get('/', async (ctx) => {
 const backUrl = '/back';  /* 绕开前端的 history 模式，不然路径叠加了 */
 
 /* 开始写接口 */
-	// 登录
+// 登录
 	let login = require('./login.js');
 	router.post(backUrl + '/login', async (ctx) => {
 		ctx.body = await login.checkLogin(ctx);
 	});
-	// 操作树节点
+// 操作树节点
 	let tree = require('./tree.js');
 	router.get(backUrl + '/tree', async (ctx) => {
 		ctx.body = await tree.getTree(ctx);
@@ -36,31 +36,31 @@ const backUrl = '/back';  /* 绕开前端的 history 模式，不然路径叠加
 	router.get(backUrl + '/getchildname', async (ctx) => {
 		ctx.body = await tree.getChildName(ctx);
 	});
-	router.get(backUrl + '/addtreenode', async (ctx) => {
+	router.post(backUrl + '/addtreenode', async (ctx) => {
 		ctx.body = await tree.addTreeNode(ctx);
 	});
-	router.get(backUrl + '/modifytreenode', async (ctx) => {
+	router.post(backUrl + '/modifytreenode', async (ctx) => {
 		ctx.body = await tree.modifyTreeNode(ctx);
 	});
-	router.get(backUrl + '/deletetreenode', async (ctx) => {
+	router.post(backUrl + '/deletetreenode', async (ctx) => {
 		ctx.body = await tree.deleteTreeNode(ctx);
 	});
-	router.get(backUrl + '/changesort', async (ctx) => {
+	router.post(backUrl + '/changesort', async (ctx) => {
 		ctx.body = await tree.changeSort(ctx);
 	});
-	router.get(backUrl + '/changefather', async (ctx) => {
+	router.post(backUrl + '/changefather', async (ctx) => {
 		ctx.body = await tree.changeFather(ctx);
 	});
-	// 操作子节点
+// 操作子节点
 	let cont = require('./cont.js');
 	router.get(backUrl + '/cont', async (ctx) => {
     ctx.body = await cont.getNodeCont(ctx);
 	});
 	router.post(backUrl + '/allcont', async (ctx) => {
-		ctx.body = await cont.postAllCont(ctx);
+		ctx.body = await cont.getAllCont(ctx);
 	});
 	router.post(backUrl + '/almostcont', async (ctx) => {
-		ctx.body = await cont.postAlmostCont(ctx);
+		ctx.body = await cont.getAlmostCont(ctx);
 	});
 	router.post(backUrl + '/addnodecont', async (ctx) => {
 		ctx.body = await cont.addNodeCont(ctx);
@@ -68,13 +68,13 @@ const backUrl = '/back';  /* 绕开前端的 history 模式，不然路径叠加
 	router.post(backUrl + '/modifynodecont', async (ctx) => {
 		ctx.body = await cont.modifyNodeCont(ctx);
 	});
-	router.get(backUrl + '/deletenodecont', async (ctx) => {
+	router.post(backUrl + '/deletenodecont', async (ctx) => {
 		ctx.body = await cont.deleteNodeCont(ctx);
 	});
-	router.get(backUrl + '/changecontsort', async (ctx) => {
-		ctx.body = await cont.changeSort(ctx);
+	router.post(backUrl + '/changecontsort', async (ctx) => {
+		ctx.body = await cont.changeContSort(ctx);
 	});
-	// 上传图片
+// 上传图片
 	let image = require('./image.js');
 	router.post(backUrl + '/main_upload', upload.single('image'), async (ctx) => {
 		ctx.body = await image.saveMainImg(ctx);
@@ -85,33 +85,33 @@ const backUrl = '/back';  /* 绕开前端的 history 模式，不然路径叠加
 	router.get(backUrl + '/getimglist', async (ctx) => {
 		ctx.body = await image.getImgList(ctx);
 	});
-	router.get(backUrl + '/deleteimg', async (ctx) => { // 删除main和wall的
+	router.post(backUrl + '/deleteimg', async (ctx) => { // 删除main和wall的
 		ctx.body = await image.deleteImg(ctx);
 	});
   router.post(backUrl + '/treecont_upload', upload.single('treecont'), async (ctx) => { // treecont上传图片
     ctx.body = await image.saveTreeContImg(ctx);
 	});
-	router.get(backUrl + '/deletetreecontimg', async (ctx) => { // 删除treecont的
+	router.post(backUrl + '/deletetreecontimg', async (ctx) => { // 删除treecont的
 		ctx.body = await image.deleteTreeContImg(ctx);
 	});
-	// 操作日志
+// 操作日志
 	let log = require('./log.js');
-	router.get(backUrl + '/loglistbyctime', async (ctx) => {
+	router.post(backUrl + '/loglistbyctime', async (ctx) => {
 		ctx.body = await log.getAllLogListByCTime(ctx);
 	});
-	router.get(backUrl + '/loglistbymtime', async (ctx) => {
+	router.post(backUrl + '/loglistbymtime', async (ctx) => {
 		ctx.body = await log.getAllLogListByMTime(ctx);
 	});
 	router.get(backUrl + '/logcont', async (ctx) => {
     ctx.body = await log.getLogCont(ctx);
 	});
-	router.get(backUrl + '/addlogcont', async (ctx) => {
+	router.post(backUrl + '/addlogcont', async (ctx) => {
 		ctx.body = await log.addLogCont(ctx);
 	});
 	router.post(backUrl + '/modifylogcont', async (ctx) => {
 		ctx.body = await log.modifyLogCont(ctx);
 	});
-	router.get(backUrl + '/deletelogcont', async (ctx) => {
+	router.post(backUrl + '/deletelogcont', async (ctx) => {
     ctx.body = await log.deleteLogCont(ctx);
 	});
 /* 结束 */

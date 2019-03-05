@@ -47,8 +47,8 @@ exports.getNodeCont = async (ctx) => {
 };
 
 // 查所有
-exports.postAllCont = async (ctx) => {
-  let keywords = ctx.request.body.keywords;
+exports.getAllCont = async (ctx) => {
+  let keywords = ctx.request.body.keywords || [];
   let pageNo = ctx.request.body.pageNo;
   let pageSize = ctx.request.body.pageSize;
 
@@ -88,8 +88,8 @@ exports.postAllCont = async (ctx) => {
 };
 
 // 查所有，除了 my secret place
-exports.postAlmostCont = async (ctx) => {
-  let keywords = ctx.request.body.keywords;
+exports.getAlmostCont = async (ctx) => {
+  let keywords = ctx.request.body.keywords || [];
   let pageNo = ctx.request.body.pageNo;
   let pageSize = ctx.request.body.pageSize;
   let sql1 = "SELECT category_id FROM category WHERE label='My Secret Place'";
@@ -209,13 +209,13 @@ exports.deleteNodeCont = async (ctx) => {
 };
 
 // 交换顺序，上移或下移
-exports.changeSort = async (ctx) => {
+exports.changeContSort = async (ctx) => {
   let sql1 = "UPDATE cont SET sort=? WHERE cTime=?";
-  let array1 = [ctx.query.otherSort, ctx.query.thiscTime];
+  let array1 = [ctx.request.body.otherSort, ctx.request.body.thiscTime];
   await query(sql1, array1);
 
   let sql2 = "UPDATE cont SET sort=? WHERE cTime=?";
-  let array2 = [ctx.query.thisSort, ctx.query.othercTime];
+  let array2 = [ctx.request.body.thisSort, ctx.request.body.othercTime];
   await query(sql2, array2);
   
   return {

@@ -84,7 +84,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { TreeClient } from '../util/clientHelper';
+import { TreeHelper } from '@/client/TreeHelper';
 import { baseEnv } from '../config';
 
 interface TreeType {
@@ -113,10 +113,10 @@ export default class MyNav extends Vue {
   }
 
   async init() {
-    let res: any = await TreeClient.getTree('home');
-    if (!res) return;
+    let res: any = await TreeHelper.getTree('home');
     this.tree = [];
-    for (let item of res.data) {
+    if (res.length === 0) return;
+    for (let item of res) {
       for (let jtem of item.children) {
         for (let ktem of jtem.children) {
           this.tree.push({
@@ -149,7 +149,6 @@ export default class MyNav extends Vue {
         }
       }
     }
-    
     cb(results); // 调用 callback 返回建议列表的数据
   }
 

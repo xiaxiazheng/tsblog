@@ -99,7 +99,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { baseEnv } from '../config';
-import { ContClient } from '../util/clientHelper';
+import { TreeContHelper } from '@/client/TreeContHelper';
 
 interface TreeType {
   c_id: string;
@@ -143,18 +143,21 @@ export default class TreeMain extends Vue {
 
     /* 下面这一块实现的是 默认树首页显示最近修改的5个节点 */
     let params = {
-      keywords: '',
       pageNo: 1,
       pageSize: 5
     };
+    console.log(this.keywords);
+    // if (this.keywords.length !== 0) {
+    //   Vue.set(params, 'keywords', this.keywords);
+    // }
     let res;
     if (this.type === "home") {
-      res = await ContClient.postAlmostCont(params);
+      res = await TreeContHelper.getAlmostCont(params);
     }
     if (this.type === 'admin') {
-      res = await ContClient.postAllCont(params);
+      res = await TreeContHelper.getAllCont(params);
     }
-    let list = res.data.list;
+    let list = res.list;
     for (let item of list) {
       item.cont = item.cont.replace(/<br\/>/g, "\n");
       item.cont = item.cont.replace(/</g, "&lt;"); // html标签的<转成实体字符,让所有的html标签失效
@@ -216,14 +219,14 @@ export default class TreeMain extends Vue {
     };
     let res;
     if (this.type === "home") {
-      res = await ContClient.postAlmostCont(params);
+      res = await TreeContHelper.getAlmostCont(params);
     }
     if (this.type === 'admin') {
-      res = await ContClient.postAllCont(params);
+      res = await TreeContHelper.getAllCont(params);
     }
-    this.totalNumber = res.data.totalNumber;
+    this.totalNumber = res.totalNumber;
     this.nowContList = [];
-    this.handleRes(res.data.list);
+    this.handleRes(res.list);
   }
 
   // 处理请求到的数据

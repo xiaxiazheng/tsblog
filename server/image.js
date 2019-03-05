@@ -97,18 +97,18 @@ exports.getImgList = async (ctx) => {
 // 删除某张图片，删掉本地的还要删掉image数据库的记录
 exports.deleteImg = async (ctx) => {
   let filepath = '';
-  if(ctx.query.type === 'main') {
-    filepath = __dirname + "/img/main/" + ctx.query.filename;
+  if(ctx.request.body.type === 'main') {
+    filepath = __dirname + "/img/main/" + ctx.request.body.filename;
   }
-  if(ctx.query.type === 'wall') {
-    filepath = __dirname + "/img/wall/" + ctx.query.filename;
+  if(ctx.request.body.type === 'wall') {
+    filepath = __dirname + "/img/wall/" + ctx.request.body.filename;
   }
 
   try {
     await Common.deleteFile(filepath);
 
     let sql = "DELETE FROM image WHERE img_id=? && type=?";
-    let array = [ctx.query.img_id, ctx.query.type];
+    let array = [ctx.request.body.img_id, ctx.request.body.type];
     await query(sql, array);
   } catch(e) {
     console.log(e);
@@ -120,13 +120,13 @@ exports.deleteImg = async (ctx) => {
 
 // 删除树的某图片，删掉本地的图片，还要把cont数据库的对应filename设为''
 exports.deleteTreeContImg = async (ctx) => {
-  let filepath = __dirname + "/img/treecont/" + ctx.query.filename;
+  let filepath = __dirname + "/img/treecont/" + ctx.request.body.filename;
 
   try {
     await Common.deleteFile(filepath);
 
     let sql = "UPDATE cont SET filename='' WHERE filename=?";
-    let array = [ctx.query.filename];
+    let array = [ctx.request.body.filename];
     await query(sql, array);
   } catch(e) {
     console.log(e);
