@@ -33,6 +33,9 @@ const backUrl = '/back';  /* 绕开前端的 history 模式，不然路径叠加
 	router.get(backUrl + '/tree', async (ctx) => {
 		ctx.body = await tree.getTree(ctx);
 	});
+	router.get(backUrl + '/searchtree', async (ctx) => {
+		ctx.body = await tree.searchTree(ctx);
+	});
 	router.get(backUrl + '/getchildname', async (ctx) => {
 		ctx.body = await tree.getChildName(ctx);
 	});

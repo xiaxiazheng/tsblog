@@ -1,5 +1,5 @@
 <template>
-  <div class="adminmain">
+  <div class="adminhomemain">
     <UploadPhotoWall type="main"></UploadPhotoWall>
   </div>
 </template>
@@ -13,7 +13,7 @@ import UploadPhotoWall from '@/components/UploadPhotoWall.vue';
     UploadPhotoWall
   },
 })
-export default class AdminMain extends Vue {
+export default class AdminHomeMain extends Vue {
 
 }
 </script>

@@ -1,78 +1,28 @@
 <template>
   <header class="mynav">
-    <!-- 展示版 -->
-    <div v-if="type === 'home'">
+    <div>
       <div class="leftside">
-        <span @click="clickTabs('HomeMain')">
+        <span @click="clickTabs('Main')">
           {{ titlehome }}
         </span>
       </div>
       <div class="rightside">
         <!-- 搜索框 -->
-        <el-autocomplete
-          class="searchBox"
-          popper-class="searchBoxPopper"
-          v-model="searchkeyword"
-          :fetch-suggestions="querySearch"
-          placeholder="搜索树的节点 空格分隔key"
-          :trigger-on-focus="false"
-          @select="handleSelect">
-          <i
-            class="el-icon-search el-input__icon"
-            slot="suffix">
-          </i>
-          <template slot-scope="{ item }">
-            <div :title="item.flabel + ' -> ' + item.label">
-              <div class="label">{{ item.label }}</div>
-              <span class="flabel">{{ item.flabel }}</span>
-            </div>
-          </template>
-        </el-autocomplete>
+        <div class="searchbox">
+          <el-input v-model="keyword" placeholder="搜索树的节点" prefix-icon="el-icon-search" clearable></el-input>
+          <ul v-if="keyword !== '' && isSearch" class="ScrollBar">
+            <li v-for="(item, index) of searchList" :key="index" @click="choiceSearch(item)">
+              <div class="item">
+                <div class="label">{{ item.c_label }}</div>
+                <span class="flabel">{{ item.f_label }}（{{item.category}}）</span>
+              </div>
+            </li>
+          </ul>
+        </div>
         <!-- 右边的 tabs 们 -->
-        <span class="tabItem" :class="{'active': activeTab === 'Tree'}" @click="clickTabs('Tree')">知识树</span>
-        <span class="tabItem" :class="{'active': activeTab === 'Log'}" @click="clickTabs('Log')">日志</span>
-        <span class="tabItem" :class="{'active': activeTab === 'PhotoWall'}" @click="clickTabs('PhotoWall')">图片墙</span>
-        <!-- <span class="tabItem" :class="{'active': activeTab === 'Chart'}" @click="clickTabs('Chart')">玩具</span> -->
-        <a href="https://github.com/xiaxiazheng/myblog">
-          GitHub
-          <i class="el-icon-star-off"></i>
-        </a>
-      </div>
-    </div>
-    
-    <!-- 控制台版 -->
-    <div v-if="type === 'admin'">
-      <div class="leftside">
-        <span @click="clickTabs('AdminMain')">
-          {{ titleadmin }}
-        </span>
-      </div>
-      <div class="rightside">
-        <!-- 搜索框 -->
-        <el-autocomplete
-          class="searchBox"
-          popper-class="searchBoxPopper"
-          v-model="searchkeyword"
-          :fetch-suggestions="querySearch"
-          placeholder="搜索树的节点 空格分隔key"
-          :trigger-on-focus="false"
-          @select="handleSelect">
-          <i
-            class="el-icon-search el-input__icon"
-            slot="suffix">
-          </i>
-          <template slot-scope="{ item }">
-            <div :title="item.flabel + ' -> ' + item.label">
-              <div class="label">{{ item.label }}</div>
-              <span class="flabel">{{ item.flabel }}</span>
-            </div>
-          </template>
-        </el-autocomplete>
-        <!-- 右边的 tabs 们 -->
-        <span class="tabItem" :class="{'active': activeTab === 'AdminTree'}" @click="clickTabs('AdminTree')">知识树</span>
-        <span class="tabItem" :class="{'active': activeTab === 'AdminLog'}" @click="clickTabs('AdminLog')">日志</span>
-        <span class="tabItem" :class="{'active': activeTab === 'AdminPhotoWall'}" @click="clickTabs('AdminPhotoWall')">图片墙</span>
-        <!-- <span class="tabItem" :class="{'active': activeTab === 'AdminChart'}" @click="clickTabs('AdminChart')">玩具</span> -->
+        <span :class="{'active': activeTab === 'Tree' || activeTab === 'AdminTree'}" @click="clickTabs('Tree')">知识树</span>
+        <span :class="{'active': activeTab === 'Log' || activeTab === 'AdminLog'}" @click="clickTabs('Log')">日志</span>
+        <span :class="{'active': activeTab === 'PhotoWall' || activeTab === 'AdminPhotoWall'}" @click="clickTabs('PhotoWall')">图片墙</span>
         <a href="https://github.com/xiaxiazheng/myblog">
           GitHub
           <i class="el-icon-star-off"></i>
@@ -83,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { TreeHelper } from '@/client/TreeHelper';
 import { baseEnv } from '../config';
 
@@ -96,11 +46,16 @@ interface TreeType {
 @Component
 export default class MyNav extends Vue {
   @Prop() type: any;
+
   titlehome: string = 'XIAXIAZheng';
   titleadmin: string = 'XIAXIAZheng';
   tree: TreeType[] = [];
   activeTab: string = '';
-  searchkeyword: string = '';
+  keyword: string = '';
+  timer: number = 0;
+  // 搜索
+  isSearch: boolean = false;
+  searchList: any[] = [];
 
   mounted() {
     this.$nextTick(function () {
@@ -109,6 +64,7 @@ export default class MyNav extends Vue {
         this.titleadmin = "黄猪猪欢迎你的到来";
       }
       this.init();
+      this.activeTab = this.$route.name || '';  // 刷新页面时初始化高亮的 tab
     });
   }
 
@@ -129,54 +85,34 @@ export default class MyNav extends Vue {
     }
   }
 
+  // 点击选择模块
   clickTabs(tabName: any) {
-    this.$router.push({ name: tabName });
-    this.activeTab = tabName;
+    let name = this.type !== 'admin' ? tabName : `Admin${tabName}`;
+    this.$router.push({ name: name });
+    this.activeTab = name;
   }
 
-  // 处理是否搜索
-  querySearch(queryString: any, cb: any) {
-    let results: TreeType[];
-    if (!queryString) { // 没关键字就跳过
-      results = this.tree;
+  // 搜索
+  @Watch('keyword')
+  handleSearch() {
+    if (this.keyword && this.keyword !== '') {
+      if (this.timer) clearTimeout(this.timer)
+      this.timer = setTimeout(async () => {
+        let res = await TreeHelper.searchTree(this.keyword);
+        if (res) {
+          this.searchList = res;
+          this.isSearch = true;
+        }
+      }, 500);
     } else {
-      let keywords: string[] = queryString.split(' '); // 去掉空格
-      keywords = keywords.filter(item => item !== ""); // 去掉连续空格造成的东西
-      results = this.tree;
-      if (keywords.length !== 0) { // 没关键字就跳过
-        for (let keyword of keywords) {
-          results = results.filter(this.createFilter(keyword));
-        }
-      }
+      this.searchList = [];
     }
-    cb(results); // 调用 callback 返回建议列表的数据
   }
 
-  // 处理搜索的筛选
-  createFilter(keyword: any) {
-    return (item: any) => {
-      return (item.label.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 || item.flabel.toLowerCase().indexOf(keyword.toLowerCase()) !== -1);
-    };
-  }
-  
-  // 点击搜索出来的待选
-  handleSelect(item: any) {
-    if (this.type === 'home') {
-      this.$router.replace({
-        name: "Tree",
-        query: {
-          id: btoa(encodeURIComponent(item.id))
-        }
-      });
-    }
-    if (this.type === 'admin') {
-      this.$router.replace({
-        name: "AdminTree",
-        query: {
-          id: btoa(encodeURIComponent(item.id))
-        }
-      });
-    }
+  // 点击已选择的项
+  choiceSearch(item: any) {
+    this.isSearch = false;
+    console.log(item);
   }
 }
 </script>
@@ -211,14 +147,46 @@ export default class MyNav extends Vue {
         }
       }
       .rightside {
-        .tabItem {
+        .searchbox {
+          position: relative;
+          display: inline-block;
+          >ul {
+            position: absolute;
+            top: 42px;
+            left: 0;
+            height: auto;
+            max-height: 300px;
+            border: 1px solid #dcdfe6;
+            box-sizing: border-box;
+            border-radius: 3px;
+            background-color: white;
+            >li {
+              text-align: left;
+              padding: 2px 5px;
+              border-bottom: 1px solid #e28e8e80;
+              cursor: pointer;
+              >.item {
+                .label {
+                  font-size: 16px;
+                }
+                >span {
+                  color: #ccc;
+                }
+              }
+            }
+            >li:hover {
+              background-color: #b3e0f9;
+            }
+          }
+        }
+        >span {
           display: inline-block;
           height: 1.7rem;
           margin-left: 1.5rem;
           font-size: .9rem;
           cursor: pointer;
         }
-        .tabItem:hover {
+        >span:hover {
           border-bottom: 2px solid #409eff;
         }
         .active {
@@ -230,29 +198,11 @@ export default class MyNav extends Vue {
           text-decoration: none;
           color: black;
         }
-        .searchBox {
-          display: inline-block;
-          vertical-align: middle;
-        }
-      }
-    }
-  }
-  // 这个搜索的弹出框在比较全局的地方
-  .searchBoxPopper {
-    li {
-      line-height: normal;
-      padding: 7px;
-      .label {
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
-      .flabel {
-        font-size: 12px;
-        color: #b4b4b4;
       }
     }
   }
 }
+
 // 移动端
 @media screen and (max-width: @splitWidth) {
   .mynav {
@@ -273,16 +223,13 @@ export default class MyNav extends Vue {
         }
       }
       .rightside {
-        .el-autocomplete {
-          display: none;
-        }
-        .tabItem {
+        >span {
           display: inline-block;
           line-height: 24px;
           margin: 0 5px;
           font-size: 0.9rem;
         }
-        .tabItem:hover {
+        >span:hover {
           border-bottom: 2px solid #409eff;
         }
         .active {

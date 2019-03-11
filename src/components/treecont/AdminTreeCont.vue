@@ -4,7 +4,9 @@
       <h1>{{title}}</h1>
 			<ul>
 				<li v-for="(item, index) in contObj.list" :key="index">
-					<el-input v-model="item.title" placeholder="请输入内容"></el-input>
+					<!-- 小标题框 -->
+          <el-input v-model="item.title" placeholder="请输入内容"></el-input>
+          <!-- 文本输入框 -->
           <el-input
 						type="textarea"
 						:autosize="{ minRows: 3, maxRows: 15 }"
@@ -14,25 +16,16 @@
 					<!-- 左下角的各种控制按键 -->
 					<div class="ctrlbox">
 						<span class="iconbox">
-							<el-button
-								type="text"
-								size="mini"
-								@click="() => upCont(item, index)"
-								v-if="index !== 0">
+              <!-- 上移按钮 -->
+							<el-button type="text" size="mini" @click="() => upCont(item, index)" v-if="index !== 0">
 								<i class="el-icon-arrow-up"></i>
 							</el-button>
-							<el-button
-								type="text"
-								size="mini"
-								@click="() => downCont(item, index)"
-								v-if="index !== contObj.list.length - 1">
+              <!-- 下移按钮 -->
+							<el-button type="text" size="mini" @click="() => downCont(item, index)" v-if="index !== contObj.list.length - 1">
 								<i class="el-icon-arrow-down"></i>
 							</el-button>
-							<el-button
-								type="text"
-								size="mini"
-								@click="() => deleteCont(item, index)"
-								v-if="contObj.list.length > 1">
+              <!-- 删除按钮 -->
+							<el-button type="text" size="mini" @click="() => deleteCont(item, index)" v-if="contObj.list.length > 1">
 								<i class="el-icon-delete"></i>	
 							</el-button>
 						</span>
@@ -285,23 +278,25 @@ export default class AdminTreeCont extends Vue {
     this.dialogImageName = file.imgname;
     this.dialogVisible = true;
   }
+
   // 上传成功后
   handleSuccess(response: any, file: any, fileList: any) {
     this.$message.success("上传成功");
     this.init();
   }
+
   // 上传失败后
   handleError(err: any, file: any, fileList: any) {
     this.$message.error("上传失败");
     this.init();
   }
+
   // 删除图片后
   async handleRemove(file: any, fileList: any) {
     /* 如果不是服务器上的图片，就直接删除 */
     if (file.status === 'ready') {
       return true;
     }
-
     this.$confirm(`此操作将永久删除该文件${file.imgname}, 是否继续?`, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -341,13 +336,41 @@ export default class AdminTreeCont extends Vue {
 				position: relative;
 				text-align: right;
 				margin-top: 5px;
-				.el-input {  /* 标题 */
+        // 小标题
+        .el-input {
 					margin-top: 10px;
-				}
-				.el-textarea {  /* 内容 */
-					margin-top: 10px;
-				}
-				.ctrlbox {  /* 控制栏 */
+        }
+        // 内容输入框
+				.el-textarea {
+          margin-top: 10px;
+          >textarea {
+            display: inline-block;
+            overflow:hidden;
+            overflow-y: auto;
+            height: 100%;
+          }
+          >textarea::-webkit-scrollbar {
+            /*滚动条整体样式*/
+            width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
+            height: 7px;
+          }
+          >textarea::-webkit-scrollbar-thumb {
+            /*滚动条里面小方块*/
+            border-radius: .5rem;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            background: #dcdfe6;
+          }
+          >textarea::-webkit-scrollbar-track {
+            /*滚动条里面轨道*/
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            border-radius: .5rem;
+            background: white;
+          }
+        }
+        /* 控制栏 */
+				.ctrlbox {
 					position: relative;
 					overflow: hidden;
 					.iconbox {
@@ -359,8 +382,9 @@ export default class AdminTreeCont extends Vue {
 						float: right;
 						color: #ccc;
 					}
-				}
-				.uploadtreecontimg {  /* 上传图片 */
+        }
+        /* 上传图片 */
+				.uploadtreecontimg {
 					position: absolute;
 					right: -157px;
 					top: 10px;

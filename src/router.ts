@@ -12,7 +12,7 @@ export default new VueRouter({
         {
           path: '',
           name: 'HomeMain',
-          component: () => import('@/views/main/Main.vue'),
+          component: () => import('@/views/main/HomeMain.vue'),
         },
         {
           path: 'tree',
@@ -29,11 +29,6 @@ export default new VueRouter({
           name: 'Log',
           component: () => import('@/views/log/Log.vue'),
         },
-        // {
-        //   path: 'chart',
-        //   name: 'Chart',
-        //   component: () => import('@/views/chart/chart.vue'),
-        // }
       ]
     },
     {
@@ -47,8 +42,8 @@ export default new VueRouter({
       children: [
         {
           path: '',
-          name: 'AdminMain',
-          component: () => import('@/views/main/AdminMain.vue'),
+          name: 'AdminHomeMain',
+          component: () => import('@/views/main/AdminHomeMain.vue'),
         },
         {
           path: 'admintree',
@@ -64,11 +59,6 @@ export default new VueRouter({
           path: 'adminlog',
           name: 'AdminLog',
           component: () => import('@/views/log/AdminLog.vue'),
-        },
-        {
-          path: 'adminchart',
-          name: 'AdminChart',
-          component: () => import('@/views/chart/chart.vue'),
         }
       ]
     }

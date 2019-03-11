@@ -9,6 +9,11 @@ export namespace TreeHelper {
     return data && data.resultsCode === 'success' ? data.data : [];
   }
 
+  export async function searchTree(keyword: string): Promise<any[]> {
+    const data = await axiosGetHelper(`${baseUrl}/searchtree?keyword=${keyword}`);
+    return data && data.resultsCode === 'success' ? data.data : [];
+  }
+
   export async function getChildName(id: string): Promise<any[]> {
     const data = await axiosGetHelper(`${baseUrl}/getchildname?id=${id}`);
     return data && data.resultsCode === 'success' ? data.data : [];

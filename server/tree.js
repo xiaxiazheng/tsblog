@@ -68,6 +68,38 @@ exports.getTree = async (ctx) => {
   };
 }
 
+// 按关键字搜索树
+exports.searchTree = async (ctx) => {
+  let keyword = ctx.query.keyword;
+  let array = [];
+  let sql1 = `SELECT * FROM category ORDER BY sort`;
+  let res1 = await query(sql1, array);
+  let sql2 = `SELECT * FROM tree WHERE c_label LIKE '%${keyword}%' || f_label LIKE '%${keyword}%' ORDER BY f_sort, c_sort`;
+  let res2 = await query(sql2, array);
+  res2.forEach((item) => {
+    let category = '';
+    for (let i = 0; i < res1.length; i++) {
+      if (item.category_id === res1[i].category_id) {
+        category = res1[i].label;
+        break;
+      }
+    }
+    item.category = category;
+  });
+  // 去除掉 MySceretPlace
+  for (let i = 0; i < res2.length; i++) {
+    if (res2[i].category === 'My Secret Place') {
+      res2.splice(i, 1);
+    }
+  }
+  
+  return {
+    resultsCode: 'success',
+    message: '搜索树成功',
+    data: res2,
+  };
+}
+
 // 查三级节点名
 exports.getChildName = async (ctx) => {
   let sql = "SELECT c_label FROM tree WHERE c_id=?";
