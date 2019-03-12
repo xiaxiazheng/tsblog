@@ -54,7 +54,6 @@ export default class MyNav extends Vue {
 
   titlehome: string = 'XIAXIAZheng';
   titleadmin: string = 'XIAXIAZheng';
-  tree: TreeType[] = [];
   activeTab: string = '';
   keyword: string = '';
   timer: number = 0;
@@ -64,30 +63,16 @@ export default class MyNav extends Vue {
 
   mounted() {
     this.$nextTick(function () {
-      if (baseEnv === "productionPig") {
-        this.titlehome = "黄苹苹欢迎你的到来";
-        this.titleadmin = "黄猪猪欢迎你的到来";
-      }
       this.init();
-      this.activeTab = this.$route.name || '';  // 刷新页面时初始化高亮的 tab
     });
   }
 
-  async init() {
-    let res: any = await TreeHelper.getTree('home');
-    this.tree = [];
-    if (res.length === 0) return;
-    for (let item of res) {
-      for (let jtem of item.children) {
-        for (let ktem of jtem.children) {
-          this.tree.push({
-            id: ktem.id,
-            flabel: `${item.label} -> ${jtem.label}`,
-            label: ktem.label
-          });
-        }
-      }
+  init() {
+    if (baseEnv === "productionPig") {
+      this.titlehome = "黄苹苹欢迎你的到来";
+      this.titleadmin = "黄猪猪欢迎你的到来";
     }
+    this.activeTab = this.$route.name || '';  // 刷新页面时初始化高亮的 tab
   }
 
   // 点击选择模块
