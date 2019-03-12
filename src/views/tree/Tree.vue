@@ -1,22 +1,24 @@
 <template>
   <div class="tree">
-    <div class="lefttree ScrollBar" v-if="showTree || isPC">
-      <el-tree
-        :data="tree"
-        :props="defaultProps"
-        node-key="id"
-        :default-expanded-keys="defaultExpandedKeys"
-        :highlight-current="true"
-        @node-click="handleClick"
-        accordion>
-      </el-tree>
-    </div>
+    <transition name="slide-fade">
+      <div class="lefttree ScrollBar" v-if="showTree || isPC">
+        <el-tree
+          :data="tree"
+          :props="defaultProps"
+          node-key="id"
+          :default-expanded-keys="defaultExpandedKeys"
+          :highlight-current="true"
+          @node-click="handleClick"
+          accordion>
+        </el-tree>
+      </div>
+    </transition>
     <!-- 给移动端隐藏树用的 -->
     <div class="hidetree" @click="isShowTree" v-if="!isPC">
       <i v-if="showTree" class="el-icon-arrow-left"></i>
       <i v-if="!showTree" class="el-icon-arrow-right"></i>
     </div>
-    <div class="rightcont ScrollBar" v-if="!showTree || isPC" ref="rightcont">
+    <div class="rightcont ScrollBar" v-show="!showTree || isPC" ref="rightcont">
       <TreeCont @scrollToTop="scrollToTop"></TreeCont>
     </div>
   </div>
@@ -165,6 +167,16 @@ export default class Tree extends Vue {
       .el-tree {
         padding: 10px 5px;
       }
+    }
+    .slide-fade-enter-active {
+      transition: all .3s ease;
+    }
+    .slide-fade-leave-active {
+      transition: all .6s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    }
+    .slide-fade-enter, .slide-fade-leave-to {
+      transform: translateX(-10px); /* 这个如果为正数，就是从下到上，为负从上到下，改成X控制左右 */
+      opacity: 0;
     }
     .rightcont {
       width: 100%;

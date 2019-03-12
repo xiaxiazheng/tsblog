@@ -58,6 +58,7 @@ export default class Admin extends Vue {
 		height: 100%;
 		.adminrouter {
       height: calc(100% - 38px);
+      overflow: hidden;
 		}
   }  
 }

@@ -104,7 +104,7 @@ exports.modifyLogCont = async (ctx) => {
 // 删单篇日志
 exports.deleteLogCont = async (ctx) => {
   let sql = `DELETE FROM log WHERE log_id=?`;
-  let array = [ctx.query.id];
+  let array = [ctx.request.body.id];
   await query(sql, array);
   return {
     resultsCode: 'success',

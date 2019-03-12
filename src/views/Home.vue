@@ -28,7 +28,7 @@ export default class Home extends Vue {
     height: 100%;
     overflow: hidden;
     .homerouter {
-      height: calc(100% - 3.6rem - 2px);
+      height: calc(100% - 58px);
       margin-top: 58px;
     }
   }

@@ -9,7 +9,7 @@ exports.getTree = async (ctx) => {
   let res1 = await query(sql1, array);
   let sql2 = "SELECT * FROM tree ORDER BY f_sort, c_sort";
   let res2 = await query(sql2, array);
-  /* 先把tree里的二级树整理好 */
+  /* 先把 tree 里的二级树整理好 */
   let list = [];
   for (let i in res2) {
     let find = false;
@@ -96,7 +96,7 @@ exports.searchTree = async (ctx) => {
   return {
     resultsCode: 'success',
     message: '搜索树成功',
-    data: res2,
+    data: res2,  // 返回记录列表
   };
 }
 
@@ -117,7 +117,7 @@ exports.addTreeNode = async (ctx) => {
   let sql = '';
   let newchildId = Common.getRandomNum();
   let level = ctx.request.body.level;
-  if (level === '1') { // 若为一个大类
+  if (level === 1) { // 若为一个大类
     let newfathId = Common.getRandomNum();
     let newcateId = Common.getRandomNum();
     sql = "INSERT INTO category VALUES (?, ?, ?)";
@@ -139,11 +139,11 @@ exports.addTreeNode = async (ctx) => {
     };
   }
   else {
-    if(level === '2') { // 若是父节点
+    if(level === 2) { // 若是父节点
       let newfathId = Common.getRandomNum();
       sql = `INSERT INTO tree VALUES (${newfathId}, 'newNode', ${(parseInt(ctx.request.body.sort) + 1)}, ${newchildId}, 'newChildNode', 1, ${ctx.request.body.category_id})`;
     }
-    if(level === '3') { // 若是子节点
+    if(level === 3) { // 若是子节点
       sql = `INSERT INTO tree VALUES (${ctx.request.body.id}, '${ctx.request.body.label}', ${ctx.request.body.f_sort}, ${newchildId}, 'newChildNode', ${(parseInt(ctx.request.body.c_sort) + 1)}, ${ctx.request.body.category_id})`;
     }
     let array = [];
@@ -162,7 +162,7 @@ exports.addTreeNode = async (ctx) => {
 
 // 改
 exports.modifyTreeNode = async (ctx) => {
-  if(ctx.request.body.level === '1') {
+  if(ctx.request.body.level === 1) {
     let sql = "UPDATE category SET label=? WHERE category_id=?";
     let array = [ctx.request.body.label, ctx.request.body.id];
     await query(sql, array);
@@ -173,10 +173,10 @@ exports.modifyTreeNode = async (ctx) => {
     };
   } else {
     let flag = '';
-    if(ctx.request.body.level === '3') {
+    if(ctx.request.body.level === 3) {
       flag = 'c';
     }
-    if(ctx.request.body.level === '2') {
+    if(ctx.request.body.level === 2) {
       flag = 'f';
     }
     let sql = `UPDATE tree SET ${flag}_label=? WHERE ${flag}_id=?`;
@@ -194,7 +194,7 @@ exports.modifyTreeNode = async (ctx) => {
 exports.deleteTreeNode = async (ctx) => {
   const level = ctx.request.body.level;
   const id = ctx.request.body.id;
-  if(level === '1') { // 若为一级节点
+  if(level === 1) { // 若为一级节点
     // 先找到该一级节点的所有三级节点
     let sql1 = "SELECT c_id FROM tree WHERE category_id=?";
     let array = [id];
@@ -220,7 +220,7 @@ exports.deleteTreeNode = async (ctx) => {
       message: '删除成功'
     };
   }
-  if(level === '2') { // 若为二级节点
+  if(level === 2) { // 若为二级节点
     // 先找到该二级节点的所有三级节点
     let sql1 = "SELECT c_id FROM tree WHERE f_id=?";
     let array = [id];
@@ -242,7 +242,7 @@ exports.deleteTreeNode = async (ctx) => {
       message: '删除成功'
     };
   }
-  if(level === '3') { // 若为三级节点
+  if(level === 3) { // 若为三级节点
     // 删除该子节点的具体信息
     let sql1 = "DELETE FROM cont WHERE c_id=?";
     let array = [id];
@@ -262,7 +262,7 @@ exports.deleteTreeNode = async (ctx) => {
 // 交换顺序，上移或下移
 exports.changeSort = async (ctx) => {
   const level = ctx.request.body.level;
-  if(level === '1') {
+  if(level === 1) {
     let sql1 = "UPDATE category SET sort=? WHERE category_id=?";
     let array1 = [ctx.request.body.otherSort, ctx.request.body.thisId];
     await query(sql1, array1);
@@ -277,8 +277,8 @@ exports.changeSort = async (ctx) => {
     };
   } else {
     let flag = '';
-    level === '3' && (flag = 'c');
-    level === '2' && (flag = 'f');
+    level === 3 && (flag = 'c');
+    level === 2 && (flag = 'f');
     
     let sql1 = `UPDATE tree SET ${flag}_sort=? WHERE ${flag}_id=?`;
     let array1 = [ctx.request.body.otherSort, ctx.request.body.thisId];
@@ -299,11 +299,11 @@ exports.changeSort = async (ctx) => {
 exports.changeFather = async (ctx) => {
   let sql = '', array = [];
   let body = ctx.request.body;
-  if(body.shuttleLevel === '2') { // 二级节点要穿梭
+  if(body.shuttleLevel === 2) { // 二级节点要穿梭
     sql = "UPDATE tree SET category_id=?, f_sort=? WHERE f_id=?";
     array = [body.category_id, body.f_sort, body.f_id];
   }
-  if(body.shuttleLevel === '3') {  // 三级节点要穿梭
+  if(body.shuttleLevel === 3) {  // 三级节点要穿梭
     sql = "UPDATE tree SET f_id=?, f_label=?, f_sort=?, c_sort=? WHERE c_id=?";
     array = [body.fatherid, body.fatherlabel, body.fathersort, body.newchildsort, body.childid];
   }

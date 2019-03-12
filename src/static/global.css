@@ -6,78 +6,35 @@
     top: 0;
   }
 }
-/* 知识点树样式 */
-.lefttree {
+.el-message-box {
+  display: inline-block;
+  max-width: 420px;
+  width: 100%;
+}
+/* 进度条全局样式 */
+.ScrollBar {
   display: inline-block;
   overflow: hidden;
   overflow-y: auto;
-  width: 20rem;
   height: 100%;
-  vertical-align: top;
 }
-.lefttree .el-tree {
-  padding: 10px 5px;
-}
-.lefttree::-webkit-scrollbar {
+.ScrollBar::-webkit-scrollbar {
   /*滚动条整体样式*/
   width: 7px;
   /* 高宽分别对应横竖滚动条的尺寸 */
   height: 7px;
 }
-.lefttree::-webkit-scrollbar-thumb {
+.ScrollBar::-webkit-scrollbar-thumb {
   /*滚动条里面小方块*/
   border-radius: .5rem;
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
   -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
   background: #dcdfe6;
 }
-.lefttree::-webkit-scrollbar-track {
+.ScrollBar::-webkit-scrollbar-track {
   /*滚动条里面轨道*/
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
   -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
   border-radius: .5rem;
-  background: white;
-}
-/* 知识点树详情样式 */
-.rightcont {
-  display: inline-block;
-  overflow: hidden;
-  overflow-y: auto;
-  width: calc(80%);
-  height: 100%;
-  border-left: 1px solid #eaecef;
-  box-sizing: border-box;
-  vertical-align: top;
-}
-@media screen and (min-width: 500px) {
-  .rightcont .admincont {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem 2.5rem;
-  }
-  .rightcont .treecont {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem 2.5rem;
-  }
-}
-.rightcont::-webkit-scrollbar {
-  /*滚动条整体样式*/
-  width: 7px;
-  /* 高宽分别对应横竖滚动条的尺寸 */
-  height: 7px;
-}
-.rightcont::-webkit-scrollbar-thumb {
-  /*滚动条里面小方块*/
-  border-radius: 0.5rem;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  background: #dcdfe6;
-}
-.rightcont::-webkit-scrollbar-track {
-  /*滚动条里面轨道*/
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  border-radius: 0.5rem;
   background: white;
 }

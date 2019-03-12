@@ -1,37 +1,21 @@
 <template>
   <div class="photowall">
-    <div>
-      <el-upload
-        action="#"
-        name="image"
-        list-type="picture-card"
-        :on-preview="handlePictureCardPreview"
-        :file-list="imgUrllist">
-        <i class="el-icon-plus"></i>
-      </el-upload>
-      <!-- 查看大图的 dialog -->
-      <el-dialog width="40%" :visible.sync="dialogVisible" :title="dialogImageName">
+    <div class="photowall-main ScrollBar">
+      <!-- 展示 -->
+      <div class="wrap">
+        <img
+          v-for="(item, index) of imgUrllist"
+          :title="item.imgname"
+          :key="index"
+          :src="item.url"
+          :alt="item.imgname"
+          @click="photoPreview(item)">
+      </div>
+      <!-- 预览 -->
+      <el-dialog width="70%" :visible.sync="dialogVisible" :title="dialogImageName">
         <img width="100%" :src="dialogImageUrl" alt="">
         <span>{{ dialogCTime }}</span>
       </el-dialog>
-    </div>
-    <!-- <h1>瀑布流改造升级中</h1> -->
-    <div class="masonry">
-      <div class="column">
-        <div class="item">
-          <div class="item__content"> </div>
-        </div> <!-- more items -->
-      </div>
-      <div class="column">
-        <div class="item">
-          <div class="item__content"> </div>
-        </div> <!-- more items -->
-      </div>
-      <div class="column">
-        <div class="item">
-          <div class="item__content"> </div>
-        </div> <!-- more items -->
-      </div>
     </div>
   </div>
 </template>
@@ -47,15 +31,17 @@ interface ImgListType {
   filename: string;
   cTime: string;
   url: string;
-}
+};
 
 @Component
 export default class PhotoWall extends Vue {
+  // 图片列表
+  imgUrllist: ImgListType[] = [];
+  // 预览
   dialogImageName: string = "";
   dialogImageUrl: string = "";
   dialogCTime: string = "";
   dialogVisible: boolean = false;
-  imgUrllist: ImgListType[] = [];
 
   mounted() {
     this.$nextTick(function () {
@@ -79,7 +65,7 @@ export default class PhotoWall extends Vue {
     }
   }
 
-  handlePictureCardPreview(file: any) {
+  photoPreview(file: any) {
     this.dialogImageUrl = file.url;
     this.dialogImageName = file.imgname;
     this.dialogCTime = file.cTime;
@@ -91,55 +77,52 @@ export default class PhotoWall extends Vue {
 <style lang="less">
 @splitWidth: 500px;
 
-// PC 端
-@media screen and (min-width: @splitWidth) {
+// @media screen and (min-width: @splitWidth) {
   .photowall {
-    height: 100%;
-    .el-upload-list__item.is-success .el-upload-list__item-status-label {
-      // 去掉右上角的绿勾勾
-      display: none !important;
-    }
-    .el-upload-list--picture-card
-      .el-upload-list__item-actions
-      .el-upload-list__item-delete {
-      // 去掉删除图片的字体图标
-      display: none !important;
-    }
-    .el-upload--picture-card {
-      // 去掉上传图片的框
-      display: none !important;
-    }
-    .el-dialog {
-      max-width: 800px;
-      min-width: 400px;
+    .photowall-main {
+      width: calc(100% - 20px);
+      height: calc(100% - 10px);
+      padding: 5px 10px;
+      // 展示
+      .wrap {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        img {
+          max-width: 100%;
+          margin: 3px;
+          padding: 1px;
+          height: 200px;
+          background: #b4cfec;
+          flex-grow: 1;
+          object-fit: cover;
+          transition: .3s;
+          cursor: pointer;
+        }
+        img:hover{
+          transform: scale(1.05);
+          z-index: 3;
+        }
+      }
+      .wrap:after{
+        display: block;
+        content: '';
+        flex-grow: 9999;
+      }
+      // 预览
+      .el-dialog {
+        >span {
+          display: inline-block;
+          margin-top: 6px;
+          color: #9dbbda;
+        }
+      }
     }
   }
-}
+// }
 
 // 移动端
-@media screen and (max-width: @splitWidth) {
-  .photowall {
-    overflow-y: auto;
-    >div {
-      padding-top: 15px;
-    }
-    .el-upload-list__item.is-success .el-upload-list__item-status-label {
-      // 去掉右上角的绿勾勾
-      display: none !important;
-    }
-    .el-upload-list--picture-card
-      .el-upload-list__item-actions
-      .el-upload-list__item-delete {
-      // 去掉删除图片的字体图标
-      display: none !important;
-    }
-    .el-upload--picture-card {
-      // 去掉上传图片的框
-      display: none !important;
-    }
-    .el-dialog {
-      width: 99% !important;
-    }
-  }
-}
+// @media screen and (max-width: @splitWidth) {
+  
+// }
 </style>

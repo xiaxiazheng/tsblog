@@ -2,7 +2,7 @@
   <header class="mynav">
     <div>
       <div class="leftside">
-        <span @click="clickTabs('Main')">
+        <span @click="clickTabs('HomeMain')">
           {{ titlehome }}
         </span>
       </div>
@@ -10,14 +10,19 @@
         <!-- 搜索框 -->
         <div class="searchbox">
           <el-input v-model="keyword" placeholder="搜索树的节点" prefix-icon="el-icon-search" clearable></el-input>
-          <ul v-if="keyword !== '' && isSearch" class="ScrollBar">
-            <li v-for="(item, index) of searchList" :key="index" @click="choiceSearch(item)">
-              <div class="item">
-                <div class="label">{{ item.c_label }}</div>
-                <span class="flabel">{{ item.f_label }}（{{item.category}}）</span>
-              </div>
-            </li>
-          </ul>
+          <transition name="slide-fade">
+            <ul v-if="keyword !== '' && isSearch" class="searchtree ScrollBar">
+              <li v-if="searchList.length === 0">
+                <span class="tips">暂无搜索结果</span>
+              </li>
+              <li v-else v-for="(item, index) of searchList" :key="index" @click="choiceSearch(item)">
+                <div class="item">
+                  <span class="label">{{ item.c_label }}</span>
+                  <span class="flabel">{{ item.f_label }}（{{item.category}}）</span>
+                </div>
+              </li>
+            </ul>
+          </transition>
         </div>
         <!-- 右边的 tabs 们 -->
         <span :class="{'active': activeTab === 'Tree' || activeTab === 'AdminTree'}" @click="clickTabs('Tree')">知识树</span>
@@ -41,7 +46,7 @@ interface TreeType {
   flabel: string;
   id: number;
   label: string;
-}
+};
 
 @Component
 export default class MyNav extends Vue {
@@ -102,17 +107,33 @@ export default class MyNav extends Vue {
         if (res) {
           this.searchList = res;
           this.isSearch = true;
+          console.log(res);
         }
       }, 500);
     } else {
-      this.searchList = [];
+      this.isSearch = false;
     }
   }
 
   // 点击已选择的项
   choiceSearch(item: any) {
     this.isSearch = false;
-    console.log(item);
+    if (this.type === 'home') {
+      this.$router.replace({
+        name: "Tree",
+        query: {
+          id: btoa(encodeURIComponent(item.c_id))
+        }
+      });
+    }
+    if (this.type === 'admin') {
+      this.$router.replace({
+        name: "AdminTree",
+        query: {
+          id: btoa(encodeURIComponent(item.c_id))
+        }
+      });
+    }
   }
 }
 </script>
@@ -150,29 +171,59 @@ export default class MyNav extends Vue {
         .searchbox {
           position: relative;
           display: inline-block;
-          >ul {
+          .el-input {
+            line-height: 1;
+            .el-input__inner {
+              height: 34px;
+              line-height: 34px;
+            }
+            .el-input__icon {
+              line-height: 1;
+            }
+          }
+          .searchtree {
             position: absolute;
-            top: 42px;
+            top: 38px;
             left: 0;
+            width: 232px;
             height: auto;
-            max-height: 300px;
+            max-height: 350px;
             border: 1px solid #dcdfe6;
             box-sizing: border-box;
-            border-radius: 3px;
+            border-radius: 4px;
             background-color: white;
             >li {
-              text-align: left;
               padding: 2px 5px;
+              line-height: 1;
+              text-align: left;
               border-bottom: 1px solid #e28e8e80;
+              box-sizing: border-box;
               cursor: pointer;
               >.item {
+                padding: 6px 0;
                 .label {
-                  font-size: 16px;
+                  display: block;
+                  padding-bottom: 6px;
+                  color: #606266;
+                  font-size: 14px;
+                  line-height: 1.2;
                 }
                 >span {
-                  color: #ccc;
+                  color: #d4abab;
                 }
               }
+              .tips {
+                display: inline-block;
+                height: 32px;
+                line-height: 32px;
+                padding-left: 5px;
+                letter-spacing: 1px;
+                font-size: 14px;
+                color: #c0c4cc;
+              }
+            }
+            >li:last-child {
+              border-bottom: none;
             }
             >li:hover {
               background-color: #b3e0f9;
@@ -197,6 +248,16 @@ export default class MyNav extends Vue {
           font-size: .9rem;
           text-decoration: none;
           color: black;
+        }
+        .slide-fade-enter-active {
+          transition: all .3s ease;
+        }
+        .slide-fade-leave-active {
+          transition: all .6s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+        }
+        .slide-fade-enter, .slide-fade-leave-to {
+          transform: translateY(-10px); /* 这个如果为正数，就是从下到上，为负从上到下，改成X控制左右 */
+          opacity: 0;
         }
       }
     }
@@ -223,6 +284,9 @@ export default class MyNav extends Vue {
         }
       }
       .rightside {
+        .searchbox {
+          display: none;
+        }
         >span {
           display: inline-block;
           line-height: 24px;

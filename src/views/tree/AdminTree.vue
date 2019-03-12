@@ -1,81 +1,62 @@
 <template>
   <div class="admintree">
 	  <!-- 左边的树 -->
-	  <div class="lefttree ScrollBar" v-if="showTree || isPC">
-      <el-tree
-				:data="tree"
-				:props="defaultProps"
-				node-key="id"
-				:default-expanded-keys="expandedList"
-				@node-click="handleClick"
-				:expand-on-click-node="false">
-				<span class="custom-tree-node" slot-scope="{ node, data }" @mouseover="showIcon(node)" @mouseout="hideIcon(node)">
-					<span>{{ node.label }}</span>
-					<span class="iconBox" v-if="node.data.hovering">
-						<el-button
-							type="text"
-							size="mini"
-							@click.stop="() => upordown(node, data, 'up')"
-							v-if="node.previousSibling">
-							<i class="el-icon-arrow-up"></i>
-						</el-button>
-						<el-button
-							type="text"
-							size="mini"
-							@click.stop="() => upordown(node, data, 'down')"
-							v-if="node.nextSibling">
-							<i class="el-icon-arrow-down"></i>
-						</el-button>
-						<el-button
-							type="text"
-							size="mini"
-							@click.stop="() => motify(node, data)">
-							<i class="el-icon-edit-outline"></i>
-						</el-button>
-						<el-button
-							type="text"
-							size="mini"
-							@click.stop="() => append(node, data)">
-							<i class="el-icon-circle-plus-outline"></i>
-						</el-button>
-						<el-button
-							type="text"
-							size="mini"
-							@click.stop="() => shuttle(node, data)"
-							v-if="node.level !== 1">
-							<i class="el-icon-upload"></i>
-						</el-button>
-						<el-button
-							type="text"
-							size="mini"
-							@click.stop="() => remove(node, data)">
-							<i class="el-icon-delete"></i>	
-						</el-button>
-					</span>
-				</span>
-			</el-tree>
-		</div>
+    <transition name="slide-fade">
+      <div class="lefttree ScrollBar" v-if="showTree || isPC">
+        <el-tree
+          :data="tree"
+          :props="defaultProps"
+          node-key="id"
+          :default-expanded-keys="expandedList"
+          @node-click="handleClick"
+          :expand-on-click-node="false">
+          <span class="custom-tree-node" slot-scope="{ node, data }" @mouseover="showIcon(node)" @mouseout="hideIcon(node)">
+            <span>{{ node.label }}</span>
+            <span class="iconBox" v-if="node.data.hovering">
+              <!-- 上移 -->
+              <el-button type="text" size="mini" @click.stop="() => upordown(node, data, 'up')" v-if="node.previousSibling">
+                <i class="el-icon-arrow-up"></i>
+              </el-button>
+              <!-- 下移 -->
+              <el-button type="text" size="mini" @click.stop="() => upordown(node, data, 'down')" v-if="node.nextSibling">
+                <i class="el-icon-arrow-down"></i>
+              </el-button>
+              <!-- 修改 -->
+              <el-button type="text" size="mini" @click.stop="() => motify(node, data)">
+                <i class="el-icon-edit-outline"></i>
+              </el-button>
+              <!-- 新增 -->
+              <el-button type="text" size="mini" @click.stop="() => append(node, data)">
+                <i class="el-icon-circle-plus-outline"></i>
+              </el-button>
+              <!-- 穿梭 -->
+              <el-button type="text" size="mini" @click.stop="() => shuttle(node, data)" v-if="node.level !== 1">
+                <i class="el-icon-upload"></i>
+              </el-button>
+              <!-- 删除 -->
+              <el-button type="text" size="mini" @click.stop="() => remove(node, data)">
+                <i class="el-icon-delete"></i>	
+              </el-button>
+            </span>
+          </span>
+        </el-tree>
+      </div>
+    </transition>
     <!-- 给移动端隐藏树用的 -->
     <div class="hidetree" @click="isShowTree" v-if="!isPC">
       <i v-if="showTree" class="el-icon-arrow-left"></i>
       <i v-if="!showTree" class="el-icon-arrow-right"></i>
     </div>
 		<!-- 右边的子组件 -->
-		<div v-if="!showTree || isPC" class="rightcont ScrollBar" ref="rightcont">
-			<el-switch
-				v-model="isEdit"
-				title="是否编辑">
-			</el-switch>
+		<div class="rightcont ScrollBar" ref="rightcont" v-if="!showTree || isPC">
+      <!-- 切换按键 -->
+			<el-switch v-model="isEdit" title="是否编辑"></el-switch>
 			<!-- 切换以下两个 -->
       <AdminTreeCont v-if="isEdit" :propsname="propsname" @scrollToTop="scrollToTop"></AdminTreeCont>
 			<TreeCont v-if="!isEdit" :propsname="propsname" @scrollToTop="scrollToTop"></TreeCont>
 		</div>
 		<!-- 修改节点名称的dialog -->
-		<el-dialog
-			title="提示"
-			:visible.sync="showEditDialog"
-			width="30%"
-			:before-close="handleCloseDialog">
+		<el-dialog title="提示" :visible.sync="showEditDialog" width="30%" :before-close="handleCloseDialog">
 			<span>{{notice}}</span>
 			<el-input v-model="motifyNode.newNodeName" placeholder="请输入内容" @keyup.native.enter="handleSaveNode"></el-input>
 			<span slot="footer" class="dialog-footer">
@@ -84,11 +65,7 @@
 			</span>
 		</el-dialog>
 		<!-- 穿梭更换父节点的dialog -->
-		<el-dialog
-			title="提示"
-			:visible.sync="showShuttleDialog"
-			width="30%"
-			:before-close="handleCloseDialog">
+		<el-dialog title="提示" :visible.sync="showShuttleDialog" width="30%" :before-close="handleCloseDialog">
 			<span>请选择"{{shuttleChildLabel}}"要穿梭到的
 				<span v-if="shuttleLevel === 2">一级</span>
 				<span v-if="shuttleLevel === 3">二级</span>
@@ -160,27 +137,15 @@ export default class AdminTree extends Vue {
       this.isPC = window.innerWidth <= this.splitWidth ? false : true;
       console.log("isPC:", this.isPC);
       this.onWidthChange();
+      if (this.$route.query.id) {
+        // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
+        this.expandedList.push(parseInt(atob(<string>this.$route.query.id), 10));
+      }
       this.init();
     });
   }
-  
-  @Watch("$route")
-  onRouteChange() {
-    this.saveFathExpend(null); // 这里要在刷新前保存节点
-    this.init();
-  }
-
-  // 滚动到顶部，给子组件调用的
-  scrollToTop() {
-    let div = this.$refs["rightcont"] as HTMLDivElement;
-    div["scrollTop"] = 0;
-  }
 
   async init() {
-    if (this.$route.query.id) {
-      // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
-      this.expandedList.push(parseInt(atob(<string>this.$route.query.id), 10));
-    }
     this.tree = await TreeHelper.getTree('admin');
     // 给树设置hover属性
     for (let i in this.tree) {
@@ -193,6 +158,18 @@ export default class AdminTree extends Vue {
         }
       }
     }
+  }
+
+  @Watch("$route")
+  onRouteChange() {
+    this.saveFathExpend(null); // 这里要在刷新前保存节点
+    this.init();
+  }
+
+  // 滚动到顶部，给子组件调用的
+  scrollToTop() {
+    let div = this.$refs["rightcont"] as HTMLDivElement;
+    div["scrollTop"] = 0;
   }
 
   // onmouseover时显示图标
@@ -214,11 +191,10 @@ export default class AdminTree extends Vue {
         }
       });
       this.propsname = node.data.label;
-
+      this.saveFathExpend(node);
       // 移动端
       this.showTree = false;
     }
-    this.saveFathExpend(node);
   }
 
   // 新增节点
@@ -246,7 +222,6 @@ export default class AdminTree extends Vue {
     let res = await TreeHelper.addTreeNode(params);
     if (res) {
       this.$message.success('新增成功');
-      this.saveFathExpend(node);
       this.init();
     } else {
       this.$message.error('新增失败');
@@ -281,7 +256,7 @@ export default class AdminTree extends Vue {
                 let res = await TreeHelper.deleteTreeNode(params);
                 if (res) {
                   this.$message.success('删除成功');
-                  this.saveFathExpend(node);
+                  this.saveFathExpend(null);
                   this.init();
                   this.propsname = ''; // 改变传过去的值
                 } else {
@@ -315,7 +290,7 @@ export default class AdminTree extends Vue {
         let res = await TreeHelper.deleteTreeNode(params);
         if (res) {
           this.$message.success('删除成功');
-          this.saveFathExpend(node);
+          this.saveFathExpend(null);
           this.init();
           this.propsname = ''; // 改变传过去的值
         } else {
@@ -345,7 +320,7 @@ export default class AdminTree extends Vue {
         let res = await TreeHelper.deleteTreeNode(params);
         if (res) {
           this.$message.success('删除成功');
-          this.saveFathExpend(node);
+          this.saveFathExpend(null);
           this.init();
           this.propsname = ''; // 改变传过去的值
         } else {
@@ -375,7 +350,6 @@ export default class AdminTree extends Vue {
       newNodeName: data.label,
     };
     this.showEditDialog = true;
-    this.saveFathExpend(node);
   }
 
   // 保存修改的节点名称
@@ -400,7 +374,7 @@ export default class AdminTree extends Vue {
       }
       this.motifyNode.newNodeName = '';
     } else {
-      this.$message.success('修改失败');
+      this.$message.error('修改失败');
     }
   }
 
@@ -503,14 +477,13 @@ export default class AdminTree extends Vue {
     let res: any = await TreeHelper.changeSort(params);
     if (res) {
       type === 'up' ? this.$message.success('上移成功') : this.$message.success('下移成功');
-      this.saveFathExpend(node);
       this.init();
     } else {
-      type === 'up' ? this.$message.success('上移失败') : this.$message.success('下移失败');
+      type === 'up' ? this.$message.error('上移失败') : this.$message.error('下移失败');
     }
   }
 
-  // 处理关闭dialog
+  // 处理关闭 dialog
   handleCloseDialog() {
     this.showEditDialog = false;
     this.motifyNode = {
@@ -649,6 +622,16 @@ export default class AdminTree extends Vue {
         z-index: 2;
 			}
     }
+    .slide-fade-enter-active {
+      transition: all .3s ease;
+    }
+    .slide-fade-leave-active {
+      transition: all .6s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    }
+    .slide-fade-enter, .slide-fade-leave-to {
+      transform: translateX(-10px); /* 这个如果为正数，就是从下到上，为负从上到下，改成X控制左右 */
+      opacity: 0;
+    }
     .lefttree, .rightcont {
       width: 100%;
     }
@@ -656,8 +639,9 @@ export default class AdminTree extends Vue {
       position: absolute;
       bottom: 5px;
       left: 9px;
+      opacity: 0.7;
       z-index: 2;
-      padding: 10px;
+      padding: 15px 20px;
       background-color: white;
       border-radius: 3px;
       border: 1px solid #ccc;
