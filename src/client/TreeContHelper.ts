@@ -25,9 +25,9 @@ export namespace TreeContHelper {
     return data && data.resultsCode === 'success' ? true : false;
   }
 
-  export async function modifyNodeCont(params: any): Promise<boolean> {
+  export async function modifyNodeCont(params: any): Promise<any> {
     const data = await axiosPostHelper(`${baseUrl}/modifynodecont`, params);
-    return data && data.resultsCode === 'success' ? true : false;
+    return data && data.resultsCode === 'success' ? data.message : false;
   }
 
   export async function deleteNodeCont(params: any): Promise<boolean> {

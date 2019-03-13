@@ -263,11 +263,10 @@ export default class AdminTreeCont extends Vue {
     }
     let params: any = this.contObj;
     let res: any = await TreeContHelper.modifyNodeCont(params);
-    if (res) {
-      this.$message.success('编辑成功');
-      setTimeout(() => { this.init(); }, 1000);
-    } else {
+    if (!res) {
       this.$message.error('编辑失败');
+    } else {
+      this.$message.success(res);
     }
   }
 
@@ -432,7 +431,10 @@ export default class AdminTreeCont extends Vue {
 					margin-top: 10px;
 				}
 				.el-textarea {  /* 内容 */
-					margin-top: 10px;
+          margin-top: 10px;
+          >textarea {
+            resize: none;
+          }
 				}
 				.ctrlbox {  /* 控制栏 */
 					position: relative;
