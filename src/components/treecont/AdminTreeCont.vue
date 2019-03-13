@@ -347,6 +347,7 @@ export default class AdminTreeCont extends Vue {
             overflow:hidden;
             overflow-y: auto;
             height: 100%;
+            resize: none;
           }
           >textarea::-webkit-scrollbar {
             /*滚动条整体样式*/
