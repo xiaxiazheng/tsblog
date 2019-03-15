@@ -122,7 +122,7 @@ export default class AdminTree extends Vue {
   /* 子节点穿梭 */
   fatherNodeList: any[] = []; // 子节点上一级的所有节点
   showShuttleDialog: boolean = false;
-  shuttleLevel: Number = 0;
+  shuttleLevel: number = 0;
   originFathId: string = '';
   choiceFathId: string = '';
   shuttleChildId: string = '';
@@ -222,6 +222,7 @@ export default class AdminTree extends Vue {
     let res = await TreeHelper.addTreeNode(params);
     if (res) {
       this.$message.success('新增成功');
+      this.saveFathExpend(node);
       this.init();
     } else {
       this.$message.error('新增失败');
@@ -230,7 +231,8 @@ export default class AdminTree extends Vue {
 
   // 删除节点
   async remove(node: any, data: any) {
-    if (node.level === 3) { // 若是叶子节点
+    // 若是叶子节点
+    if (node.level === 3) {
       this.$confirm(`你将删除的是三级节点${data.label}, 你确定?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -258,7 +260,10 @@ export default class AdminTree extends Vue {
                   this.$message.success('删除成功');
                   this.saveFathExpend(null);
                   this.init();
-                  this.propsname = ''; // 改变传过去的值
+                  // 如果删除的是当前路由 id 的节点，就改变传给子组件的值，传字符串过去清除路由
+                  if (data.id === parseInt(atob(<string>this.$route.query.id), 10)) {
+                    this.propsname = '';
+                  }
                 } else {
                   this.$message.error('删除失败');
                 }
@@ -270,8 +275,8 @@ export default class AdminTree extends Vue {
         this.$message.info(`已取消删除 ${data.label}`);
       });
     }
-
-    if (node.level === 2) { // 若是二级节点
+    // 若是二级节点
+    if (node.level === 2) {
       this.$confirm(`你将删除的是二级节点${data.label}, 你确定?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -292,7 +297,8 @@ export default class AdminTree extends Vue {
           this.$message.success('删除成功');
           this.saveFathExpend(null);
           this.init();
-          this.propsname = ''; // 改变传过去的值
+          // 改变传过去的值，清除路由
+          this.propsname = '';
         } else {
           this.$message.error('删除失败');
         }
@@ -300,8 +306,8 @@ export default class AdminTree extends Vue {
         this.$message.info(`已取消删除 ${data.label}`);
       });
     }
-
-    if (node.level === 1) { // 若是一级节点
+    // 若是一级节点
+    if (node.level === 1) {
       this.$confirm(`你将删除的是一级节点${data.label}, 你确定?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -322,7 +328,8 @@ export default class AdminTree extends Vue {
           this.$message.success('删除成功');
           this.saveFathExpend(null);
           this.init();
-          this.propsname = ''; // 改变传过去的值
+          // 改变传过去的值，清除路由
+          this.propsname = '';
         } else {
           this.$message.error('删除失败');
         }
