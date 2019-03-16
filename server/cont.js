@@ -200,7 +200,7 @@ exports.modifyNodeCont = async (ctx) => {
 // 删
 exports.deleteNodeCont = async (ctx) => {
   let sql = "DELETE FROM cont WHERE c_id=? && sort=?";
-  let array = [ctx.query.id, ctx.query.sort];
+  let array = [ctx.request.body.id, ctx.request.body.sort];
   await query(sql, array);
   return {
     resultsCode: 'success',

@@ -31,7 +31,7 @@ interface ImgListType {
   filename: string;
   cTime: string;
   url: string;
-};
+}
 
 @Component
 export default class PhotoWall extends Vue {

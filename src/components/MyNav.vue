@@ -46,7 +46,7 @@ interface TreeType {
   flabel: string;
   id: number;
   label: string;
-};
+}
 
 @Component
 export default class MyNav extends Vue {
@@ -77,24 +77,27 @@ export default class MyNav extends Vue {
 
   // 点击选择模块
   clickTabs(tabName: any) {
-    let name = this.type !== 'admin' ? tabName : `Admin${tabName}`;
-    this.$router.push({ name: name });
-    this.activeTab = name;
+    let pushname = this.type !== 'admin' ? tabName : `Admin${tabName}`;
+    this.$router.push({ name: pushname });
+    this.activeTab = pushname;
   }
 
   // 搜索
   @Watch('keyword')
   handleSearch() {
     if (this.keyword && this.keyword !== '') {
-      if (this.timer) clearTimeout(this.timer)
-      this.timer = setTimeout(async () => {
-        let res = await TreeHelper.searchTree(this.keyword);
-        if (res) {
-          this.searchList = res;
-          this.isSearch = true;
-          console.log(res);
-        }
-      }, 500);
+      if (this.timer) clearTimeout(this.timer);
+      this.timer = setTimeout(
+        async () => {
+          let res = await TreeHelper.searchTree(this.keyword);
+          if (res) {
+            this.searchList = res;
+            this.isSearch = true;
+            console.log(res);
+          }
+        },
+        500
+      );
     } else {
       this.isSearch = false;
     }
