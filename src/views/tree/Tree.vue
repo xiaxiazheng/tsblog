@@ -10,6 +10,10 @@
           :highlight-current="true"
           @node-click="handleClick"
           accordion>
+          <span class="custom-tree-node" slot-scope="{ node }">
+            <span :class="{ 'active': activeId === node.data.id }">{{node.label}}</span>
+            <!-- <span :class="{ 'active': activeId === node.data.id }">{{ node.label }}</span> -->
+          </span>
         </el-tree>
       </div>
     </transition>
@@ -42,6 +46,7 @@ export default class Tree extends Vue {
     label: 'label'
   };
   defaultExpandedKeys: any = [];
+  activeId: number = 0;  // 叶子节点的 id，三级节点的
   // 移动端相关
   splitWidth: number = 500;
   showTree: boolean = true;
@@ -79,7 +84,8 @@ export default class Tree extends Vue {
   async init() {
     if (this.$route.query.id) {  // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
       this.defaultExpandedKeys = []; // 前台展示的话直接清空
-      this.defaultExpandedKeys.push(parseInt(atob(<string>this.$route.query.id), 10));
+      this.activeId = parseInt(atob(<string>this.$route.query.id), 10);
+      this.defaultExpandedKeys.push(this.activeId);
     }
     this.tree = await TreeHelper.getTree('home');
   }
@@ -92,7 +98,7 @@ export default class Tree extends Vue {
           id: btoa(encodeURIComponent(node.data.id))
         }
       });
-
+      this.activeId = node.data.id;
       // 移动端
       this.showTree = false;
     }
@@ -130,6 +136,12 @@ export default class Tree extends Vue {
       vertical-align: top;
       .el-tree {
         padding: 10px 5px;
+        .custom-tree-node {
+          font-size: 14px;
+          .active {
+            color: #409eff;
+          }
+        }
       }
     }
     .rightcont {
@@ -166,6 +178,12 @@ export default class Tree extends Vue {
       vertical-align: top;
       .el-tree {
         padding: 10px 5px;
+        .custom-tree-node {
+          font-size: 14px;
+          .active {
+            color: #409eff;
+          }
+        }
       }
     }
     .slide-fade-enter-active {

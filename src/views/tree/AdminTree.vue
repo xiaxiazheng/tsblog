@@ -10,8 +10,8 @@
           :default-expanded-keys="expandedList"
           @node-click="handleClick"
           :expand-on-click-node="false">
-          <span class="custom-tree-node" slot-scope="{ node, data }" @mouseover="showIcon(node)" @mouseout="hideIcon(node)">
-            <span>{{ node.label }}</span>
+          <span class="custom-tree-node" slot-scope="{ node, data }" @mouseover="node.data.hovering=true" @mouseout="node.data.hovering=false">
+            <span :class="{ 'active': activeId === node.data.id }">{{ node.label }}</span>
             <span class="iconBox" v-if="node.data.hovering">
               <!-- 上移 -->
               <el-button type="text" size="mini" @click.stop="() => upordown(node, data, 'up')" v-if="node.previousSibling">
@@ -107,6 +107,7 @@ export default class AdminTree extends Vue {
     children: 'children',
     label: 'label'
   };
+  activeId: number = 0;  // 当前路由的id ，是三级节点 id
   // 传给子组件的名字
   propsname: string = '';
   // 保存当前默认展开的节点，不然一操作树init数据树就要折叠
@@ -138,8 +139,9 @@ export default class AdminTree extends Vue {
       console.log("isPC:", this.isPC);
       this.onWidthChange();
       if (this.$route.query.id) {
+        this.activeId = parseInt(atob(<string>this.$route.query.id), 10);
         // 如果有id就做节点展开，起码刷新的时候要把当前的节点存起来展开
-        this.expandedList.push(parseInt(atob(<string>this.$route.query.id), 10));
+        this.expandedList.push(this.activeId);
       }
       this.init();
     });
@@ -162,7 +164,11 @@ export default class AdminTree extends Vue {
 
   @Watch("$route")
   onRouteChange() {
-    this.saveFathExpend(null); // 这里要在刷新前保存节点
+    // 路由变化时，浏览器 id 的节点要打开
+    if (this.$route.query.id) {
+      this.activeId = parseInt(atob(<string>this.$route.query.id), 10);
+      this.expandedList.push(this.activeId);
+    }
     this.init();
   }
 
@@ -170,16 +176,6 @@ export default class AdminTree extends Vue {
   scrollToTop() {
     let div = this.$refs["rightcont"] as HTMLDivElement;
     div["scrollTop"] = 0;
-  }
-
-  // onmouseover时显示图标
-  showIcon(item: any) {
-    item.data.hovering = true;
-  }
-  
-  // onmouseout时隐藏图标
-  hideIcon(item: any) {
-    item.data.hovering = false;
   }
     
   // 点击节点，三个参数分别为传递给 data 属性的数组中该节点所对应的对象、节点对应的 Node、节点组件本身。
@@ -556,6 +552,9 @@ export default class AdminTree extends Vue {
       vertical-align: top;
       .el-tree {
         padding: 10px 5px;
+        .active {
+          color: #409eff;
+        }
       }
     }
     .rightcont {
@@ -606,6 +605,9 @@ export default class AdminTree extends Vue {
 // 移动端
 @media screen and (max-width: @splitWidth) {
   .admintree {
+    .active {
+      color: #409eff;
+    }
 		.custom-tree-node {
 			flex: 1;
 			display: flex;
