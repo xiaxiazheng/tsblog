@@ -58,7 +58,12 @@
 		<!-- 修改节点名称的dialog -->
 		<el-dialog title="提示" :visible.sync="showEditDialog" width="30%" :before-close="handleCloseDialog">
 			<span>{{notice}}</span>
-			<el-input v-model="motifyNode.newNodeName" placeholder="请输入内容" @keyup.native.enter="handleSaveNode"></el-input>
+			<el-input
+        v-model="motifyNode.newNodeName"
+        placeholder="请输入内容"
+        @keyup.native.enter="handleSaveNode"
+        autofocus
+        clearable></el-input>
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="handleCloseDialog">取 消</el-button>
 				<el-button type="primary" @click="handleSaveNode">确 定</el-button>

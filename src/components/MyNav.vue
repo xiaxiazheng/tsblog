@@ -9,7 +9,13 @@
       <div class="rightside">
         <!-- 搜索框 -->
         <div class="searchbox">
-          <el-input v-model="keyword" placeholder="搜索树的节点" prefix-icon="el-icon-search" clearable></el-input>
+          <el-input
+            v-model="keyword"
+            placeholder="搜索树的节点"
+            prefix-icon="el-icon-search"
+            @focus="handleSearch"
+            @blur="isSearch = false"
+            clearable></el-input>
           <transition name="slide-fade">
             <ul v-if="keyword !== '' && isSearch" class="searchtree ScrollBar">
               <li v-if="searchList.length === 0">
