@@ -330,74 +330,78 @@ export default class AdminTreeCont extends Vue {
     h1 {
       margin-bottom: 10px;
 		}
-		>div >ul {
-			width: 82.6%; /* 经过计算的，别乱改啊 */
-			li {
-				position: relative;
-				text-align: right;
-				margin-top: 5px;
-        // 小标题
-        .el-input {
-					margin-top: 10px;
+		>div {
+      width: 67%;
+      margin: 0 auto;
+      >ul {
+        width: 82.6%; /* 经过计算的，别乱改啊 */
+        li {
+          position: relative;
+          text-align: right;
+          margin-top: 5px;
+          // 小标题
+          .el-input {
+            margin-top: 10px;
+          }
+          // 内容输入框
+          .el-textarea {
+            margin-top: 10px;
+            >textarea {
+              display: inline-block;
+              overflow:hidden;
+              overflow-y: auto;
+              height: 100%;
+              resize: none;
+            }
+            >textarea::-webkit-scrollbar {
+              /*滚动条整体样式*/
+              width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
+              height: 7px;
+            }
+            >textarea::-webkit-scrollbar-thumb {
+              /*滚动条里面小方块*/
+              border-radius: .5rem;
+              box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+              -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+              background: #dcdfe6;
+            }
+            >textarea::-webkit-scrollbar-track {
+              /*滚动条里面轨道*/
+              box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+              -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+              border-radius: .5rem;
+              background: white;
+            }
+          }
+          /* 控制栏 */
+          .ctrlbox {
+            position: relative;
+            overflow: hidden;
+            .iconbox {
+              position: absolute;
+              left: 0;
+              top: -5px;
+            }
+            .time {
+              float: right;
+              color: #ccc;
+            }
+          }
+          /* 上传图片 */
+          .uploadtreecontimg {
+            position: absolute;
+            right: -157px;
+            top: 10px;
+            .alreadyhasone {
+              width: 148px;
+              .el-upload--picture-card {
+                display: none;
+              }
+            }
+          }
         }
-        // 内容输入框
-				.el-textarea {
-          margin-top: 10px;
-          >textarea {
-            display: inline-block;
-            overflow:hidden;
-            overflow-y: auto;
-            height: 100%;
-            resize: none;
-          }
-          >textarea::-webkit-scrollbar {
-            /*滚动条整体样式*/
-            width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
-            height: 7px;
-          }
-          >textarea::-webkit-scrollbar-thumb {
-            /*滚动条里面小方块*/
-            border-radius: .5rem;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-            background: #dcdfe6;
-          }
-          >textarea::-webkit-scrollbar-track {
-            /*滚动条里面轨道*/
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-            border-radius: .5rem;
-            background: white;
-          }
-        }
-        /* 控制栏 */
-				.ctrlbox {
-					position: relative;
-					overflow: hidden;
-					.iconbox {
-						position: absolute;
-						left: 0;
-						top: -5px;
-					}
-					.time {
-						float: right;
-						color: #ccc;
-					}
-        }
-        /* 上传图片 */
-				.uploadtreecontimg {
-					position: absolute;
-					right: -157px;
-					top: 10px;
-					.alreadyhasone {
-						width: 148px;
-						.el-upload--picture-card {
-						  display: none;
-						}
-					}
-				}
-			}
-		}
+      }
+    }
 		.button {
 			margin-top: 20px;
 			text-align: center;

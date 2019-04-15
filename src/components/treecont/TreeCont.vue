@@ -2,6 +2,7 @@
   <div class="treecont" ref="treecont">
     <div v-if="$route.query.id" class="treecontent">
       <h1>{{title}}</h1>
+      <!-- 内容 -->
       <ul>
         <li v-for="(item, index) in contObj.list" :key="index">
           <h2>
@@ -140,8 +141,8 @@ export default class TreeCont extends Vue {
     line-height: 1.5;
     .treecontent {
       h1 {
-        margin-bottom: 10px;
-        padding-right: 20px;
+        width: 64%;
+        margin: 0 auto 10px;
       }
       h2 {
         position: relative;
@@ -162,7 +163,8 @@ export default class TreeCont extends Vue {
         }
       }
       ul {
-        margin-top: 20px;
+        width: 64%;
+        margin: 20px auto 0;
         li {
           margin: 20px 0;
           .imgbox {
@@ -192,19 +194,41 @@ export default class TreeCont extends Vue {
       .mao {
         position: fixed;
         top: 115px;
-        right: 16px;
-        max-width: 11%;
+        right: 8px;
+        max-width: calc((100% - 20rem) * 0.15 - 11px);
+        max-height: calc(100% - 3.6rem - 130px);
+        padding-right: 3px;
         text-align: right;
         opacity: 0.3;
+        overflow-y: auto;
         >a {
           display: block;
           min-height: 20px;
           margin: 2px;
-          border-bottom: 1px solid rgba(0,0,0,0.1);
+          border-bottom: 1px solid #c0c5cb;
         }
       }
       .mao:hover {
         opacity: 0.9;
+      }
+      .mao::-webkit-scrollbar {
+        /*滚动条整体样式*/
+        width: 3px; /* 高宽分别对应横竖滚动条的尺寸 */
+        height: 7px;
+      }
+      .mao::-webkit-scrollbar-thumb {
+        /*滚动条里面小方块*/
+        border-radius: 0.5rem;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        background: #d2d5dc;
+      }
+      .mao::-webkit-scrollbar-track {
+        /*滚动条里面轨道*/
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        border-radius: 0.5rem;
+        background: white;
       }
     
       pre {
@@ -301,6 +325,7 @@ export default class TreeCont extends Vue {
         letter-spacing: 1px;
         line-height: 1.7;
         margin: 0 0 0.6rem 1px;
+        word-break: break-all;
       }
 
       .mao {

@@ -4,6 +4,7 @@
     <transition name="slide-fade">
       <div class="lefttree ScrollBar" v-if="showTree || isPC">
         <el-tree
+          ref="admintree"
           :data="tree"
           :props="defaultProps"
           node-key="id"
@@ -47,6 +48,10 @@
       <i v-if="showTree" class="el-icon-arrow-left"></i>
       <i v-if="!showTree" class="el-icon-arrow-right"></i>
     </div>
+    <!-- 给移动端滚回页面上方 -->
+    <div class="scrolltop" v-if="!isPC && !showTree">
+      <i  @click="scrollToTop" class="el-icon-arrow-up"></i>
+    </div>
 		<!-- 右边的子组件 -->
 		<div class="rightcont ScrollBar" ref="rightcont" v-if="!showTree || isPC">
       <!-- 切换按键 -->
@@ -59,10 +64,10 @@
 		<el-dialog title="提示" :visible.sync="showEditDialog" width="30%" :before-close="handleCloseDialog">
 			<span>{{notice}}</span>
 			<el-input
+        ref="editinput"
         v-model="motifyNode.newNodeName"
         placeholder="请输入内容"
         @keyup.native.enter="handleSaveNode"
-        autofocus
         clearable></el-input>
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="handleCloseDialog">取 消</el-button>
@@ -192,9 +197,12 @@ export default class AdminTree extends Vue {
         }
       });
       this.propsname = node.data.label;
-      this.saveFathExpend(node);
       // 移动端
       this.showTree = false;
+      // 等页面挂载了再触发
+      setTimeout(() => {
+        this.scrollToTop();
+      }, 0);
     }
   }
 
@@ -223,7 +231,7 @@ export default class AdminTree extends Vue {
     let res = await TreeHelper.addTreeNode(params);
     if (res) {
       this.$message.success('新增成功');
-      this.saveFathExpend(node);
+      this.saveFathExpend();  // 保存树节点折叠/展开信息
       this.init();
     } else {
       this.$message.error('新增失败');
@@ -259,7 +267,7 @@ export default class AdminTree extends Vue {
                 let res = await TreeHelper.deleteTreeNode(params);
                 if (res) {
                   this.$message.success('删除成功');
-                  this.saveFathExpend(null);
+                  this.saveFathExpend();  // 保存树节点折叠/展开信息
                   this.init();
                   // 如果删除的是当前路由 id 的节点，就改变传给子组件的值，传字符串过去清除路由
                   if (data.id === parseInt(atob(<string>this.$route.query.id), 10)) {
@@ -296,7 +304,7 @@ export default class AdminTree extends Vue {
         let res = await TreeHelper.deleteTreeNode(params);
         if (res) {
           this.$message.success('删除成功');
-          this.saveFathExpend(null);
+          this.saveFathExpend();  // 保存树节点折叠/展开信息
           this.init();
           // 改变传过去的值，清除路由
           this.propsname = '';
@@ -327,7 +335,7 @@ export default class AdminTree extends Vue {
         let res = await TreeHelper.deleteTreeNode(params);
         if (res) {
           this.$message.success('删除成功');
-          this.saveFathExpend(null);
+          this.saveFathExpend(); // 保存树节点折叠/展开信息
           this.init();
           // 改变传过去的值，清除路由
           this.propsname = '';
@@ -358,6 +366,11 @@ export default class AdminTree extends Vue {
       newNodeName: data.label,
     };
     this.showEditDialog = true;
+    // 等上面的盒子挂载到页面了才可以获取到
+    setTimeout(() => {  /* 建立宏任务，等待当前事件循环结束以及渲染后，执行这个代码 */
+      let editinput: any = this.$refs.editinput;
+      editinput.focus();  /* 使输入框获得焦点 */
+    }, 0);
   }
 
   // 保存修改的节点名称
@@ -381,6 +394,7 @@ export default class AdminTree extends Vue {
         this.propsname = this.motifyNode.newNodeName;  // 保证修改的值能直接传给子组件，因为改了值路由没变，子组件不会刷新
       }
       this.motifyNode.newNodeName = '';
+      this.saveFathExpend();  // 保存树节点折叠/展开信息
     } else {
       this.$message.error('修改失败');
     }
@@ -404,7 +418,6 @@ export default class AdminTree extends Vue {
     this.shuttleChildId = data.id;
     this.shuttleChildLabel = data.label;
     this.showShuttleDialog = true;
-    this.saveFathExpend(node);
   }
 
   // 保存穿梭
@@ -453,6 +466,7 @@ export default class AdminTree extends Vue {
     if (res) {
       this.$message.success('穿梭成功');
       this.showShuttleDialog = false;
+      this.saveFathExpend();
       this.init();
     } else {
       this.$message.error('穿梭失败');
@@ -486,6 +500,7 @@ export default class AdminTree extends Vue {
     if (res) {
       type === 'up' ? this.$message.success('上移成功') : this.$message.success('下移成功');
       this.init();
+      this.saveFathExpend();
     } else {
       type === 'up' ? this.$message.error('上移失败') : this.$message.error('下移失败');
     }
@@ -505,24 +520,18 @@ export default class AdminTree extends Vue {
   }
 
   // 保存当前一二级节点们的展开状态
-  saveFathExpend(node: any) {
-    if (node) {
-      let list = [];
-      if (node.level === 1) {  // 一级节点
-        list = node.parent.childNodes;
-      } else if (node.level === 2) {  // 二级节点
-        list = node.parent.parent.childNodes;
-      } else {  // 三级节点
-        list = node.parent.parent.parent.childNodes;
-      }
-      this.allNodelist = list;
-    }
+  saveFathExpend() {
+    // 获取树的 dom 节点
+    const treedom: any = this.$refs.admintree;
+    // 获取树的数组
+    const treelist = treedom.$children;
     this.expandedList = [];
-    for (let item of this.allNodelist) {
-      if (item.expanded) { // 在一级节点展开的情况下才保存它下级节点的展开情况
-        this.expandedList.push(item.data.id);
-        for (let jtem of item.childNodes) {
-          if (jtem.expanded) {
+    // 保存一二级的展开状态就行了
+    for (let item of treelist) {
+      if (item.expanded) {  // 在一级节点展开的情况下才保存它下级节点的展开情况
+        this.expandedList.push(item.node.data.id);
+        for (let jtem of item.node.childNodes) {
+          if (jtem.expanded) {  // 同理，在二级节点展开时才保存
             this.expandedList.push(jtem.data.id);
           }
         }
@@ -568,14 +577,12 @@ export default class AdminTree extends Vue {
       box-sizing: border-box;
       vertical-align: top;
       .admincont {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 2rem 2.5rem;
+        width: 100%;
+        padding: 3rem 0;
       }
       .treecont {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 2rem 2.5rem;
+        width: 100%;
+        padding: 3rem 0;
       }
     }
     .hiddentree {
@@ -649,16 +656,20 @@ export default class AdminTree extends Vue {
     .lefttree, .rightcont {
       width: 100%;
     }
-    .hidetree {
+    .hidetree, .scrolltop {
       position: absolute;
       bottom: 5px;
       left: 9px;
-      opacity: 0.7;
+      opacity: 0.5;
       z-index: 2;
       padding: 15px 20px;
       background-color: white;
       border-radius: 3px;
       border: 1px solid #ccc;
+    }
+    .scrolltop {
+      right: 9px;
+      left: unset;
     }
   }
 }
