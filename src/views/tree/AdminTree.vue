@@ -184,8 +184,8 @@ export default class AdminTree extends Vue {
 
   // 滚动到顶部，给子组件调用的
   scrollToTop() {
-    let div = this.$refs["rightcont"] as HTMLDivElement;
-    div["scrollTop"] = 0;
+    let div = this.$refs.rightcont as HTMLDivElement;
+    div.scrollTop = 0;
   }
     
   // 点击节点，三个参数分别为传递给 data 属性的数组中该节点所对应的对象、节点对应的 Node、节点组件本身。
@@ -200,9 +200,12 @@ export default class AdminTree extends Vue {
       // 移动端
       this.showTree = false;
       // 等页面挂载了再触发
-      setTimeout(() => {
-        this.scrollToTop();
-      }, 0);
+      setTimeout(
+        () => {
+          this.scrollToTop();
+        },
+        0
+      );
     }
   }
 
@@ -367,10 +370,13 @@ export default class AdminTree extends Vue {
     };
     this.showEditDialog = true;
     // 等上面的盒子挂载到页面了才可以获取到
-    setTimeout(() => {  /* 建立宏任务，等待当前事件循环结束以及渲染后，执行这个代码 */
-      let editinput: any = this.$refs.editinput;
-      editinput.focus();  /* 使输入框获得焦点 */
-    }, 0);
+    setTimeout(
+      () => {  /* 建立宏任务，等待当前事件循环结束以及渲染后，执行这个代码 */
+        let editinput = this.$refs.editinput as HTMLDivElement;
+        editinput.focus();  /* 使输入框获得焦点 */
+      },
+      0
+    );
   }
 
   // 保存修改的节点名称
