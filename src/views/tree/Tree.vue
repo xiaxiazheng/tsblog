@@ -149,16 +149,6 @@ export default class Tree extends Vue {
       border-left: 1px solid #eaecef;
       box-sizing: border-box;
       vertical-align: top;
-      .admincont {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 2rem 2.5rem;
-      }
-      .treecont {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 2rem 2.5rem;
-      }
     }
     .hiddentree {
       display: none;

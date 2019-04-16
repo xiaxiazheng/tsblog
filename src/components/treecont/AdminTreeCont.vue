@@ -1,6 +1,6 @@
 <template>
   <div class="admincont">
-	  <div v-if="$route.query.id">
+	  <div v-if="$route.query.id" class="admincontent">
       <h1>{{title}}</h1>
 			<ul>
 				<li v-for="(item, index) in contObj.list" :key="index">
@@ -70,7 +70,7 @@
 				<img width="100%" :src="dialogImageUrl" :alt="dialogImageName" :title="dialogImageName">
 			</el-dialog>
 		</div>
-		<div v-else>
+		<div class="treemainbox" v-else>
 			<TreeMain type="admin" @scrollToTop="scrollToTop"></TreeMain>
 		</div>
   </div>
@@ -326,13 +326,13 @@ export default class AdminTreeCont extends Vue {
 @media screen and (min-width: @splitWidth) {
   .admincont {
 		text-align: left;
-		padding: 10px;
-    h1 {
-      margin-bottom: 10px;
-		}
-		>div {
+    padding: 10px;
+    .admincontent {
       width: 67%;
       margin: 0 auto;
+      h1 {
+        margin-bottom: 10px;
+      }
       >ul {
         width: 82.6%; /* 经过计算的，别乱改啊 */
         li {
@@ -401,20 +401,24 @@ export default class AdminTreeCont extends Vue {
           }
         }
       }
+      .button {
+        margin-top: 20px;
+        text-align: center;
+      }
+      .save {
+        position: fixed;
+        text-align: center;
+        right: 4.5rem;
+        bottom: 2rem;
+      }
+      .el-dialog {
+        max-width: 800px;
+        min-width: 400px;
+      }      
     }
-		.button {
-			margin-top: 20px;
-			text-align: center;
-		}
-		.save {
-			position: fixed;
-			text-align: center;
-			right: 4.5rem;
-			bottom: 2rem;
-    }
-    .el-dialog {
-      max-width: 800px;
-      min-width: 400px;
+    .treemainbox {
+      width: 67%;
+      margin: 0 auto;
     }
   }
 }

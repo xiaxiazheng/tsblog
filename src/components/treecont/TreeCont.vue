@@ -28,7 +28,7 @@
         <img width="100%" :src="dialogImageUrl" :alt="dialogImageName" :title="dialogImageName">
       </el-dialog>
     </div>
-    <div v-else>
+    <div v-else class="treemainbox">
       <TreeMain type="home" @scrollToTop="scrollToTop"></TreeMain>
     </div>
   </div>
@@ -140,9 +140,10 @@ export default class TreeCont extends Vue {
     text-align: left;
     line-height: 1.5;
     .treecontent {
+      width: 67%;
+      margin: 0 auto;
       h1 {
-        width: 64%;
-        margin: 0 auto 10px;
+        margin-bottom: 10px;
       }
       h2 {
         position: relative;
@@ -163,8 +164,7 @@ export default class TreeCont extends Vue {
         }
       }
       ul {
-        width: 64%;
-        margin: 20px auto 0;
+        margin-top: 20px;
         li {
           margin: 20px 0;
           .imgbox {
@@ -265,14 +265,18 @@ export default class TreeCont extends Vue {
         border-radius: 0.5rem;
         background: #282c34;
       }
+
+      .el-dialog {
+        max-width: 800px;
+        min-width: 400px;
+        img {
+          max-width: 100%;
+        }
+      }      
     }
-    
-    .el-dialog {
-      max-width: 800px;
-      min-width: 400px;
-      img {
-        max-width: 100%;
-      }
+    .treemainbox {
+      width: 67%;
+      margin: 0 auto;
     }
   }
 }
