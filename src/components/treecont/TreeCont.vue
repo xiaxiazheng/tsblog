@@ -186,9 +186,10 @@ export default class TreeCont extends Vue {
         }
       }
       p {
+        margin: 0 0 0.6rem 1px;
         font-size: 1rem;
         line-height: 1.7;
-        margin: 0 0 0.6rem 1px;
+        word-break: break-all;
       }
 
       .mao {

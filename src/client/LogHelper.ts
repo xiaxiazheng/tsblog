@@ -10,7 +10,7 @@ export namespace LogHelper {
   }
 
   export async function getLogListByMTime(params: any): Promise<any> {
-    const data = await axiosPostHelper(`${baseUrl}/loglistbyctime`, params);
+    const data = await axiosPostHelper(`${baseUrl}/loglistbymtime`, params);
     return data && data.resultsCode === 'success' ? data.data : false;
   }
 
