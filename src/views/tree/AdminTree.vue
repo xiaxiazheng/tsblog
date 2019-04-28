@@ -175,12 +175,9 @@ export default class AdminTree extends Vue {
 
   @Watch("$route")
   onRouteChange() {
-    // 路由变化时，浏览器 id 的节点要打开
     if (this.$route.query.id) {
       this.activeId = parseInt(atob(<string>this.$route.query.id), 10);
-      this.expandedList.push(this.activeId);
     }
-    this.init();
   }
 
   // 滚动到顶部，给子组件调用的
@@ -234,9 +231,9 @@ export default class AdminTree extends Vue {
     }
     let res = await TreeHelper.addTreeNode(params);
     if (res) {
+      this.saveTreeExpend();  // 保存树节点折叠/展开信息
       await this.init();
       this.$message.success('新增成功');
-      this.saveFathExpend();  // 保存树节点折叠/展开信息
     } else {
       this.$message.error('新增失败');
     }
@@ -270,9 +267,9 @@ export default class AdminTree extends Vue {
                 };
                 let res = await TreeHelper.deleteTreeNode(params);
                 if (res) {
+                  this.saveTreeExpend();  // 保存树节点折叠/展开信息
                   await this.init();
                   this.$message.success('删除成功');
-                  this.saveFathExpend();  // 保存树节点折叠/展开信息
                   // 如果删除的是当前路由 id 的节点，就改变传给子组件的值，传字符串过去清除路由
                   if (data.id === parseInt(atob(<string>this.$route.query.id), 10)) {
                     this.propsname = '';
@@ -307,9 +304,9 @@ export default class AdminTree extends Vue {
         };
         let res = await TreeHelper.deleteTreeNode(params);
         if (res) {
+          this.saveTreeExpend();  // 保存树节点折叠/展开信息
           await this.init();
           this.$message.success('删除成功');
-          this.saveFathExpend();  // 保存树节点折叠/展开信息
           // 改变传过去的值，清除路由
           this.propsname = '';
         } else {
@@ -338,9 +335,9 @@ export default class AdminTree extends Vue {
         };
         let res = await TreeHelper.deleteTreeNode(params);
         if (res) {
+          this.saveTreeExpend(); // 保存树节点折叠/展开信息
           await this.init();
           this.$message.success('删除成功');
-          this.saveFathExpend(); // 保存树节点折叠/展开信息
           // 改变传过去的值，清除路由
           this.propsname = '';
         } else {
@@ -393,6 +390,7 @@ export default class AdminTree extends Vue {
     };
     let res: any = await TreeHelper.modifyTreeNode(params);
     if (res) {
+      this.saveTreeExpend();  // 保存树节点折叠/展开信息
       await this.init();
       this.$message.success('修改成功');
       this.showEditDialog = false;
@@ -401,7 +399,6 @@ export default class AdminTree extends Vue {
         this.propsname = this.motifyNode.newNodeName;  // 保证修改的值能直接传给子组件，因为改了值路由没变，子组件不会刷新
       }
       this.motifyNode.newNodeName = '';
-      this.saveFathExpend();  // 保存树节点折叠/展开信息
     } else {
       this.$message.error('修改失败');
     }
@@ -471,10 +468,10 @@ export default class AdminTree extends Vue {
     }
     let res: any = await TreeHelper.changeFather(params);
     if (res) {
+      this.saveTreeExpend();
       await this.init();
       this.$message.success('穿梭成功');
       this.showShuttleDialog = false;
-      this.saveFathExpend();
     } else {
       this.$message.error('穿梭失败');
     }
@@ -505,11 +502,11 @@ export default class AdminTree extends Vue {
     
     let res: any = await TreeHelper.changeSort(params);
     if (res) {
+      this.saveTreeExpend();
       await this.init();
-      type === 'up' ? this.$message.success('上移成功') : this.$message.success('下移成功');
-      this.saveFathExpend();
+      this.$message.success(`${ type === 'up' ? '上移' : '下移' }成功`);
     } else {
-      type === 'up' ? this.$message.error('上移失败') : this.$message.error('下移失败');
+      this.$message.success(`${ type === 'up' ? '上移' : '下移' }失败`);
     }
   }
 
@@ -527,7 +524,7 @@ export default class AdminTree extends Vue {
   }
 
   // 保存当前一二级节点们的展开状态
-  saveFathExpend() {
+  saveTreeExpend() {
     // 获取树的 dom 节点
     const treedom: any = this.$refs.admintree;
     // 获取树的数组
