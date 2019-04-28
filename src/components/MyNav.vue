@@ -75,7 +75,7 @@ export default class MyNav extends Vue {
 
   init() {
     if (baseEnv === "productionPig") {
-      this.titlehome = "黄苹苹欢迎你的到来";
+      this.titlehome = "燕苹的小站";
       this.titleadmin = "黄猪猪欢迎你的到来";
     }
     this.activeTab = this.$route.name || '';  // 刷新页面时初始化高亮的 tab
