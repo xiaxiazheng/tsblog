@@ -76,7 +76,7 @@ export default class MyNav extends Vue {
   init() {
     if (baseEnv === "productionPig") {
       this.titlehome = "燕苹的小站";
-      this.titleadmin = "黄猪猪欢迎你的到来";
+      this.titleadmin = "猪猪的小站";
     }
     this.activeTab = this.$route.name || '';  // 刷新页面时初始化高亮的 tab
   }
@@ -99,7 +99,6 @@ export default class MyNav extends Vue {
           if (res) {
             this.searchList = res;
             this.isSearch = true;
-            console.log(res);
           }
         },
         500
@@ -116,7 +115,8 @@ export default class MyNav extends Vue {
       this.$router.replace({
         name: "Tree",
         query: {
-          id: btoa(encodeURIComponent(item.c_id))
+          id: btoa(encodeURIComponent(item.c_id)),
+          isSearch: 'true'
         }
       });
     }
@@ -124,7 +124,8 @@ export default class MyNav extends Vue {
       this.$router.replace({
         name: "AdminTree",
         query: {
-          id: btoa(encodeURIComponent(item.c_id))
+          id: btoa(encodeURIComponent(item.c_id)),
+          isSearch: 'true'
         }
       });
     }
