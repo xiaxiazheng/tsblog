@@ -12,9 +12,9 @@
       <i class="el-icon-plus"></i>
     </el-upload>
     <!-- 查看大图的 dialog -->
-    <el-dialog width="40%" :visible.sync="dialogVisible" :title="dialogImageName">
+    <el-dialog :visible.sync="dialogVisible" :title="dialogImageName">
       <img width="100%" :src="dialogImageUrl" alt="">
-      <span>{{ dialogCTime }}</span>
+      <span class="createtime">{{ dialogCTime }}</span>
     </el-dialog>
   </div>
 </template>
@@ -116,8 +116,9 @@ export default class UploadPhotoWall extends Vue {
   .uploadphotowall {
     height: 100%;
     .el-dialog {
-      max-width: 800px;
-      min-width: 400px;
+      .createtime {
+        margin-top: 10px;
+      }
     }
   } 
 }

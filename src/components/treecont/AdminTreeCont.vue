@@ -66,7 +66,7 @@
 				<el-button type="primary" @click="saveText" :disabled="!isModify" icon="el-icon-check"></el-button>
 			</div>
 			<!-- 查看大图的 dialog -->
-			<el-dialog width="40%" :visible.sync="dialogVisible" :title="dialogImageName">
+			<el-dialog :visible.sync="dialogVisible" :title="dialogImageName">
 				<img width="100%" :src="dialogImageUrl" :alt="dialogImageName" :title="dialogImageName">
 			</el-dialog>
 		</div>
@@ -411,10 +411,6 @@ export default class AdminTreeCont extends Vue {
         right: 4.5rem;
         bottom: 2rem;
       }
-      .el-dialog {
-        max-width: 800px;
-        min-width: 400px;
-      }      
     }
     .treemainbox {
       width: 67%;
@@ -484,10 +480,6 @@ export default class AdminTreeCont extends Vue {
         height: 36px;
         padding: 0;
       }
-    }
-    .el-dialog {
-      max-width: 800px;
-      min-width: 400px;
     }
   }
 }

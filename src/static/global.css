@@ -11,6 +11,50 @@
   max-width: 420px;
   width: 100%;
 }
+.el-dialog__wrapper {
+  display: flex;
+  align-items: center;
+}
+.el-dialog__wrapper > .el-dialog {
+  width: unset;
+  max-width: 70%;
+  min-width: 400px;
+  max-height: 95%;
+  margin: 0 auto;
+  margin-top: unset !important;
+  /* 进度条全局样式 */
+  display: inline-block;
+  overflow: hidden;
+  overflow-y: auto;
+}
+.el-dialog__wrapper > .el-dialog > .el-dialog__header {
+  position: sticky;
+  top: 0;
+  background: white;
+}
+.el-dialog__wrapper > .el-dialog > .el-dialog__body > span {
+  display: inline-block;
+}
+.el-dialog__wrapper > .el-dialog::-webkit-scrollbar {
+  /*滚动条整体样式*/
+  width: 7px;
+  /* 高宽分别对应横竖滚动条的尺寸 */
+  height: 7px;
+}
+.el-dialog__wrapper > .el-dialog::-webkit-scrollbar-thumb {
+  /*滚动条里面小方块*/
+  border-radius: .5rem;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  background: #dcdfe6;
+}
+.el-dialog__wrapper > .el-dialog::-webkit-scrollbar-track {
+  /*滚动条里面轨道*/
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: .5rem;
+  background: white;
+}
 /* 进度条全局样式 */
 .ScrollBar {
   display: inline-block;

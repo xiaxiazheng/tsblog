@@ -12,9 +12,9 @@
           @click="photoPreview(item)">
       </div>
       <!-- 预览 -->
-      <el-dialog width="70%" :visible.sync="dialogVisible" :title="dialogImageName">
+      <el-dialog :visible.sync="dialogVisible" :title="dialogImageName">
         <img width="100%" :src="dialogImageUrl" alt="">
-        <span>{{ dialogCTime }}</span>
+        <span class="createtime">{{ dialogCTime }}</span>
       </el-dialog>
     </div>
   </div>
@@ -75,9 +75,7 @@ export default class PhotoWall extends Vue {
 </script>
 
 <style lang="less">
-@splitWidth: 500px;
 
-// @media screen and (min-width: @splitWidth) {
   .photowall {
     .photowall-main {
       width: calc(100% - 20px);
@@ -114,15 +112,10 @@ export default class PhotoWall extends Vue {
         >span {
           display: inline-block;
           margin-top: 6px;
+          margin-top: 10px;
           color: #9dbbda;
         }
       }
     }
   }
-// }
-
-// 移动端
-// @media screen and (max-width: @splitWidth) {
-  
-// }
 </style>

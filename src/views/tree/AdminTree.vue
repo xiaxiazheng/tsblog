@@ -61,8 +61,8 @@
 			<TreeCont v-if="!isEdit" :propsname="propsname" @scrollToTop="scrollToTop"></TreeCont>
 		</div>
 		<!-- 修改节点名称的dialog -->
-		<el-dialog title="提示" :visible.sync="showEditDialog" width="30%" :before-close="handleCloseDialog">
-			<span>{{notice}}</span>
+		<el-dialog class="editname" title="提示" :visible.sync="showEditDialog" width="30%" :before-close="handleCloseDialog">
+			<span class="notice">{{notice}}</span>
 			<el-input
         ref="editinput"
         v-model="motifyNode.newNodeName"
@@ -357,13 +357,13 @@ export default class AdminTree extends Vue {
   motify(node: any, data: any) {
     let level = node.level;
     if (level === 3) {
-      this.notice = '修改三级节点名称';
+      this.notice = '修改三级节点名称：';
     }
     if (level === 2) {
-      this.notice = '修改二级节点名称';
+      this.notice = '修改二级节点名称：';
     }
     if (level === 1) {
-      this.notice = '修改一级节点名称';
+      this.notice = '修改一级节点名称：';
     }
     this.motifyNode = {
       id: data.id,
@@ -592,6 +592,12 @@ export default class AdminTree extends Vue {
         width: 100%;
         padding: 3rem 0;
       }
+      .el-switch {
+        position: fixed;
+        right: 30px;
+        top: 80px;
+        z-index: 2;
+			}
     }
     .hiddentree {
       display: none;
@@ -611,14 +617,17 @@ export default class AdminTree extends Vue {
 				z-index: 2;
 			}
 		}
-		.rightcont {
-			.el-switch {
-        position: fixed;
-        right: 30px;
-        top: 80px;
-        z-index: 2;
-			}
-		}
+    .editname {
+      .notice {
+        width: 130px;
+        text-align: right;
+        vertical-align: middle;
+      }
+      .el-input {
+        width: calc(100% - 130px);
+        vertical-align: middle;
+      }
+    }
   }
 }
 
