@@ -1,13 +1,14 @@
 // 前端访问路径及所在环境
 let url: string = "";
 let env: string = "";
+let host: string = "http://www.xiaxiazheng.cn";
 if (process.env.NODE_ENV.match('production')) {
   if  (process.env.VUE_APP_TITLE.match('hyp')) {
-    url = 'http://123.207.5.131:518';
+    url = `${host}:518`;
     env = "productionPig";    
   }
   if (process.env.VUE_APP_TITLE.match('zyb')) {
-    url = 'http://123.207.5.131:3000';
+    url = `${host}:3000`;
     env = "production";
   }
 }

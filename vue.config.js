@@ -18,8 +18,6 @@ module.exports = {
       'axios': "axios",
       "vuex": "Vuex",
       "vue2-editor": "Vue2Editor",
-      "svg.js": "SVG",
-      "svg.draggable.js/dist/svg.draggable.js": "SVG",
     },
   }
 }
