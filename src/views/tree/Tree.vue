@@ -73,6 +73,7 @@ export default class Tree extends Vue {
   @Watch("$route")
   onRouteChanged() {
     this.init();
+    this.scrollToTop();
   }
 
   // 滚动到顶部，给子组件调用的
@@ -86,6 +87,9 @@ export default class Tree extends Vue {
       this.defaultExpandedKeys = []; // 前台展示的话直接清空
       this.activeId = parseInt(atob(<string>this.$route.query.id), 10);
       this.defaultExpandedKeys.push(this.activeId);
+    } else {
+      this.defaultExpandedKeys = [];
+      this.activeId = -1;
     }
     this.tree = await TreeHelper.getTree('home');
   }

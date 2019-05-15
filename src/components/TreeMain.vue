@@ -258,14 +258,16 @@ export default class TreeMain extends Vue {
       this.$router.replace({
         name: "Tree",
         query: {
-          id: btoa(encodeURIComponent(item.c_id))
+          id: btoa(encodeURIComponent(item.c_id)),
+          isSearch: 'true'
         }
       });
     } else {
       this.$router.replace({
         name: "AdminTree",
         query: {
-          id: btoa(encodeURIComponent(item.c_id))
+          id: btoa(encodeURIComponent(item.c_id)),
+          isSearch: 'true'
         }
       });
     }

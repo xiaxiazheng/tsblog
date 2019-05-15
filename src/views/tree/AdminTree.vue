@@ -177,11 +177,15 @@ export default class AdminTree extends Vue {
   onRouteChange() {
     if (this.$route.query.id) {
       this.activeId = parseInt(atob(<string>this.$route.query.id), 10);
+    } else {
+      this.expandedList = [];
+      this.activeId = -1;
     }
     // 只有在搜索造成路由变化的时候，才会主动推进该数组
     if (this.$route.query.isSearch) {
       this.expandedList.push(this.activeId);
     }
+    this.scrollToTop();
   }
 
   // 滚动到顶部，给子组件调用的

@@ -11,7 +11,8 @@
 						type="textarea"
 						:autosize="{ minRows: 3, maxRows: 15 }"
 						placeholder="请输入内容"
-						v-model="item.cont">
+						v-model="item.cont"
+            autocomplete='on'>
 					</el-input>
 					<!-- 左下角的各种控制按键 -->
 					<div class="ctrlbox">
