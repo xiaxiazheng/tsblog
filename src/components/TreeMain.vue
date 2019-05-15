@@ -258,15 +258,21 @@ export default class TreeMain extends Vue {
         name: "Tree",
         query: {
           id: btoa(encodeURIComponent(item.c_id)),
-          isSearch: 'true'
+          isSearch: 'true',
+          searchSort: item.sort
         }
       });
+      // this.$router.replace({
+      //   path: `tree?id=${btoa(encodeURIComponent(item.c_id))}&isSearch=true#${item.c_id}-${item.sort}`
+      // })
+      console.log('点击搜索结果', item);
     } else {
       this.$router.replace({
         name: "AdminTree",
         query: {
           id: btoa(encodeURIComponent(item.c_id)),
-          isSearch: 'true'
+          isSearch: 'true',
+          searchSort: item.sort
         }
       });
     }

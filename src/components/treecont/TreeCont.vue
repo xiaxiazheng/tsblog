@@ -6,7 +6,12 @@
       <ul>
         <li v-for="(item, index) in contObj.list" :key="index">
           <h2>
-            <a :href="'#' + item.title + item.sort" :name="item.title + item.sort">{{item.title}}</a>
+            <a
+              :class="{ 'activeSearch': $route.query.searchSort == item.sort }"
+              :href="`#${contObj.id}-${item.sort}`"
+              :name="`${contObj.id}-${item.sort}`">
+              {{item.title}}
+            </a>
             <span v-if="contObj.list">
               修改时间：
               <span>{{item.motifytime}}</span>
@@ -21,7 +26,11 @@
       </ul>
       <!-- 右边的锚点们 -->
       <div class="mao">
-        <a v-for="(item, index) in contObj.list" :key="index" :href="'#' + item.title + item.sort">{{item.title}}</a>
+        <a
+          v-for="(item, index) in contObj.list"
+          :key="index"
+          :class="{ 'activeSearch': $route.query.searchSort == item.sort }"
+          :href="`#${contObj.id}-${item.sort}`">{{item.title}}</a>
       </div>
       <!-- 查看大图的 dialog -->
       <el-dialog :visible.sync="dialogVisible" :title="dialogImageName">
@@ -59,6 +68,7 @@ export default class TreeCont extends Vue {
   contObj: ContType = {
     list: []
   };
+  // searchSort: string = -1;
   baseImgUrl: string = `${baseImgUrl}/treecont/`;
   dialogVisible: boolean = false;
   dialogImageName: string = "";
@@ -154,6 +164,9 @@ export default class TreeCont extends Vue {
           display: inline-block;
           height: 40px;
           line-height: 40px;
+          &.activeSearch {
+            color: #ecac61;
+          }
         }
         > span {
           position: absolute;
@@ -207,6 +220,9 @@ export default class TreeCont extends Vue {
           min-height: 20px;
           margin: 2px;
           border-bottom: 1px solid #c0c5cb;
+          &.activeSearch {
+            color: #ecac61;
+          }
         }
       }
       .mao:hover {
