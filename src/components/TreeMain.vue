@@ -146,7 +146,6 @@ export default class TreeMain extends Vue {
       pageNo: 1,
       pageSize: 5
     };
-    console.log(this.keywords);
     // if (this.keywords.length !== 0) {
     //   Vue.set(params, 'keywords', this.keywords);
     // }

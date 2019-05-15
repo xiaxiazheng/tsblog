@@ -2,7 +2,17 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
+// const scrollBehavior = function (to: any, from: any, savedPosition: any) {
+//   if (to.hash) {
+//     return {
+//       // 通过 to.hash 的值來找到对应的元素
+//       selector: to.hash
+//     };
+//   }
+// };
+
 export default new VueRouter({
+  // scrollBehavior,
   mode: 'history',
   routes: [
     {

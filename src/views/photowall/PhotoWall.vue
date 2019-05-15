@@ -61,7 +61,6 @@ export default class PhotoWall extends Vue {
           url: `${baseImgUrl}/wall/${item.filename}`
         });
       }
-      console.log(this.imgUrllist);
     }
   }
 
