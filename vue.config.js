@@ -1,4 +1,4 @@
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = {
   // assetsDir: "static", // 会全部打包到static文件夹中
   configureWebpack: {
@@ -18,6 +18,7 @@ module.exports = {
       'axios': "axios",
       "vuex": "Vuex",
       "vue2-editor": "Vue2Editor",
+      'marked': 'marked',
     },
   }
 }
