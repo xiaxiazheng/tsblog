@@ -18,11 +18,11 @@
             v-if="totalNumber !== 0">
           </el-pagination>
         </div>
-        <ul>
+        <ul class="log-list">
           <li v-for="(item, index) of list" :key="index" @click="choiceLog(item.log_id)">
             <div>
-              <span class="title">{{item.title}}</span>
-              <span class="author">{{item.author}}</span>
+              <span class="title" :title="item.title">{{item.title}}</span>
+              <span class="author" :title="item.author">{{item.author}}</span>
             </div>
             <div>
               <span class="time" v-if="sortType === 'create'">创建时间：{{item.cTime}}</span>
@@ -34,8 +34,7 @@
     </transition>
     <!-- 日志详情 -->
     <div class="logdetail ScrollBar" v-if="showCont">
-      <el-button class="backlist" type="info" icon="el-icon-back" plain @click="backLogList"></el-button>
-      <LogCont></LogCont>
+      <LogCont :backLogList="backLogList"></LogCont>
     </div>
   </div>
 </template>
@@ -163,7 +162,7 @@ export default class AdminLog extends Vue {
         top: 80px;
         z-index: 2;
       }
-      >ul {
+      .log-list {
         margin: 10px 50px;
         >li {
           display: flex;
@@ -174,27 +173,45 @@ export default class AdminLog extends Vue {
           box-sizing: border-box;
           text-align: left;
           cursor: pointer;
-          >div {
+          &:hover {
+            color: #409EFF;
+          }
+          &:last-child {
+            border-color: transparent;
+          }
+          >div:first-child {
+            width: calc(100% - 13rem);
             >span {
-              margin: 0 15px;
+              display: inline-block;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: nowrap;
+              vertical-align: middle;
+              &:first-child {
+                width: calc(100% - 5rem);
+                margin: 0 0.5rem;
+                font-size: 14px;
+              }
+              &:last-child {
+                width: 4rem;
+              }
             }
           }
-          .title {
-            font-size: 14px;
+          >div:last-child {
+            width: 13rem;
+            text-align: right;
+            >span {
+              margin-right: 0.5rem;
+            }
           }
           .author, .time {
             color: #ccc;
           }
         }
-        >li:hover {
-          color: #409EFF;
-        }
-        >li:last-child {
-          border-color: transparent;
-        }
       }
     }
     .logdetail {
+      width: 100%;
       height: calc(100% - 44px);
       padding: 22px 0;
       .backlist {
@@ -252,7 +269,7 @@ export default class AdminLog extends Vue {
         height: 35px;
         opacity: 0.7;
       }
-      >ul {
+      .log-list {
         height: calc(100% - 80px);
         overflow-y: auto;
         padding: 0 10px;

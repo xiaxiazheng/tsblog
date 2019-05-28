@@ -4,7 +4,7 @@ import router from './router';
 import store from './store';
 import hljs from 'highlight.js';
 
-// 使页面pre代码高亮
+// 使页面 pre 代码高亮
 let hlfunc = function (el: any) {
   let blocks = el.querySelectorAll('pre');
   blocks.forEach((block: any) => {

@@ -1,13 +1,26 @@
 <template>
-  <div class="adminlogcont">
-    <el-button class="savebutton" type="primary" icon="el-icon-check" @click="saveLog"></el-button>
+  <div
+    class="adminlogcont"
+    :class="{
+      'width70': edittype === 'richtext',
+      'width90': edittype === 'markdown'
+    }">
+    <el-button class="backbutton" v-if="!isModify" icon="el-icon-back" plain @click="backToLogList"></el-button>
+    <el-button class="backbutton" v-if="isModify" type="danger" icon="el-icon-back" plain @click="backToLogList" title="请注意保存"></el-button>
+    <el-button class="savebutton" type="primary" icon="el-icon-check" @click="saveLog" title="保存日志"></el-button>
     <el-input class="title" v-model="title" placeholder="请输入标题"></el-input>
     <el-input class="author" v-model="author" placeholder="请输入作者"></el-input>
     <div class="time">
       <span>创建时间: {{cTime}}</span>
       <span>修改时间：{{mTime}}</span>
     </div>
-    <vue-editor class="vueeditor" v-model="logcont"></vue-editor>
+    <!-- 富文本编辑框 -->
+    <vue-editor v-if="edittype === 'richtext'" class="vueeditor" v-model="logcont"></vue-editor>
+    <!-- Markdown 编辑框和展示框 -->
+    <div v-if="edittype === 'markdown'" class="markdownbox">
+      <el-input class="markdown-editor" type="textarea" resize="none" v-model="logcont"></el-input>
+      <div class="markdown-shower ScrollBar" v-html="markHTML"></div>  
+    </div>
   </div>
 </template>
 
@@ -15,6 +28,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { VueEditor } from 'vue2-editor';
 import { LogHelper } from '@/client/LogHelper';
+import marked from 'marked';
 
 @Component({
   components: {
@@ -22,12 +36,18 @@ import { LogHelper } from '@/client/LogHelper';
   },
 })
 export default class AdminLogCont extends Vue {
+  @Prop({ type: Function }) backLogList: any;
+
   logid: string = '';
   title: string = '';
   author: string = '';
   cTime: string = '';
   mTime: string = '';
   logcont: string = '';
+  logcontBackup: string = '';
+  markHTML: string = '';
+  isModify: boolean = false;  // 页面内容是否修改了
+  edittype: 'richtext' | 'markdown' = 'richtext';
 
   mounted() {
     this.$nextTick(function () {
@@ -44,7 +64,32 @@ export default class AdminLogCont extends Vue {
       this.author = res.author;
       this.cTime = res.cTime;
       this.mTime = res.mTime;
+      this.edittype = res.edittype;
       this.logcont = res.logcont;
+      this.logcontBackup = res.logcont;  // 备份，用于做是否修改的检查
+    }
+  }
+
+  @Watch('logcont')
+  handleMarkdownEdit() {
+    // 若为 markdown 则修改就显示效果
+    this.edittype === 'markdown' && (this.markHTML = marked(this.logcont));
+    // 若修改了就标记状态
+    this.isModify = this.logcont !== this.logcontBackup ? true : false;
+  }
+
+  // 返回日志列表
+  backToLogList() {
+    if (this.isModify) {
+      this.$confirm(`日志内容已被修改且未保存，确定返回？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.backLogList();
+      });
+    } else {
+      this.backLogList();
     }
   }
 
@@ -56,7 +101,14 @@ export default class AdminLogCont extends Vue {
       logcont: this.logcont
     };
     let res = await LogHelper.modifyLogCont(params);
-    res ? this.$message.success('保存成功') : this.$message.error('保存失败');
+    if (res) {
+      this.$message.success(res);
+      // 清空为未修改状态
+      this.logcontBackup = this.logcont;
+      this.isModify = false;
+    } else {
+      this.$message.error('保存失败');
+    }
   }
 }
 </script>
@@ -66,8 +118,9 @@ export default class AdminLogCont extends Vue {
 
 // PC 端
 @media screen and (min-width: @splitWidth) {
+  .width70 { width: 70%; }
+  .width90 { width: 90%; }
   .adminlogcont {
-    width: 75%;
     margin: 0 auto;
     .title {
       width: 50%;
@@ -90,34 +143,87 @@ export default class AdminLogCont extends Vue {
         color: #ccc;
       }
     }
+    .backbutton {
+      position: fixed;
+      left: 5%;
+      top: 80px;
+      z-index: 2;
+    }
     .savebutton {
       position: fixed;
-      right: 5%;
-      bottom: 40px;
+      left: 5%;
+      top: 125px;
+      margin-left: 0;
     }
-    // 编辑器
+    // 富文本编辑器
     .vueeditor {
       height: 660px;
       margin-bottom: 45px;
       // 在这里写里面进度条的样式
-      .ql-editor::-webkit-scrollbar {
-        /*滚动条整体样式*/
-        width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
-        height: 7px;
+      .ql-editor {
+        &::-webkit-scrollbar {
+          /*滚动条整体样式*/
+          width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
+          height: 7px;
+        }
+        &::-webkit-scrollbar-thumb {
+          /*滚动条里面小方块*/
+          border-radius: .5rem;
+          box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          background: #dcdfe6;
+        }
+        &::-webkit-scrollbar-track {
+          /*滚动条里面轨道*/
+          box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          border-radius: .5rem;
+          background: white;
+        }
       }
-      .ql-editor::-webkit-scrollbar-thumb {
-        /*滚动条里面小方块*/
-        border-radius: .5rem;
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        background: #dcdfe6;
+    }
+    // markdown 编辑器
+    .markdownbox {
+      height: 35rem;
+      >div {
+        width: 50%;
+        height: 100%;
+        vertical-align: top;
       }
-      .ql-editor::-webkit-scrollbar-track {
-        /*滚动条里面轨道*/
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        border-radius: .5rem;
-        background: white;
+      .markdown-editor {
+        textarea {
+          height: 100%;
+          &::-webkit-scrollbar {
+            /*滚动条整体样式*/
+            width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
+            height: 7px;
+          }
+          &::-webkit-scrollbar-thumb {
+            /*滚动条里面小方块*/
+            border-radius: .5rem;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            background: #dcdfe6;
+          }
+          &::-webkit-scrollbar-track {
+            /*滚动条里面轨道*/
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+            border-radius: .5rem;
+            background: white;
+          }
+        }
+      }
+      .markdown-shower {
+        display: inline-block;
+        padding: 5px 15px;
+        color: #606266;
+        background-color: #fff;
+        border: 1px solid #dcdfe6;
+        box-sizing: border-box;
+        border-radius: 4px;
+        text-align: left;
+        word-break: break-all;
       }
     }
   }
@@ -149,12 +255,23 @@ export default class AdminLogCont extends Vue {
         display: block;
       }
     }
+    .backbutton {
+      position: fixed;
+      left: 5px;
+      bottom: 5px;
+      z-index: 2;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      opacity: 0.7;
+    }
     .savebutton {
       position: fixed;
       right: 5px;
       bottom: 49px;
       width: 34px;
       height: 36px;
+      margin-left: 0;
       padding: 0;
       z-index: 2;
     }

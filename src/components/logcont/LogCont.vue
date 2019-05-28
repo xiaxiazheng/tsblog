@@ -1,12 +1,14 @@
 <template>
   <div class="logcont">
+    <el-button class="backbutton" v-if="!isModify" icon="el-icon-back" plain @click="backLogList"></el-button>
     <h2 class="title">{{title}}</h2>
     <h3 class="author">{{author}}</h3>
     <div class="time">
       <span>创建时间: {{cTime}}</span>
       <span>修改时间: {{mTime}}</span>
     </div>
-    <vue-editor v-model="logcont" disabled></vue-editor>
+    <vue-editor v-if="edittype === 'richtext'" v-model="logcont" disabled></vue-editor>
+    <div class="markdown" v-if="edittype === 'markdown'" v-html="markHTML"></div>
   </div>
 </template>
 
@@ -14,6 +16,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { LogHelper } from '@/client/LogHelper';
 import { VueEditor } from 'vue2-editor';
+import marked from 'marked';
 
 @Component({
   components: {
@@ -21,12 +24,16 @@ import { VueEditor } from 'vue2-editor';
   },
 })
 export default class LogCont extends Vue {
+  @Prop({ type: Function }) backLogList: any;
+
   logid: string = '';
   title: string = '';
   author: string = '';
   cTime: string = '';
   mTime: string = '';
   logcont: string = '';
+  markHTML: string = '';  // 根据 logcont 写的 markdown 转换成的 html
+  edittype: 'richtext' | 'markdown' = 'richtext';
 
   mounted() {
     this.$nextTick(function () {
@@ -49,6 +56,8 @@ export default class LogCont extends Vue {
       this.cTime = res.cTime;
       this.mTime = res.mTime;
       this.logcont = res.logcont;
+      this.edittype = res.edittype;
+      this.edittype === 'markdown' && (this.markHTML = marked(this.logcont));
     }
   }
 }
@@ -62,6 +71,12 @@ export default class LogCont extends Vue {
   .logcont {
     width: 70%;
     margin: 0 auto;
+    .backbutton {
+      position: fixed;
+      left: 5%;
+      top: 80px;
+      z-index: 2;
+    }
     .title {
       font-size: 16px;
     }
@@ -78,6 +93,14 @@ export default class LogCont extends Vue {
     .logcont {
       font-size: 1rem;
       text-align: left;
+    }
+    .markdown {
+      display: inline-block;
+      width: 100%;
+      padding: 5px 15px;
+      color: #606266;
+      text-align: left;
+      word-break: break-all;
     }
 
     // 无奈之举23333

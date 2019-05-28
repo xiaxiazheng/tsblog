@@ -19,14 +19,14 @@ export namespace LogHelper {
     return data && data.resultsCode === 'success' ? data.data : false;
   }
 
-  export async function addLogCont(): Promise<boolean> {
-    const data = await axiosPostHelper(`${baseUrl}/addlogcont`);
+  export async function addLogCont(params: any): Promise<boolean> {
+    const data = await axiosPostHelper(`${baseUrl}/addlogcont`, params);
     return data && data.resultsCode === 'success' ? true : false;
   }
 
-  export async function modifyLogCont(params: any): Promise<boolean> {
+  export async function modifyLogCont(params: any): Promise<string | false> {
     const data = await axiosPostHelper(`${baseUrl}/modifylogcont`, params);
-    return data && data.resultsCode === 'success' ? true : false;
+    return data && data.resultsCode === 'success' ? data.message : false;
   }
 
   export async function deleteLogCont(params: any): Promise<boolean> {

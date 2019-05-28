@@ -4,7 +4,8 @@
     <transition name="slide-fade">
       <div class="loglist ScrollBar" v-if="!showCont">
         <h3>所有日志</h3>
-        <el-button class="addbutton" type="info" icon="el-icon-plus" plain @click="addNewLog"></el-button>
+        <el-button class="addbutton1" title="新增富文本日志" type="info" icon="el-icon-plus" plain @click="addNewLog('richtext')"></el-button>
+        <el-button class="addbutton2" title="新增markdown日志" type="info" icon="el-icon-plus" plain @click="addNewLog('markdown')"></el-button>
         <div class="option">
           <div class="tabs">
             <span :class="{'active': sortType === 'create'}" @click="sortType='create'">按创建时间</span>
@@ -19,16 +20,16 @@
             v-if="totalNumber !== 0">
           </el-pagination>
         </div>
-        <ul>
+        <ul class="log-list">
           <li v-for="(item, index) of list" :key="index" @click="choiceLog(item.log_id)">
             <div>
-              <span class="title">{{item.title}}</span>
-              <span class="author">{{item.author}}</span>
+              <span class="title" :title="item.title">{{item.title}}</span>
+              <span class="author" :title="item.author">{{item.author}}</span>
             </div>
             <div>
               <span class="time" v-if="sortType === 'create'">创建时间：{{item.cTime}}</span>
               <span class="time" v-if="sortType === 'modify'">修改时间：{{item.mTime}}</span>
-              <i class="el-icon-circle-close-outline" @click.stop="deleteLog(item.title, item.author, item.log_id)"></i>
+              <i class="deleteIcon el-icon-delete" @click.stop="deleteLog(item.title, item.author, item.log_id)"></i>
             </div>
           </li>
         </ul>
@@ -36,14 +37,13 @@
     </transition>
     <!-- 日志详情 -->
     <div class="logdetail ScrollBar" v-if="showCont">
-      <el-button class="backlist" type="info" icon="el-icon-back" plain @click="backLogList"></el-button>
       <el-switch
         v-model="isEdit"
         title="是否编辑">
       </el-switch>
       <!-- 切换以下两个 -->
-      <LogCont v-if="!isEdit"></LogCont>
-      <AdminLogCont v-if="isEdit"></AdminLogCont>
+      <LogCont v-if="!isEdit" :backLogList="backLogList"></LogCont>
+      <AdminLogCont v-if="isEdit" :backLogList="backLogList"></AdminLogCont>
     </div>
   </div>
 </template>
@@ -63,8 +63,8 @@ import { LogHelper } from '@/client/LogHelper';
 export default class AdminLog extends Vue {
   list: object[] = [];
   showCont: boolean = false;
-  isEdit: boolean = false;
-  sortType: 'create' | 'modify' = 'create';
+  isEdit: boolean = true;
+  sortType: 'create' | 'modify' = 'modify';
   // 分页
   totalNumber: number = 0;
   pageNo: number = 1;
@@ -116,8 +116,11 @@ export default class AdminLog extends Vue {
   }
 
   // 新建一篇日志
-  async addNewLog() {
-    let res = await LogHelper.addLogCont();
+  async addNewLog(type: 'richtext' | 'markdown') {
+    let params = {
+      edittype: type
+    };
+    let res = await LogHelper.addLogCont(params);
     if (res) {
       this.$message.success('新建成功');
       this.pageNo === 1 ? this.init() : this.pageNo = 1;
@@ -201,13 +204,17 @@ export default class AdminLog extends Vue {
           }
         }
       }
-      .addbutton {
+      .addbutton1, .addbutton2 {
         position: fixed;
         left: 5%;
         top: 80px;
         z-index: 2;
       }
-      >ul {
+      .addbutton2 {
+        top: 125px;
+        margin-left: 0;
+      }
+      .log-list {
         margin: 10px 50px;
         >li {
           display: flex;
@@ -218,29 +225,46 @@ export default class AdminLog extends Vue {
           box-sizing: border-box;
           text-align: left;
           cursor: pointer;
-          >div {
+          &:hover {
+            color: #409EFF;
+          }
+          &:last-child {
+            border-color: transparent;
+          }
+          >div:first-child {
+            width: calc(100% - 13rem);
             >span {
-              margin: 0 15px;
-            }
-            i {
-              font-size: 14px;
-            }
-            i:hover {
-              color: red;
+              display: inline-block;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: nowrap;
+              vertical-align: middle;
+              &:first-child {
+                width: calc(100% - 5rem);
+                margin: 0 0.5rem;
+                font-size: 14px;
+              }
+              &:last-child {
+                width: 4rem;
+              }
             }
           }
-          .title {
-            font-size: 14px;
+          >div:last-child {
+            width: 13rem;
+            text-align: right;
+            >span {
+              margin-right: 0.5rem;
+            }
           }
           .author, .time {
             color: #ccc;
           }
-        }
-        >li:hover {
-          color: #409EFF;
-        }
-        >li:last-child {
-          border-color: transparent;
+          .deleteIcon {
+            font-size: 14px;
+            &:hover {
+              color: red;
+            }
+          }
         }
       }
     }
@@ -248,12 +272,6 @@ export default class AdminLog extends Vue {
       width: 100%;
       height: calc(100% - 44px);
       padding: 22px 0;
-      .backlist {
-        position: fixed;
-        left: 5%;
-        top: 80px;
-        z-index: 2;
-      }
       .el-switch {
         position: fixed;
         right: 5%;
@@ -359,16 +377,6 @@ export default class AdminLog extends Vue {
     .logdetail {
       height: calc(100% - 20px);
       padding: 10px 5px;
-      .backlist {
-        position: fixed;
-        left: 5px;
-        bottom: 5px;
-        z-index: 2;
-        width: 40px;
-        height: 40px;
-        padding: 0;
-        opacity: 0.7;
-      }
       .el-switch {
         position: fixed;
         right: 17px;
