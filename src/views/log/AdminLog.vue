@@ -29,6 +29,7 @@
             <div>
               <span class="time" v-if="sortType === 'create'">创建时间：{{item.cTime}}</span>
               <span class="time" v-if="sortType === 'modify'">修改时间：{{item.mTime}}</span>
+              <i class="isShowIcon el-icon-view" :class="{'isShow': item.isShow === 'true'}" @click.stop="isShowLog(item)"></i>
               <i class="deleteIcon el-icon-delete" @click.stop="deleteLog(item.title, item.author, item.log_id)"></i>
             </div>
           </li>
@@ -87,13 +88,14 @@ export default class AdminLog extends Vue {
         pageSize: this.pageSize
       };
       if (this.sortType === 'create') {
-        res = await LogHelper.getLogListByCTime(params);
+        res = await LogHelper.getLogListAllByCTime(params);
       } else {
-        res = await LogHelper.getLogListByMTime(params);
+        res = await LogHelper.getLogListAllByMTime(params);
       }
       if (res) {
         this.totalNumber = res.totalNumber;
         this.list = res.list;
+        console.log(this.list);
       }
     }
   }
@@ -113,6 +115,20 @@ export default class AdminLog extends Vue {
   @Watch("pageNo")
   handlePageNo() {
     this.init();
+  }
+
+  async isShowLog(item: any) {
+    let params = {
+      id: item.log_id,
+      isShow: item.isShow === 'true' ? 'false' : 'true'
+    };
+    let res = await LogHelper.isShowLog(params);
+    if (res) {
+      this.$message.success('修改显示状态成功');
+      this.pageNo === 1 ? this.init() : this.pageNo = 1;
+    } else {
+      this.$message.error('修改显示状态失败');
+    }
   }
 
   // 新建一篇日志
@@ -232,7 +248,7 @@ export default class AdminLog extends Vue {
             border-color: transparent;
           }
           >div:first-child {
-            width: calc(100% - 13rem);
+            width: calc(100% - 15rem);
             >span {
               display: inline-block;
               text-overflow: ellipsis;
@@ -248,21 +264,33 @@ export default class AdminLog extends Vue {
                 width: 4rem;
               }
             }
-          }
-          >div:last-child {
-            width: 13rem;
-            text-align: right;
-            >span {
-              margin-right: 0.5rem;
+            .author {
+              color: #ccc;
             }
           }
-          .author, .time {
-            color: #ccc;
-          }
-          .deleteIcon {
-            font-size: 14px;
-            &:hover {
-              color: red;
+          >div:last-child {
+            width: 15rem;
+            text-align: right;
+            .time {
+              color: #ccc;
+            }
+            .isShowIcon {
+              margin: 0 0.5rem;
+              font-size: 14px;
+              color: #646f77;
+              &:hover {
+                color: #ff5722;
+              }
+            }
+            .isShow {
+              color: #409EFF;
+            }
+            .deleteIcon {
+              font-size: 14px;
+              color: #646f77;
+              &:hover {
+                color: #ff5722;
+              }
             }
           }
         }

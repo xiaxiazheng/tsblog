@@ -75,9 +75,9 @@ export default class AdminLog extends Vue {
         pageSize: this.pageSize
       };
       if (this.sortType === 'create') {
-        res = await LogHelper.getLogListByCTime(params);
+        res = await LogHelper.getLogListShowByCTime(params);
       } else {
-        res = await LogHelper.getLogListByMTime(params);
+        res = await LogHelper.getLogListShowByMTime(params);
       }
       if (res) {
         this.totalNumber = res.totalNumber;
