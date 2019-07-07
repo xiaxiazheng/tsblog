@@ -2,23 +2,34 @@
 let url: string = "";
 let env: string = "";
 let host: string = "http://www.xiaxiazheng.cn";
-if (process.env.NODE_ENV.match('production')) {
-  if  (process.env.VUE_APP_TITLE.match('hyp')) {
+let nav: string = '';
+if (process.env.NODE_ENV === 'production') {
+  if (process.env.VUE_APP_TITLE === 'hyp') {
     url = `${host}:518`;
-    env = "productionPig";    
+    env = "productionPig";
+    nav = '燕苹的小站';
   }
-  if (process.env.VUE_APP_TITLE.match('zyb')) {
+  if (process.env.VUE_APP_TITLE === 'zyb') {
     url = `${host}:3000`;
     env = "production";
+    nav = 'XIAXIAZheng';
   }
 }
-if (process.env.NODE_ENV.match('development')) {
-  url = 'http://localhost:3000';
-  env = "development";
+if (process.env.NODE_ENV === 'development') {
+  if (process.env.VUE_APP_TITLE === 'hyp') {
+    url = 'http://localhost:518';
+    env = "development";
+    nav = '燕苹的小站';
+  }
+  if (process.env.VUE_APP_TITLE === 'zyb') {
+    url = 'http://localhost:3000';
+    env = "development";
+    nav = 'XIAXIAZheng';
+  }
 }
-// console.log('VUE_APP_TITLE: ', process.env.VUE_APP_TITLE);
-// console.log(process.env.NODE_ENV, url);
+
 export const baseImgUrl = url;
 export const baseUrl = `${url}/back`;
 export const baseEnv = env;
+export const navTitle = nav;
 

@@ -1,19 +1,9 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
+import { baseEnv } from './config';
 
-// const scrollBehavior = function (to: any, from: any, savedPosition: any) {
-//   if (to.hash) {
-//     return {
-//       // 通过 to.hash 的值來找到对应的元素
-//       selector: to.hash
-//     };
-//   }
-// };
-
-export default new VueRouter({
-  // scrollBehavior,
-  mode: 'history',
+let routerConfig: any = {
   routes: [
     {
       path: '/',
@@ -73,4 +63,11 @@ export default new VueRouter({
       ]
     }
   ],
-});
+};
+
+// 若是服务器端，开启 history 模式
+if (baseEnv === "production") {
+  routerConfig.mode = 'history';
+}
+
+export default new VueRouter(routerConfig);

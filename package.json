@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve --mode serve",
+    "servePig": "vue-cli-service serve --mode servePig",
     "lint": "vue-cli-service lint",
-    "buildfront": "SET NODE_ENV=development && npm run build",
+    "buildfront": "(SET NODE_ENV=development) && vue-cli-service build",
     "build": "vue-cli-service build --mode build",
     "buildPig": "vue-cli-service build --mode buildPig"
   },

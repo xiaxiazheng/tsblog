@@ -3,7 +3,7 @@
     <div>
       <div class="leftside">
         <span @click="clickTabs('HomeMain')">
-          {{ titlehome }}
+          {{ navtitle }}
         </span>
       </div>
       <div class="rightside">
@@ -15,7 +15,8 @@
             prefix-icon="el-icon-search"
             @focus="handleSearch"
             @blur="isSearch = false"
-            clearable></el-input>
+            clearable>
+          </el-input>
           <transition name="slide-fade">
             <ul v-if="keyword !== '' && isSearch" class="searchtree ScrollBar">
               <li v-if="searchList.length === 0">
@@ -46,7 +47,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { TreeHelper } from '@/client/TreeHelper';
-import { baseEnv } from '../config';
+import { navTitle } from '../config';
 
 interface TreeType {
   flabel: string;
@@ -58,8 +59,7 @@ interface TreeType {
 export default class MyNav extends Vue {
   @Prop() type: any;
 
-  titlehome: string = 'XIAXIAZheng';
-  titleadmin: string = 'XIAXIAZheng';
+  navtitle: string = '';
   activeTab: string = '';
   keyword: string = '';
   timer: number = 0;
@@ -69,15 +69,12 @@ export default class MyNav extends Vue {
 
   mounted() {
     this.$nextTick(function () {
+      this.navtitle = navTitle;
       this.init();
     });
   }
 
   init() {
-    if (baseEnv === "productionPig") {
-      this.titlehome = "燕苹的小站";
-      this.titleadmin = "猪猪的小站";
-    }
     this.activeTab = this.$route.name || '';  // 刷新页面时初始化高亮的 tab
   }
 
