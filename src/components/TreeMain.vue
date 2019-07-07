@@ -26,7 +26,7 @@
           最近更新的五个节点：
         </div>
         <!-- 结果列表 -->
-        <div class="searchResult" v-for="(item, index) in nowContList" :key="index">
+        <div class="searchResult" v-for="(item, index) of nowContList" :key="index">
           <div class="item" @click="handleSelect(item)">
             <h2>
               <span v-html="item.title" v-highlight></span>
@@ -73,7 +73,7 @@
           最近更新的五个节点：
         </div>
         <!-- 结果列表 -->
-        <div class="searchResult" v-for="(item, index) in nowContList" :key="index">
+        <div class="searchResult" v-for="(item, index) of nowContList" :key="index">
           <div class="item" @click="handleSelect(item)">
             <h2>
               <span v-html="item.title" v-highlight></span>
@@ -265,7 +265,7 @@ export default class TreeMain extends Vue {
       // this.$router.replace({
       //   path: `tree?id=${btoa(encodeURIComponent(item.c_id))}&isSearch=true#${item.c_id}-${item.sort}`
       // })
-      console.log('点击搜索结果', item);
+      // console.log('点击搜索结果', item);
     } else {
       this.$router.replace({
         name: "AdminTree",

@@ -27,7 +27,7 @@
       <!-- 右边的锚点们 -->
       <div class="mao">
         <a
-          v-for="(item, index) in contObj.list"
+          v-for="(item, index) of contObj.list"
           :key="index"
           :class="{ 'activeSearch': $route.query.searchSort == item.sort }"
           :href="`#${contObj.id}-${item.sort}`">{{item.title}}</a>

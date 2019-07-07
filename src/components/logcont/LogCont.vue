@@ -1,6 +1,6 @@
 <template>
   <div class="logcont">
-    <el-button class="backbutton" v-if="!isModify" icon="el-icon-back" plain @click="backLogList"></el-button>
+    <el-button class="backbutton" icon="el-icon-back" plain @click="backLogList"></el-button>
     <h2 class="title">{{title}}</h2>
     <h3 class="author">{{author}}</h3>
     <div class="time">

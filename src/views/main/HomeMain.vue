@@ -2,7 +2,7 @@
   <div class="homemain">
     <div class="carousel">
       <el-carousel :interval="5000" v-if="imgUrlList.length !== 0">
-        <el-carousel-item v-for="(item, index) in imgUrlList" :key="index">
+        <el-carousel-item v-for="(item, index) of imgUrlList" :key="index">
           <img :src="item" alt="">
         </el-carousel-item>
       </el-carousel>

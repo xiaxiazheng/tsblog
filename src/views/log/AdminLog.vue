@@ -95,13 +95,12 @@ export default class AdminLog extends Vue {
       if (res) {
         this.totalNumber = res.totalNumber;
         this.list = res.list;
-        console.log(this.list);
       }
     }
   }
 
   @Watch('$route')
-  onRouteChanged() { // 路由变化要监听
+  onRouteChanged() { // 路由变化要监听~
     this.init();
   }
 
@@ -117,6 +116,7 @@ export default class AdminLog extends Vue {
     this.init();
   }
 
+  // 是否展示某篇 log
   async isShowLog(item: any) {
     let params = {
       id: item.log_id,
@@ -180,7 +180,7 @@ export default class AdminLog extends Vue {
   // 返回日志列表
   async backLogList() {
     this.$router.push({ query: {} });
-    await this.init();
+    // await this.init(); 上面监听了路由变化，会自动更新列表
   }
 }
 </script>

@@ -115,7 +115,7 @@ export default class Tree extends Vue {
       this.timer = setTimeout(
         () => {
           this.isPC = window.innerWidth <= this.splitWidth ? false : true;
-          console.log("isPC:", this.isPC);
+          // console.log("isPC:", this.isPC);
         },
         500
       );

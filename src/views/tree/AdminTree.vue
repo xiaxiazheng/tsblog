@@ -83,7 +83,7 @@
 			</span>
 			<el-select v-model="choiceFathId">
 				<el-option
-					v-for="(item, index) in fatherNodeList"
+					v-for="(item, index) of fatherNodeList"
 					:key="index"
 					:label="item.data.label"
 					:value="item.data.id">
@@ -146,7 +146,7 @@ export default class AdminTree extends Vue {
   mounted() {
     this.$nextTick(function () {
       this.isPC = window.innerWidth <= this.splitWidth ? false : true;
-      console.log("isPC:", this.isPC);
+      // console.log("isPC:", this.isPC);
       this.onWidthChange();
       if (this.$route.query.id) {
         this.activeId = parseInt(atob(<string>this.$route.query.id), 10);
@@ -555,7 +555,7 @@ export default class AdminTree extends Vue {
   onWidthChange() {
     window.onresize = () => {
       this.isPC = window.innerWidth <= this.splitWidth ? false : true;
-      console.log("isPC:", this.isPC);
+      // console.log("isPC:", this.isPC);
     };
   }
 
