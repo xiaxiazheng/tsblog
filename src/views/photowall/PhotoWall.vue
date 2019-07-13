@@ -7,7 +7,7 @@
           v-for="(item, index) of imgUrllist"
           :title="item.imgname"
           :key="index"
-          v-lazy="item.url"
+          :src="item.url"
           :alt="item.imgname"
           @click="photoPreview(item)">
       </div>
@@ -31,12 +31,14 @@ interface ImgListType {
   filename: string;
   cTime: string;
   url: string;
+  dataset: string;
 }
 
 @Component
 export default class PhotoWall extends Vue {
   // 图片列表
   imgUrllist: ImgListType[] = [];
+  loadedNumber: number = 0;
   // 预览
   dialogImageName: string = "";
   dialogImageUrl: string = "";
@@ -52,15 +54,34 @@ export default class PhotoWall extends Vue {
   async init() {
     let res = await ImgHelper.getImgList('wall');
     if (res) {
+      const loading = require('@/static/img/loading.gif');
       for (let item of res) {
         this.imgUrllist.push({
           img_id: item.img_id,
           imgname: item.imgname,
           filename: item.filename,
           cTime: item.cTime,
-          url: `${baseImgUrl}/wall/${item.filename}`
+          dataset: `${baseImgUrl}/wall/${item.filename}`,
+          url: loading
         });
       }
+    }
+    this.lazyLoadImage();
+  }
+
+  // 批量加载，每隔三秒加载六张
+  lazyLoadImage() {
+    if (this.loadedNumber < this.imgUrllist.length) {
+      for (let i = 0; i < 6 && this.loadedNumber < this.imgUrllist.length; i++) {
+        this.imgUrllist[this.loadedNumber].url = this.imgUrllist[this.loadedNumber].dataset;
+        this.loadedNumber++;
+      }
+      setTimeout(
+        () => {
+          this.lazyLoadImage();
+        },
+        3000
+      );
     }
   }
 
