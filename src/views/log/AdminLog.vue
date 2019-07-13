@@ -10,6 +10,8 @@
           <div class="tabs">
             <span :class="{'active': sortType === 'create'}" @click="sortType='create'">按创建时间</span>
             <span :class="{'active': sortType === 'modify'}" @click="sortType='modify'">按修改时间</span>
+            <span :class="{'active': isShowAll === false }" @click="isShowAll=false">显示可见</span>
+            <span :class="{'active': isShowAll === true }" @click="isShowAll=true">显示全部</span>
           </div>
           <!-- 页码 -->
           <el-pagination
@@ -66,6 +68,7 @@ export default class AdminLog extends Vue {
   showCont: boolean = false;
   isEdit: boolean = true;
   sortType: 'create' | 'modify' = 'modify';
+  isShowAll: boolean = true;
   // 分页
   totalNumber: number = 0;
   pageNo: number = 1;
@@ -87,11 +90,20 @@ export default class AdminLog extends Vue {
         pageNo: this.pageNo,
         pageSize: this.pageSize
       };
-      if (this.sortType === 'create') {
-        res = await LogHelper.getLogListAllByCTime(params);
-      } else {
-        res = await LogHelper.getLogListAllByMTime(params);
+      if (this.isShowAll) {  // 全部日志
+        if (this.sortType === 'create') {
+          res = await LogHelper.getLogListAllByCTime(params);
+        } else {
+          res = await LogHelper.getLogListAllByMTime(params);
+        }
+      } else {  // 可见日志
+        if (this.sortType === 'create') {
+          res = await LogHelper.getLogListShowByCTime(params);
+        } else {
+          res = await LogHelper.getLogListShowByMTime(params);
+        }
       }
+
       if (res) {
         this.totalNumber = res.totalNumber;
         this.list = res.list;
@@ -102,6 +114,12 @@ export default class AdminLog extends Vue {
   @Watch('$route')
   onRouteChanged() { // 路由变化要监听~
     this.init();
+  }
+
+  // 切换显示可见或全部
+  @Watch("isShowAll")
+  hangleIsShowAll() {
+    this.pageNo === 1 ? this.init() : this.pageNo = 1;
   }
 
   // 切换排序方式
