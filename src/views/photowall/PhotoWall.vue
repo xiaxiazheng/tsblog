@@ -13,7 +13,15 @@
       </div>
       <!-- 预览 -->
       <el-dialog :visible.sync="dialogVisible" :title="dialogImageName">
-        <img width="100%" :src="dialogImageUrl" alt="">
+        <img width="100%" :src="dialogImageUrl" :alt="dialogImageName">
+        <el-button
+          type="success"
+          icon="el-icon-star-on"
+          class="copy-icon"
+          circle
+          title="复制图片路径"
+          @click="copy(dialogImageUrl)">
+        </el-button>
         <span class="createtime">{{ dialogCTime }}</span>
       </el-dialog>
     </div>
@@ -116,6 +124,20 @@ export default class PhotoWall extends Vue {
     this.dialogCTime = file.cTime;
     this.dialogVisible = true;
   }
+
+  copy(url: string) {
+    const input = document.createElement('input');
+    document.body.appendChild(input);
+    input.setAttribute('value', url);
+    input.select();
+    document.execCommand('copy');
+    this.$message({
+      type: 'success',
+      message: "复制图片路径成功",
+      duration: 1000
+    });
+    document.body.removeChild(input);
+  }
 }
 </script>
 
@@ -159,6 +181,11 @@ export default class PhotoWall extends Vue {
           margin-top: 6px;
           margin-top: 10px;
           color: #9dbbda;
+        }
+        .copy-icon {
+          position: absolute;
+          top: 5px;
+          left: 6px;
         }
       }
     }
