@@ -30,7 +30,7 @@ interface ImgListType {
   imgname: string;
   filename: string;
   cTime: string;
-  url: string;
+  url: any;
   dataset: string;
 }
 
@@ -72,9 +72,17 @@ export default class PhotoWall extends Vue {
   // 批量加载，每隔三秒加载六张
   lazyLoadImage() {
     if (this.loadedNumber < this.imgUrllist.length) {
-      for (let i = 0; i < 6 && this.loadedNumber < this.imgUrllist.length; i++) {
-        this.imgUrllist[this.loadedNumber].url = this.imgUrllist[this.loadedNumber].dataset;
-        this.loadedNumber++;
+      const error = require('@/static/img/imageNotFound.png');
+      for (let i = this.loadedNumber; i < this.imgUrllist.length && i < this.loadedNumber + 6; i++) {
+        // for (let i = 0; i < this.imgUrllist.length; i++) {
+        let prom = this.preloadImage(this.imgUrllist[i].dataset);
+        prom.then((img) => {  // 图片顺利加载
+          this.imgUrllist[i].url = img;
+          this.loadedNumber++;
+        }, () => {  // 图片加载失败，换成加载失败的图片
+          this.imgUrllist[i].url = error;
+          this.loadedNumber++;
+        });
       }
       setTimeout(
         () => {
@@ -84,6 +92,20 @@ export default class PhotoWall extends Vue {
       );
     }
   }
+
+  // 加载单张图片，promise 控制返回
+  preloadImage(path: string) {
+    return new Promise(function (resolve, reject) {
+      const image = new Image();
+      image.onload = () => {
+        resolve(image);
+      }
+      image.onerror = () => {
+        reject();
+      };
+      image.src = path;
+    });
+  };
 
   photoPreview(file: any) {
     this.dialogImageUrl = file.url;
@@ -108,7 +130,7 @@ export default class PhotoWall extends Vue {
         width: 100%;
         img {
           max-width: 100%;
-          margin: 3px;
+          margin: 5px 6px;
           padding: 1px;
           height: 200px;
           background: #b4cfec;
