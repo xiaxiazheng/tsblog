@@ -111,7 +111,7 @@ export default class PhotoWall extends Vue {
   }
 
   photoPreview(file: any) {
-    this.dialogImageUrl = file.url;
+    this.dialogImageUrl = file.dataset;
     this.dialogImageName = file.imgname;
     this.dialogCTime = file.cTime;
     this.dialogVisible = true;
