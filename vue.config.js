@@ -19,6 +19,7 @@ module.exports = {
       "vuex": "Vuex",
       "vue2-editor": "Vue2Editor",
       'marked': 'marked',
+      'vue-lazyload': 'VueLazyload',
     },
   }
 }

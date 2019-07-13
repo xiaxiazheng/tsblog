@@ -101,6 +101,7 @@ export default class LogCont extends Vue {
       color: #606266;
       text-align: left;
       word-break: break-all;
+      font-size: 14px;
     }
 
     // 无奈之举23333

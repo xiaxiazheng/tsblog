@@ -35,7 +35,7 @@
         <span :class="{'active': activeTab === 'Tree' || activeTab === 'AdminTree'}" @click="clickTabs('Tree')">知识树</span>
         <span :class="{'active': activeTab === 'Log' || activeTab === 'AdminLog'}" @click="clickTabs('Log')">日志</span>
         <span :class="{'active': activeTab === 'PhotoWall' || activeTab === 'AdminPhotoWall'}" @click="clickTabs('PhotoWall')">图片墙</span>
-        <a href="https://github.com/xiaxiazheng/myblog">
+        <a href="https://github.com/xiaxiazheng/tsblog">
           GitHub
           <i class="el-icon-star-off"></i>
         </a>

@@ -5,7 +5,7 @@
       <div class="loglist ScrollBar" v-if="!showCont">
         <h3>所有日志</h3>
         <el-button class="addbutton1" title="新增富文本日志" type="info" icon="el-icon-plus" plain @click="addNewLog('richtext')"></el-button>
-        <el-button class="addbutton2" title="新增markdown日志" type="info" icon="el-icon-plus" plain @click="addNewLog('markdown')"></el-button>
+        <el-button class="addbutton2" title="新增 markdown 日志" type="info" icon="el-icon-plus" plain @click="addNewLog('markdown')"></el-button>
         <div class="option">
           <div class="tabs">
             <span :class="{'active': sortType === 'create'}" @click="sortType='create'">按创建时间</span>

@@ -7,7 +7,7 @@
           v-for="(item, index) of imgUrllist"
           :title="item.imgname"
           :key="index"
-          :src="item.url"
+          v-lazy="item.url"
           :alt="item.imgname"
           @click="photoPreview(item)">
       </div>

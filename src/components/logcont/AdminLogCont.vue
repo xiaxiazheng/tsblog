@@ -224,6 +224,7 @@ export default class AdminLogCont extends Vue {
         border-radius: 4px;
         text-align: left;
         word-break: break-all;
+        font-size: 13px;
       }
     }
   }

@@ -7,5 +7,6 @@ declare module '*.vue' {
 declare module 'vuex-pathify';
 declare module 'vue2-editor';
 declare module 'marked';
+declare module 'VueLazyload';
 
 
