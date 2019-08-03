@@ -44,6 +44,8 @@ export default class AdminLogCont extends Vue {
   cTime: string = '';
   mTime: string = '';
   logcont: string = '';
+  titleBackup: string = "";
+  authorBackup: string = "";
   logcontBackup: string = '';
   markHTML: string = '';
   isModify: boolean = false;  // 页面内容是否修改了
@@ -66,16 +68,25 @@ export default class AdminLogCont extends Vue {
       this.mTime = res.mTime;
       this.edittype = res.edittype;
       this.logcont = res.logcont;
-      this.logcontBackup = res.logcont;  // 备份，用于做是否修改的检查
+      // 备份，用于做是否修改的检查
+      this.titleBackup = res.title;
+      this.authorBackup = res.author;
+      this.logcontBackup = res.logcont;
     }
   }
 
+  @Watch('title')
+  @Watch('author')
   @Watch('logcont')
-  handleMarkdownEdit() {
+  handleEdit() {
     // 若为 markdown 则修改就显示效果
     this.edittype === 'markdown' && (this.markHTML = marked(this.logcont));
     // 若修改了就标记状态
-    this.isModify = this.logcont !== this.logcontBackup ? true : false;
+    this.isModify = (
+      this.title !== this.titleBackup || 
+      this.author !== this.authorBackup || 
+      this.logcont !== this.logcontBackup 
+    ) ? true : false;
   }
 
   // 返回日志列表

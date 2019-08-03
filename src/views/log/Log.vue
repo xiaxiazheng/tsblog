@@ -9,8 +9,11 @@
             <span :class="{'active': sortType === 'create'}" @click="sortType='create'">按创建时间</span>
             <span :class="{'active': sortType === 'modify'}" @click="sortType='modify'">按修改时间</span>
           </div>
+          <!-- 日志搜索框 -->
+          <LogSearch type="home"></LogSearch>
           <!-- 页码 -->
           <el-pagination
+            class="pagination"
             :current-page.sync="pageNo"
             :page-size="pageSize"
             layout="total, prev, pager, next"
@@ -19,7 +22,11 @@
           </el-pagination>
         </div>
         <ul class="log-list">
-          <li v-for="(item, index) of list" :key="index" @click="choiceLog(item.log_id)">
+          <li
+            v-for="(item, index) of list"
+            :key="index"
+            @click="choiceLog(item.log_id)"
+            :class="{'stick-item': item.isStick === 'true'}">
             <div>
               <span class="title" :title="item.title">{{item.title}}</span>
               <span class="author" :title="item.author">{{item.author}}</span>
@@ -43,10 +50,12 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import LogCont from '@/components/logcont/LogCont.vue';
 import { LogHelper } from '@/client/LogHelper';
+import LogSearch from '@/components/logcont/LogSearch.vue';
 
 @Component({
   components: {
     LogCont,
+    LogSearch
   },
 })
 export default class AdminLog extends Vue {
@@ -122,94 +131,14 @@ export default class AdminLog extends Vue {
 </script>
 
 <style lang="less">
+@import '../../static/less/logList.less';
+
 @splitWidth: 500px;
 
 // PC 端
 @media screen and (min-width: @splitWidth) {
   .log {
     width: 100%;
-    .loglist {
-      width: 80%;
-      margin: 0 auto;
-      padding-top: 22px;
-      >h3 {
-        font-size: 20px;
-      }
-      .option {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 50px;
-        .tabs {
-          >span {
-            display: inline-block;
-            margin-right: 15px;
-            padding: 5px 10px;
-            border: 1px solid rgba(204,204,204,0.4);
-            box-sizing: border-box;
-            border-radius: 3px;
-            cursor: pointer;
-          }
-          .active {
-            border-color: #409EFF;
-            color: #409EFF;
-          }
-        }
-      }
-      .addbutton {
-        position: fixed;
-        left: 5%;
-        top: 80px;
-        z-index: 2;
-      }
-      .log-list {
-        margin: 10px 50px;
-        >li {
-          display: flex;
-          justify-content: space-between;
-          height: 2rem;
-          line-height: 2rem;
-          border-bottom: 1px solid rgba(204,204,204,0.4);
-          box-sizing: border-box;
-          text-align: left;
-          cursor: pointer;
-          &:hover {
-            color: #409EFF;
-          }
-          &:last-child {
-            border-color: transparent;
-          }
-          >div:first-child {
-            width: calc(100% - 13rem);
-            >span {
-              display: inline-block;
-              text-overflow: ellipsis;
-              overflow: hidden;
-              white-space: nowrap;
-              vertical-align: middle;
-              &:first-child {
-                width: calc(100% - 5rem);
-                margin: 0 0.5rem;
-                font-size: 14px;
-              }
-              &:last-child {
-                width: 4rem;
-              }
-            }
-          }
-          >div:last-child {
-            width: 13rem;
-            text-align: right;
-            >span {
-              margin-right: 0.5rem;
-            }
-          }
-          .author, .time {
-            color: #ccc;
-          }
-        }
-      }
-    }
     .logdetail {
       width: 100%;
       height: calc(100% - 44px);

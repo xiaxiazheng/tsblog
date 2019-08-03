@@ -78,6 +78,13 @@ export default class MyNav extends Vue {
     this.activeTab = this.$route.name || '';  // 刷新页面时初始化高亮的 tab
   }
 
+  @Watch("$route")
+  handleRouteChange() {
+    if (this.$route.name && this.$route.name !== this.activeTab) {
+      this.activeTab = this.$route.name;
+    }
+  }
+
   // 点击选择模块
   clickTabs(tabName: any) {
     let pushname = this.type !== 'admin' ? tabName : `Admin${tabName}`;

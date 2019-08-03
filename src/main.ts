@@ -25,7 +25,7 @@ Vue.config.productionTip = false;
 
 Vue.use(VueLazyload);
 
-import './static/global.less';
+import './static/less/global.less';
 
 new Vue({
   router,

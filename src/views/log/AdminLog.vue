@@ -10,11 +10,14 @@
           <div class="tabs">
             <span :class="{'active': sortType === 'create'}" @click="sortType='create'">按创建时间</span>
             <span :class="{'active': sortType === 'modify'}" @click="sortType='modify'">按修改时间</span>
-            <span :class="{'active': isShowAll === false }" @click="isShowAll=false">显示可见</span>
+            <span :class="{'active': isShowAll === false }" @click="isShowAll=false">仅显示可见</span>
             <span :class="{'active': isShowAll === true }" @click="isShowAll=true">显示全部</span>
           </div>
+          <!-- 日志搜索框 -->
+          <LogSearch type="admin"></LogSearch>
           <!-- 页码 -->
           <el-pagination
+            class="pagination"
             :current-page.sync="pageNo"
             :page-size="pageSize"
             layout="total, prev, pager, next"
@@ -23,7 +26,11 @@
           </el-pagination>
         </div>
         <ul class="log-list">
-          <li v-for="(item, index) of list" :key="index" @click="choiceLog(item.log_id)">
+          <li
+            v-for="(item, index) of list"
+            :key="index"
+            @click="choiceLog(item.log_id)"
+            :class="{'stick-item': item.isStick === 'true'}">
             <div>
               <span class="title" :title="item.title">{{item.title}}</span>
               <span class="author" :title="item.author">{{item.author}}</span>
@@ -31,8 +38,9 @@
             <div>
               <span class="time" v-if="sortType === 'create'">创建时间：{{item.cTime}}</span>
               <span class="time" v-if="sortType === 'modify'">修改时间：{{item.mTime}}</span>
-              <i class="isShowIcon el-icon-view" :class="{'isShow': item.isShow === 'true'}" @click.stop="isShowLog(item)"></i>
-              <i class="deleteIcon el-icon-delete" @click.stop="deleteLog(item.title, item.author, item.log_id)"></i>
+              <i title="置顶" class="isStickIcon el-icon-star-off" :class="{'isStick': item.isStick === 'true'}" @click.stop="isStickLog(item)"></i>
+              <i title="可见" class="isShowIcon el-icon-view" :class="{'isShow': item.isShow === 'true'}" @click.stop="isShowLog(item)"></i>
+              <i title="删除" class="deleteIcon el-icon-delete" @click.stop="deleteLog(item.title, item.author, item.log_id)"></i>
             </div>
           </li>
         </ul>
@@ -56,11 +64,13 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import LogCont from '@/components/logcont/LogCont.vue';
 import AdminLogCont from '@/components/logcont/AdminLogCont.vue';
 import { LogHelper } from '@/client/LogHelper';
+import LogSearch from '@/components/logcont/LogSearch.vue';
 
 @Component({
   components: {
     LogCont,
-    AdminLogCont
+    AdminLogCont,
+    LogSearch
   },
 })
 export default class AdminLog extends Vue {
@@ -134,6 +144,21 @@ export default class AdminLog extends Vue {
     this.init();
   }
 
+  // 是否置顶某篇 log
+  async isStickLog(item: any) {
+    let params = {
+      id: item.log_id,
+      isStick: item.isStick === 'true' ? 'false' : 'true'
+    };
+    let res = await LogHelper.isStickLog(params);
+    if (res) {
+      this.$message.success('修改置顶状态成功');
+      this.pageNo === 1 ? this.init() : this.pageNo = 1;
+    } else {
+      this.$message.error('修改置顶状态失败');
+    }
+  }
+
   // 是否展示某篇 log
   async isShowLog(item: any) {
     let params = {
@@ -204,116 +229,14 @@ export default class AdminLog extends Vue {
 </script>
 
 <style lang="less">
+@import '../../static/less/logList.less';
+
 @splitWidth: 500px;
 
 // PC 端
 @media screen and (min-width: @splitWidth) {
   .adminlog {
     width: 100%;
-    .loglist {
-      width: 80%;
-      margin: 0 auto;
-      padding-top: 22px;
-      >h3 {
-        font-size: 20px;
-      }
-      .option {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 50px;
-        .tabs {
-          >span {
-            display: inline-block;
-            margin-right: 15px;
-            padding: 5px 10px;
-            border: 1px solid rgba(204,204,204,0.4);
-            box-sizing: border-box;
-            border-radius: 3px;
-            cursor: pointer;
-          }
-          .active {
-            border-color: #409EFF;
-            color: #409EFF;
-          }
-        }
-      }
-      .addbutton1, .addbutton2 {
-        position: fixed;
-        left: 5%;
-        top: 80px;
-        z-index: 2;
-      }
-      .addbutton2 {
-        top: 125px;
-        margin-left: 0;
-      }
-      .log-list {
-        margin: 10px 50px;
-        >li {
-          display: flex;
-          justify-content: space-between;
-          height: 2rem;
-          line-height: 2rem;
-          border-bottom: 1px solid rgba(204,204,204,0.4);
-          box-sizing: border-box;
-          text-align: left;
-          cursor: pointer;
-          &:hover {
-            color: #409EFF;
-          }
-          &:last-child {
-            border-color: transparent;
-          }
-          >div:first-child {
-            width: calc(100% - 15rem);
-            >span {
-              display: inline-block;
-              text-overflow: ellipsis;
-              overflow: hidden;
-              white-space: nowrap;
-              vertical-align: middle;
-              &:first-child {
-                width: calc(100% - 5rem);
-                margin: 0 0.5rem;
-                font-size: 14px;
-              }
-              &:last-child {
-                width: 4rem;
-              }
-            }
-            .author {
-              color: #ccc;
-            }
-          }
-          >div:last-child {
-            width: 15rem;
-            text-align: right;
-            .time {
-              color: #ccc;
-            }
-            .isShowIcon {
-              margin: 0 0.5rem;
-              font-size: 14px;
-              color: #646f77;
-              &:hover {
-                color: #ff5722;
-              }
-            }
-            .isShow {
-              color: #409EFF;
-            }
-            .deleteIcon {
-              font-size: 14px;
-              color: #646f77;
-              &:hover {
-                color: #ff5722;
-              }
-            }
-          }
-        }
-      }
-    }
     .logdetail {
       width: 100%;
       height: calc(100% - 44px);

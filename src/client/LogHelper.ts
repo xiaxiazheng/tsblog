@@ -24,6 +24,21 @@ export namespace LogHelper {
     return data && data.resultsCode === 'success' ? data.data : false;
   }
 
+  export async function searchHomeTree(keyword: any): Promise<any[]> {
+    const data = await axiosGetHelper(`${baseUrl}/searchhomelog?keyword=${keyword}`);
+    return data && data.resultsCode === 'success' ? data.data : [];
+  }
+
+  export async function searchAdminTree(keyword: any): Promise<any[]> {
+    const data = await axiosGetHelper(`${baseUrl}/searchadminlog?keyword=${keyword}`);
+    return data && data.resultsCode === 'success' ? data.data : [];
+  }
+
+  export async function isStickLog(params: any): Promise<any> {
+    const data = await axiosPostHelper(`${baseUrl}/issticklog`, params);
+    return data && data.resultsCode === 'success' ? true : false;
+  }
+
   export async function isShowLog(params: any): Promise<any> {
     const data = await axiosPostHelper(`${baseUrl}/isshowlog`, params);
     return data && data.resultsCode === 'success' ? true : false;
