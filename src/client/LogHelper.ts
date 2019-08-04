@@ -24,6 +24,16 @@ export namespace LogHelper {
     return data && data.resultsCode === 'success' ? data.data : false;
   }
 
+  export async function getLogListUnShowByCTime(params: any): Promise<any> {
+    const data = await axiosPostHelper(`${baseUrl}/loglistunshowbyctime`, params);
+    return data && data.resultsCode === 'success' ? data.data : false;
+  }
+
+  export async function getLogListUnShowByMTime(params: any): Promise<any> {
+    const data = await axiosPostHelper(`${baseUrl}/loglistunshowbymtime`, params);
+    return data && data.resultsCode === 'success' ? data.data : false;
+  }
+
   export async function searchHomeTree(keyword: any): Promise<any[]> {
     const data = await axiosGetHelper(`${baseUrl}/searchhomelog?keyword=${keyword}`);
     return data && data.resultsCode === 'success' ? data.data : [];

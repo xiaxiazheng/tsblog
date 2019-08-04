@@ -10,8 +10,8 @@
           <div class="tabs">
             <span :class="{'active': sortType === 'create'}" @click="sortType='create'">按创建时间</span>
             <span :class="{'active': sortType === 'modify'}" @click="sortType='modify'">按修改时间</span>
-            <span :class="{'active': isShowAll === false }" @click="isShowAll=false">仅显示可见</span>
-            <span :class="{'active': isShowAll === true }" @click="isShowAll=true">显示全部</span>
+            <span :class="{'active': isShowVisible === true }" @click="isShowVisible=!isShowVisible">显示可见</span>
+            <span :class="{'active': isShowInvisible === true }" @click="isShowInvisible=!isShowInvisible">显示私密</span>
           </div>
           <!-- 日志搜索框 -->
           <LogSearch type="admin"></LogSearch>
@@ -25,7 +25,7 @@
             v-if="totalNumber !== 0">
           </el-pagination>
         </div>
-        <ul class="log-list">
+        <ul class="log-list" v-if="list.length !== 0">
           <li
             v-for="(item, index) of list"
             :key="index"
@@ -44,6 +44,7 @@
             </div>
           </li>
         </ul>
+        <div v-else class="noLogTips">暂无日志</div>
       </div>
     </transition>
     <!-- 日志详情 -->
@@ -78,7 +79,8 @@ export default class AdminLog extends Vue {
   showCont: boolean = false;
   isEdit: boolean = true;
   sortType: 'create' | 'modify' = 'modify';
-  isShowAll: boolean = true;
+  isShowVisible: boolean = true;
+  isShowInvisible: boolean = true;
   // 分页
   totalNumber: number = 0;
   pageNo: number = 1;
@@ -100,18 +102,29 @@ export default class AdminLog extends Vue {
         pageNo: this.pageNo,
         pageSize: this.pageSize
       };
-      if (this.isShowAll) {  // 全部日志
+      if (this.isShowInvisible && this.isShowVisible) {  // 全部日志
         if (this.sortType === 'create') {
           res = await LogHelper.getLogListAllByCTime(params);
         } else {
           res = await LogHelper.getLogListAllByMTime(params);
         }
-      } else {  // 可见日志
+      } else if (this.isShowVisible) {  // 可见日志
         if (this.sortType === 'create') {
           res = await LogHelper.getLogListShowByCTime(params);
         } else {
           res = await LogHelper.getLogListShowByMTime(params);
         }
+      } else if (this.isShowInvisible) {  // 不可见日志
+        if (this.sortType === 'create') {
+          res = await LogHelper.getLogListUnShowByCTime(params);
+        } else {
+          res = await LogHelper.getLogListUnShowByMTime(params);
+        }
+      } else {
+        res = {
+          totalNumber: 0,
+          list: []
+        };
       }
 
       if (res) {
@@ -126,8 +139,9 @@ export default class AdminLog extends Vue {
     this.init();
   }
 
-  // 切换显示可见或全部
-  @Watch("isShowAll")
+  // 切换显示可见或不可见或全部
+  @Watch("isShowVisible")
+  @Watch("isShowInvisible")
   hangleIsShowAll() {
     this.pageNo === 1 ? this.init() : this.pageNo = 1;
   }
@@ -237,6 +251,13 @@ export default class AdminLog extends Vue {
 @media screen and (min-width: @splitWidth) {
   .adminlog {
     width: 100%;
+    .noLogTips {
+      margin-top: 2rem;
+      letter-spacing: .1rem;
+      font-size: 16px;
+      font-weight: bold;
+      color: palevioletred;
+    }
     .logdetail {
       width: 100%;
       height: calc(100% - 44px);
