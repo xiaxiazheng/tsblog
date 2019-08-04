@@ -6,8 +6,8 @@
         <h3>所有日志</h3>
         <div class="option">
           <div class="tabs">
-            <span :class="{'active': sortType === 'create'}" @click="sortType='create'">按创建时间</span>
-            <span :class="{'active': sortType === 'modify'}" @click="sortType='modify'">按修改时间</span>
+            <span :class="{'active': orderBy === 'create'}" @click="orderBy='create'">按创建时间</span>
+            <span :class="{'active': orderBy === 'modify'}" @click="orderBy='modify'">按修改时间</span>
           </div>
           <!-- 日志搜索框 -->
           <LogSearch type="home"></LogSearch>
@@ -32,8 +32,8 @@
               <span class="author" :title="item.author">{{item.author}}</span>
             </div>
             <div>
-              <span class="time" v-if="sortType === 'create'">创建时间：{{item.cTime}}</span>
-              <span class="time" v-if="sortType === 'modify'">修改时间：{{item.mTime}}</span>
+              <span class="time" v-if="orderBy === 'create'">创建时间：{{item.cTime}}</span>
+              <span class="time" v-if="orderBy === 'modify'">修改时间：{{item.mTime}}</span>
             </div>
           </li>
         </ul>
@@ -61,7 +61,7 @@ import LogSearch from '@/components/logcont/LogSearch.vue';
 export default class AdminLog extends Vue {
   list: object[] = [];
   showCont: boolean = false;
-  sortType: 'create' | 'modify' = 'create';
+  orderBy: 'create' | 'modify' = 'create';
   // 分页
   totalNumber: number = 0;
   pageNo: number = 1;
@@ -81,13 +81,11 @@ export default class AdminLog extends Vue {
       let res: any = false;
       let params = {
         pageNo: this.pageNo,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
+        orderBy: this.orderBy,
+        isVisible: true
       };
-      if (this.sortType === 'create') {
-        res = await LogHelper.getLogListShowByCTime(params);
-      } else {
-        res = await LogHelper.getLogListShowByMTime(params);
-      }
+      res = await LogHelper.getLogListIsVisible(params);
       if (res) {
         this.totalNumber = res.totalNumber;
         this.list = res.list;
@@ -101,8 +99,8 @@ export default class AdminLog extends Vue {
   }
 
   // 切换排序方式
-  @Watch("sortType")
-  hangleSortType() {
+  @Watch("orderBy")
+  hangleorderBy() {
     this.pageNo === 1 ? this.init() : this.pageNo = 1;
   }
 

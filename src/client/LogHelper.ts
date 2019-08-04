@@ -4,33 +4,13 @@ import { axiosGetHelper, axiosPostHelper } from './clientHelper';
 
 /** 操作日志 */
 export namespace LogHelper {
-  export async function getLogListAllByCTime(params: any): Promise<any> {
-    const data = await axiosPostHelper(`${baseUrl}/loglistallbyctime`, params);
+  export async function getLogListAll(params: any): Promise<any> {
+    const data = await axiosPostHelper(`${baseUrl}/loglistall`, params);
     return data && data.resultsCode === 'success' ? data.data : false;
   }
 
-  export async function getLogListAllByMTime(params: any): Promise<any> {
-    const data = await axiosPostHelper(`${baseUrl}/loglistallbymtime`, params);
-    return data && data.resultsCode === 'success' ? data.data : false;
-  }
-
-  export async function getLogListShowByCTime(params: any): Promise<any> {
-    const data = await axiosPostHelper(`${baseUrl}/loglistshowbyctime`, params);
-    return data && data.resultsCode === 'success' ? data.data : false;
-  }
-
-  export async function getLogListShowByMTime(params: any): Promise<any> {
-    const data = await axiosPostHelper(`${baseUrl}/loglistshowbymtime`, params);
-    return data && data.resultsCode === 'success' ? data.data : false;
-  }
-
-  export async function getLogListUnShowByCTime(params: any): Promise<any> {
-    const data = await axiosPostHelper(`${baseUrl}/loglistunshowbyctime`, params);
-    return data && data.resultsCode === 'success' ? data.data : false;
-  }
-
-  export async function getLogListUnShowByMTime(params: any): Promise<any> {
-    const data = await axiosPostHelper(`${baseUrl}/loglistunshowbymtime`, params);
+  export async function getLogListIsVisible(params: any): Promise<any> {
+    const data = await axiosPostHelper(`${baseUrl}/loglistisvisible`, params);
     return data && data.resultsCode === 'success' ? data.data : false;
   }
 
