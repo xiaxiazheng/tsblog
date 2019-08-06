@@ -2,7 +2,7 @@
   <div class="log">
     <!-- 日志列表 -->
     <transition name="slide-fade">
-      <div class="loglist ScrollBar" v-if="!showCont">
+      <div class="logbox ScrollBar" v-if="!showCont">
         <h3>所有日志</h3>
         <div class="option">
           <div class="tabs">
@@ -23,7 +23,7 @@
         </div>
         <ul class="log-list">
           <li
-            v-for="(item, index) of list"
+            v-for="(item, index) of loglist"
             :key="index"
             @click="choiceLog(item.log_id)"
             :class="{'stick-item': item.isStick === 'true'}">
@@ -59,7 +59,7 @@ import LogSearch from '@/components/logcont/LogSearch.vue';
   },
 })
 export default class AdminLog extends Vue {
-  list: object[] = [];
+  loglist: object[] = [];
   showCont: boolean = false;
   orderBy: 'create' | 'modify' = 'create';
   // 分页
@@ -88,7 +88,7 @@ export default class AdminLog extends Vue {
       res = await LogHelper.getLogListIsVisible(params);
       if (res) {
         this.totalNumber = res.totalNumber;
-        this.list = res.list;
+        this.loglist = res.list;
       }
     }
   }

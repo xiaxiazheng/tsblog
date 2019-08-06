@@ -19,7 +19,7 @@
     <!-- Markdown 编辑框和展示框 -->
     <div v-if="edittype === 'markdown'" class="markdownbox">
       <el-input class="markdown-editor" type="textarea" resize="none" v-model="logcont"></el-input>
-      <div class="markdown-shower ScrollBar" v-html="markHTML"></div>  
+      <div class="markdown-shower ScrollBar" v-html="markHTML" v-highlight></div>  
     </div>
   </div>
 </template>

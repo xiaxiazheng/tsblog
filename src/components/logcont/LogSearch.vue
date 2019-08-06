@@ -34,6 +34,7 @@ import { LogHelper } from '@/client/LogHelper';
 @Component
 export default class LogSearch extends Vue {
   @Prop() type: any;
+  @Prop() classification: any;
   @Prop({ type: Function }) backLogList: any;
 
   isSearch: boolean = true;
@@ -47,7 +48,13 @@ export default class LogSearch extends Vue {
       if (this.timer) clearTimeout(this.timer);
       this.timer = setTimeout(
         async () => {
-          let res = this.type === 'home' ? await LogHelper.searchHomeTree(this.keyword) : await LogHelper.searchAdminTree(this.keyword);
+          let params: any = {
+            keyword: this.keyword
+          };
+          this.classification !== '所有日志' && (params.classification = this.classification);
+          let res = this.type === 'home' ?
+            await LogHelper.searchHomeTree(params) : 
+            await LogHelper.searchAdminTree(params);
           if (res) {
             this.searchList = res;
             this.isSearch = true;

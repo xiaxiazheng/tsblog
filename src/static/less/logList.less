@@ -1,4 +1,4 @@
-.loglist {
+.logbox {
   width: 80%;
   margin: 0 auto;
   padding-top: 22px;
@@ -9,7 +9,6 @@
   .option {
     display: flex;
     align-items: center;
-    padding: 0 50px;
     .tabs {
       >span {
         display: inline-block;
@@ -41,7 +40,7 @@
     margin-left: 0;
   }
   .log-list {
-    margin: 10px 50px;
+    margin: 10px 0;
     >li {
       display: flex;
       justify-content: space-between;
@@ -57,13 +56,13 @@
       }
       &.stick-item {
         border-bottom: none;
-        background-color: #9e9e9e36;
+        background-color: #f3f6fa;
       }
       &:last-child {
         border-color: transparent;
       }
       >div:first-child {
-        width: calc(100% - 15rem);
+        width: calc(100% - 17rem);
         >span {
           display: inline-block;
           text-overflow: ellipsis;
@@ -84,29 +83,25 @@
         }
       }
       >div:last-child {
-        width: 15rem;
+        width: 17rem;
         text-align: right;
         .time {
           margin-right: 0.4rem;
           color: #646f778a;
         }
-        .isShowIcon, .isStickIcon {
+        .isShowIcon, .isStickIcon, .isClassifyIcon, .deleteIcon {
           margin-right: 0.4rem;
           font-size: 14px;
           color: #646f77;
           &:hover {
-            color: #ff5722;
+            color: #409EFF;
           }
         }
-        .isShow, .isStick {
-          color: #409EFF;
+        .isShow, .isStick, .isClassify {
+          color: #e523da;
         }
         .deleteIcon {
-          font-size: 14px;
-          color: #646f77;
-          &:hover {
-            color: #ff5722;
-          }
+          margin-right: 0;
         }
       }
     }

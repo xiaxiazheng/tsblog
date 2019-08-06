@@ -8,7 +8,7 @@
       <span>修改时间: {{mTime}}</span>
     </div>
     <vue-editor v-if="edittype === 'richtext'" v-model="logcont" disabled></vue-editor>
-    <div class="markdown" v-if="edittype === 'markdown'" v-html="markHTML"></div>
+    <div class="markdown" v-if="edittype === 'markdown'" v-html="markHTML" v-highlight></div>
   </div>
 </template>
 

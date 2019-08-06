@@ -1,52 +1,112 @@
 <template>
   <div class="adminlog">
     <!-- 日志列表 -->
-    <transition name="slide-fade">
-      <div class="loglist ScrollBar" v-if="!showCont">
-        <h3>所有日志</h3>
-        <el-button class="addbutton1" title="新增富文本日志" type="info" icon="el-icon-plus" plain @click="addNewLog('richtext')"></el-button>
-        <el-button class="addbutton2" title="新增 markdown 日志" type="info" icon="el-icon-plus" plain @click="addNewLog('markdown')"></el-button>
-        <div class="option">
-          <div class="tabs">
-            <span :class="{'active': orderBy === 'create'}" @click="orderBy='create'">按创建时间</span>
-            <span :class="{'active': orderBy === 'modify'}" @click="orderBy='modify'">按修改时间</span>
-            <span :class="{'active': isShowVisible === true }" @click="isShowVisible=!isShowVisible">显示可见</span>
-            <span :class="{'active': isShowInvisible === true }" @click="isShowInvisible=!isShowInvisible">显示私密</span>
+    <div class="logbox ScrollBar" v-show="!showCont">
+      <!-- 新增日志按钮 -->
+      <el-button class="addbutton1" title="新增富文本日志" type="info" icon="el-icon-plus" plain @click="addNewLog('richtext')"></el-button>
+      <el-button class="addbutton2" title="新增 markdown 日志" type="info" icon="el-icon-plus" plain @click="addNewLog('markdown')"></el-button>
+      <!-- 日志分类 -->
+      <el-tabs type="border-card" v-model="activeClassification">
+        <el-tab-pane v-for="(item, index) of logClassList" :key="index" :name="item">
+          <!-- tab 头 -->
+          <span slot="label" :title="item">
+            <i v-if="item === mainClassName" class="el-icon-house"></i>
+            {{item}}
+            <i v-if="item !== mainClassName && activeClassification === item" class="el-icon-edit" @click="editClassName(item)"></i>
+          </span>
+          <!-- 日志操作选项 -->
+          <div class="option">
+            <div class="tabs">
+              <span :class="{'active': orderBy === 'create'}" @click="orderBy='create'">按创建时间</span>
+              <span :class="{'active': orderBy === 'modify'}" @click="orderBy='modify'">按修改时间</span>
+              <span :class="{'active': isShowVisible === true }" @click="isShowVisible=!isShowVisible">显示可见</span>
+              <span :class="{'active': isShowInvisible === true }" @click="isShowInvisible=!isShowInvisible">显示私密</span>
+            </div>
+            <!-- 日志搜索框 -->
+            <LogSearch type="admin" :classification="activeClassification"></LogSearch>
+            <!-- 页码 -->
+            <el-pagination
+              class="pagination"
+              :current-page.sync="pageNo"
+              :page-size="pageSize"
+              layout="total, prev, pager, next"
+              :total="totalNumber"
+              v-if="totalNumber !== 0">
+            </el-pagination>
           </div>
-          <!-- 日志搜索框 -->
-          <LogSearch type="admin"></LogSearch>
-          <!-- 页码 -->
-          <el-pagination
-            class="pagination"
-            :current-page.sync="pageNo"
-            :page-size="pageSize"
-            layout="total, prev, pager, next"
-            :total="totalNumber"
-            v-if="totalNumber !== 0">
-          </el-pagination>
-        </div>
-        <ul class="log-list" v-if="list.length !== 0">
-          <li
-            v-for="(item, index) of list"
-            :key="index"
-            @click="choiceLog(item.log_id)"
-            :class="{'stick-item': item.isStick === 'true'}">
-            <div>
-              <span class="title" :title="item.title">{{item.title}}</span>
-              <span class="author" :title="item.author">{{item.author}}</span>
-            </div>
-            <div>
-              <span class="time" v-if="orderBy === 'create'">创建时间：{{item.cTime}}</span>
-              <span class="time" v-if="orderBy === 'modify'">修改时间：{{item.mTime}}</span>
-              <i title="置顶" class="isStickIcon el-icon-star-off" :class="{'isStick': item.isStick === 'true'}" @click.stop="isStickLog(item)"></i>
-              <i title="可见" class="isShowIcon el-icon-view" :class="{'isShow': item.isShow === 'true'}" @click.stop="isShowLog(item)"></i>
-              <i title="删除" class="deleteIcon el-icon-delete" @click.stop="deleteLog(item.title, item.author, item.log_id)"></i>
-            </div>
-          </li>
-        </ul>
-        <div v-else class="noLogTips">暂无日志</div>
-      </div>
-    </transition>
+          <!-- 日志列表 -->
+          <ul class="log-list" v-if="loglist.length !== 0" v-loading="isloadinglist" element-loading-text="日志列表加载中">
+            <li
+              v-for="(item, index) of loglist"
+              :key="index"
+              @click="choiceLog(item.log_id)"
+              :class="{'stick-item': item.isStick === 'true'}">
+              <div>
+                <span class="title" :title="item.title">{{item.title}}</span>
+                <span class="author" :title="item.author">{{item.author}}</span>
+              </div>
+              <!-- 日志操作图标们 -->
+              <div>
+                <span class="time" v-if="orderBy === 'create'">创建时间：{{item.cTime}}</span>
+                <span class="time" v-if="orderBy === 'modify'">修改时间：{{item.mTime}}</span>
+                <!-- 分类 icon -->
+                <i
+                  :title="`${item.classification === '' ? '未分类' : `已分类：${item.classification}`}`"
+                  class="isClassifyIcon el-icon-position" 
+                  :class="{'isClassify el-icon-s-promotion': item.classification !== '', 'el-icon-position': item.classification === ''}"
+                  @click.stop="showSwitchClassDialog(item)">
+                </i>
+                <!-- 置顶 icon -->
+                <i
+                  :title="`${item.isStick === 'true' ? '已' : '未'}置顶`" 
+                  class="isStickIcon el-icon-thumb"
+                  :class="{'isStick': item.isStick === 'true'}"
+                  @click.stop="isStickLog(item)">
+                </i>
+                <!-- 可见 icon -->
+                <i
+                  :title="`${item.isShow === 'true' ? '' : '不'}可见`"
+                  class="isShowIcon el-icon-view"
+                  :class="{'isShow': item.isShow === 'true'}"
+                  @click.stop="isShowLog(item)">
+                </i>
+                <!-- 删除 icon -->
+                <i
+                  title="删除" 
+                  class="deleteIcon el-icon-delete" 
+                  @click.stop="deleteLog(item.title, item.author, item.log_id)">
+                </i>
+              </div>
+            </li>
+          </ul>
+          <div v-else class="noLogTips">暂无日志</div>            
+        </el-tab-pane>
+      </el-tabs>
+    </div>
+    <!-- 选择框 -->
+    <el-dialog
+      title="提示"
+      :visible.sync="isShowSwitchDialog"
+      width="30%">
+      <span>请选择该日志要切换到的分类：</span>
+      <el-select
+        v-model="switchClassName"
+        filterable
+        allow-create
+        default-first-option
+        placeholder="请选择日志分类">
+        <el-option
+          v-for="item in logClassList"
+          :key="item"
+          :label="item"
+          :value="item">
+        </el-option>
+      </el-select>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isShowSwitchDialog = false">取 消</el-button>
+        <el-button type="primary" @click="switchClassify">确 定</el-button>
+      </span>
+    </el-dialog>
     <!-- 日志详情 -->
     <div class="logdetail ScrollBar" v-if="showCont">
       <el-switch
@@ -75,12 +135,20 @@ import LogSearch from '@/components/logcont/LogSearch.vue';
   },
 })
 export default class AdminLog extends Vue {
-  list: object[] = [];
+  mainClassName: string = '所有日志';  // 常量，主要分类的名称
+  logClassList: string[] = [];
+  loglist: object[] = [];
   showCont: boolean = false;
   isEdit: boolean = true;
-  orderBy: 'create' | 'modify' = 'modify';
+  orderBy: 'create' | 'modify' = 'create';
+  activeClassification: string = this.mainClassName;
   isShowVisible: boolean = true;
   isShowInvisible: boolean = true;
+  isloadinglist: boolean = false;
+  // 切换分类
+  isShowSwitchDialog: boolean = false;
+  switchingLog: any = "";
+  switchClassName: string = '';
   // 分页
   totalNumber: number = 0;
   pageNo: number = 1;
@@ -96,33 +164,44 @@ export default class AdminLog extends Vue {
     if (this.$route.query.id) {
       this.showCont = true;
     } else {
-      this.showCont = false;
-      let res: any = false;
-      let params: any = {
-        pageNo: this.pageNo,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      if (this.isShowInvisible && this.isShowVisible) {  // 全部日志
-        res = await LogHelper.getLogListAll(params);
-      } else if (this.isShowVisible) {  // 可见日志
-        params.isVisible = true;
-        res = await LogHelper.getLogListIsVisible(params);
-      } else if (this.isShowInvisible) {  // 不可见日志
-        params.isVisible = false;
-        res = await LogHelper.getLogListIsVisible(params);
-      } else {
-        res = {
-          totalNumber: 0,
-          list: []
-        };
-      }
-
-      if (res) {
-        this.totalNumber = res.totalNumber;
-        this.list = res.list;
-      }
+      // 获取日志分类
+      // if (this.type === 'home') let res = await LogHelper.getHomeAllClass();
+      let res = await LogHelper.getLogAllClass();
+      this.logClassList = res || [];
+      this.logClassList.unshift(this.mainClassName);
+      await this.getLogList();
     }
+  }
+
+  // 获取日志列表
+  @Watch('activeClassification')
+  async getLogList() {
+    this.isloadinglist = true;
+    this.showCont = false;
+    let res: any = false;
+    let params: any = {
+      pageNo: this.pageNo,
+      pageSize: this.pageSize,
+      orderBy: this.orderBy
+    };
+    this.activeClassification !== this.mainClassName && (params.classification = this.activeClassification);
+    if (this.isShowInvisible && this.isShowVisible) {  // 全部日志
+      res = await LogHelper.getLogListAll(params);
+    } else if (this.isShowVisible) {  // 可见日志
+      params.isVisible = true;
+      res = await LogHelper.getLogListIsVisible(params);
+    } else if (this.isShowInvisible) {  // 不可见日志
+      params.isVisible = false;
+      res = await LogHelper.getLogListIsVisible(params);
+    } else {
+      res = {
+        totalNumber: 0,
+        list: []
+      };
+    }
+    this.isloadinglist = false;
+    this.totalNumber = res.totalNumber;
+    this.loglist = res.list;
   }
 
   @Watch('$route')
@@ -134,19 +213,67 @@ export default class AdminLog extends Vue {
   @Watch("isShowVisible")
   @Watch("isShowInvisible")
   hangleIsShowAll() {
-    this.pageNo === 1 ? this.init() : this.pageNo = 1;
+    this.pageNo === 1 ? this.getLogList() : this.pageNo = 1;
   }
 
   // 切换排序方式
   @Watch("orderBy")
   hangleorderBy() {
-    this.pageNo === 1 ? this.init() : this.pageNo = 1;
+    this.pageNo === 1 ? this.getLogList() : this.pageNo = 1;
   }
 
   // 点击切换页码
   @Watch("pageNo")
   handlePageNo() {
-    this.init();
+    this.getLogList();
+  }
+
+  // 打开日志切换选择对话框
+  showSwitchClassDialog(item: any) {
+    this.switchClassName = item.classification === '' ? this.mainClassName : item.classification;
+    this.isShowSwitchDialog = true;
+    this.switchingLog = item;
+  }
+
+  // 日志切换分类
+  async switchClassify() {
+    let params = {
+      id: this.switchingLog.log_id,
+      className: this.switchClassName === this.mainClassName ? '' : this.switchClassName
+    };
+    let res = await LogHelper.switchLogClass(params);
+    if (res) {
+      this.$message.success('修改日志分类成功');
+      this.isShowSwitchDialog = false;
+      this.init();
+    } else {
+      this.$message.error('修改日志分类失败');
+    }
+  }
+
+  // 编辑类别名称
+  editClassName(item: string) {
+    this.$prompt('请输入新的分类名称：', `修改分类名称“${item}”`, {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+    }).then(async ({ value }) => {
+      if (!value || value === '') {
+        this.$message.error('分类名称不能为空');
+      } else {
+        let params = {
+          newClassName: value,
+          oldClassName: item
+        };
+        let res = await LogHelper.editClassName(params);
+        if (res) {
+          this.$message.success('修改成功');
+          await this.init();
+          this.activeClassification = value;
+        }
+      }
+    }).catch(() => {
+           
+    });
   }
 
   // 是否置顶某篇 log
@@ -158,7 +285,7 @@ export default class AdminLog extends Vue {
     let res = await LogHelper.isStickLog(params);
     if (res) {
       this.$message.success('修改置顶状态成功');
-      this.pageNo === 1 ? this.init() : this.pageNo = 1;
+      this.pageNo === 1 ? this.getLogList() : this.pageNo = 1;
     } else {
       this.$message.error('修改置顶状态失败');
     }
@@ -173,7 +300,7 @@ export default class AdminLog extends Vue {
     let res = await LogHelper.isShowLog(params);
     if (res) {
       this.$message.success('修改显示状态成功');
-      this.pageNo === 1 ? this.init() : this.pageNo = 1;
+      this.pageNo === 1 ? this.getLogList() : this.pageNo = 1;
     } else {
       this.$message.error('修改显示状态失败');
     }
@@ -182,12 +309,13 @@ export default class AdminLog extends Vue {
   // 新建一篇日志
   async addNewLog(type: 'richtext' | 'markdown') {
     let params = {
-      edittype: type
+      edittype: type,
+      classification: this.activeClassification === this.mainClassName ? '' : this.activeClassification
     };
     let res = await LogHelper.addLogCont(params);
     if (res) {
       this.$message.success('新建成功');
-      this.pageNo === 1 ? this.init() : this.pageNo = 1;
+      this.pageNo === 1 ? this.getLogList() : this.pageNo = 1;
     } else {
       this.$message.error('新建失败');
     }
@@ -205,7 +333,7 @@ export default class AdminLog extends Vue {
 
   // 删除一篇日志
   deleteLog(title: string, author: string, id: string) {
-    this.$confirm(`你将删除“ ${author} ” 写的 “ ${title} ”, 你确定?'`, '提示', {
+    this.$confirm(`你将删除"${title}"'`, 'Are you sure?', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
@@ -216,7 +344,7 @@ export default class AdminLog extends Vue {
       let res: any = await LogHelper.deleteLogCont(params);
       if (res) {
         this.$message.success('删除成功');
-        this.init();
+        this.getLogList();
       } else {
         this.$message.error('删除失败');
       }
@@ -228,7 +356,6 @@ export default class AdminLog extends Vue {
   // 返回日志列表
   async backLogList() {
     this.$router.push({ query: {} });
-    // await this.init(); 上面监听了路由变化，会自动更新列表
   }
 }
 </script>
@@ -260,6 +387,9 @@ export default class AdminLog extends Vue {
         z-index: 2;
       }
     }
+    .el-tabs {
+      min-height: 600px;
+    }
   }
 }
 
@@ -268,7 +398,7 @@ export default class AdminLog extends Vue {
   .adminlog {
     width: 100%;
     overflow: hidden;
-    .loglist {
+    .logbox {
       width: 100%;
       height: calc(100% - 10px);
       margin: 0 auto;
@@ -344,16 +474,6 @@ export default class AdminLog extends Vue {
           border-color: transparent;
         }
       }
-    }
-    .slide-fade-enter-active {
-      transition: all .3s ease;
-    }
-    .slide-fade-leave-active {
-      transition: all .6s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-    }
-    .slide-fade-enter, .slide-fade-leave-to {
-      transform: translateX(-10px); /* 这个如果为正数，就是从下到上，为负从上到下，改成X控制左右 */
-      opacity: 0;
     }
     .logdetail {
       height: calc(100% - 20px);

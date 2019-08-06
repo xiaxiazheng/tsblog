@@ -4,6 +4,16 @@ import { axiosGetHelper, axiosPostHelper } from './clientHelper';
 
 /** 操作日志 */
 export namespace LogHelper {
+  export async function getLogAllClass(): Promise<any> {
+    const data = await axiosGetHelper(`${baseUrl}/logallclass`);
+    return data && data.resultsCode === 'success' ? data.data : false;
+  }
+
+  export async function getHomeLogAllClass(): Promise<any> {
+    const data = await axiosGetHelper(`${baseUrl}/homelogallclass`);
+    return data && data.resultsCode === 'success' ? data.data : false;
+  }
+
   export async function getLogListAll(params: any): Promise<any> {
     const data = await axiosPostHelper(`${baseUrl}/loglistall`, params);
     return data && data.resultsCode === 'success' ? data.data : false;
@@ -14,14 +24,24 @@ export namespace LogHelper {
     return data && data.resultsCode === 'success' ? data.data : false;
   }
 
-  export async function searchHomeTree(keyword: any): Promise<any[]> {
-    const data = await axiosGetHelper(`${baseUrl}/searchhomelog?keyword=${keyword}`);
+  export async function searchHomeTree(params: any): Promise<any[]> {
+    const data = await axiosPostHelper(`${baseUrl}/searchhomelog`, params);
     return data && data.resultsCode === 'success' ? data.data : [];
   }
 
-  export async function searchAdminTree(keyword: any): Promise<any[]> {
-    const data = await axiosGetHelper(`${baseUrl}/searchadminlog?keyword=${keyword}`);
+  export async function searchAdminTree(params: any): Promise<any[]> {
+    const data = await axiosPostHelper(`${baseUrl}/searchadminlog`, params);
     return data && data.resultsCode === 'success' ? data.data : [];
+  }
+
+  export async function editClassName(params: any): Promise<any> {
+    const data = await axiosPostHelper(`${baseUrl}/editclassname`, params);
+    return data && data.resultsCode === 'success' ? true : false;
+  }
+
+  export async function switchLogClass(params: any): Promise<any> {
+    const data = await axiosPostHelper(`${baseUrl}/switchlogclass`, params);
+    return data && data.resultsCode === 'success' ? true : false;
   }
 
   export async function isStickLog(params: any): Promise<any> {
