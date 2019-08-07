@@ -1,7 +1,7 @@
 <template>
   <div class="adminlog">
     <!-- 日志列表 -->
-    <div class="logbox ScrollBar" v-show="!showCont">
+    <div class="logbox ScrollBar" v-show="!isShowCont">
       <!-- 新增日志按钮 -->
       <el-button class="addbutton1" title="新增富文本日志" type="info" icon="el-icon-plus" plain @click="addNewLog('richtext')"></el-button>
       <el-button class="addbutton2" title="新增 markdown 日志" type="info" icon="el-icon-plus" plain @click="addNewLog('markdown')"></el-button>
@@ -41,14 +41,16 @@
               :key="index"
               @click="choiceLog(item.log_id)"
               :class="{'stick-item': item.isStick === 'true'}">
-              <div>
+              <div class="log-msg">
                 <span class="title" :title="item.title">{{item.title}}</span>
-                <span class="author" :title="item.author">{{item.author}}</span>
-              </div>
-              <!-- 日志操作图标们 -->
-              <div>
+                <span class="classify" v-if="item.classification !== ''" :title="`分类：${item.classification}`">[{{item.classification}}]</span>
+                <span class="author" :title="`作者：${item.author}`">{{item.author}}</span>
+                <span class="edittype" title="编辑类型">{{item.edittype === 'richtext' ? '（富文本文档）' : '（markdown）'}}</span>
                 <span class="time" v-if="orderBy === 'create'">创建时间：{{item.cTime}}</span>
                 <span class="time" v-if="orderBy === 'modify'">修改时间：{{item.mTime}}</span>
+              </div>
+              <!-- 日志操作图标们 -->
+              <div class="log-operator">
                 <!-- 分类 icon -->
                 <i
                   :title="`${item.classification === '' ? '未分类' : `已分类：${item.classification}`}`"
@@ -108,14 +110,14 @@
       </span>
     </el-dialog>
     <!-- 日志详情 -->
-    <div class="logdetail ScrollBar" v-if="showCont">
+    <div class="logdetail ScrollBar" v-if="isShowCont">
       <el-switch
-        v-model="isEdit"
+        v-model="isEditLog"
         title="是否编辑">
       </el-switch>
       <!-- 切换以下两个 -->
-      <LogCont v-if="!isEdit" :backLogList="backLogList"></LogCont>
-      <AdminLogCont v-if="isEdit" :backLogList="backLogList"></AdminLogCont>
+      <LogCont v-if="!isEditLog" :backLogList="backLogList"></LogCont>
+      <AdminLogCont v-if="isEditLog" :backLogList="backLogList"></AdminLogCont>
     </div>
   </div>
 </template>
@@ -138,10 +140,10 @@ export default class AdminLog extends Vue {
   mainClassName: string = '所有日志';  // 常量，主要分类的名称
   logClassList: string[] = [];
   loglist: object[] = [];
-  showCont: boolean = false;
-  isEdit: boolean = true;
   orderBy: 'create' | 'modify' = 'create';
   activeClassification: string = this.mainClassName;
+  isShowCont: boolean = false;
+  isEditLog: boolean = false;
   isShowVisible: boolean = true;
   isShowInvisible: boolean = true;
   isloadinglist: boolean = false;
@@ -162,7 +164,7 @@ export default class AdminLog extends Vue {
 
   async init() {
     if (this.$route.query.id) {
-      this.showCont = true;
+      this.isShowCont = true;
     } else {
       // 获取日志分类
       // if (this.type === 'home') let res = await LogHelper.getHomeAllClass();
@@ -177,7 +179,7 @@ export default class AdminLog extends Vue {
   @Watch('activeClassification')
   async getLogList() {
     this.isloadinglist = true;
-    this.showCont = false;
+    this.isShowCont = false;
     let res: any = false;
     let params: any = {
       pageNo: this.pageNo,
@@ -328,7 +330,7 @@ export default class AdminLog extends Vue {
         id: btoa(encodeURIComponent(id))
       }
     });
-    this.showCont = true;
+    this.isShowCont = true;
   }
 
   // 删除一篇日志

@@ -35,12 +35,9 @@
               :key="index"
               @click="choiceLog(item.log_id)"
               :class="{'stick-item': item.isStick === 'true'}">
-              <div>
+              <div class="log-msg">
                 <span class="title" :title="item.title">{{item.title}}</span>
                 <span class="author" :title="item.author">{{item.author}}</span>
-              </div>
-              <!-- 日志操作图标们 -->
-              <div>
                 <span class="time" v-if="orderBy === 'create'">创建时间：{{item.cTime}}</span>
                 <span class="time" v-if="orderBy === 'modify'">修改时间：{{item.mTime}}</span>
               </div>

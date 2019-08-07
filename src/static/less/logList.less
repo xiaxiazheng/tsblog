@@ -53,6 +53,7 @@
       cursor: pointer;
       &:hover {
         color: #409EFF;
+        background: rgba(204,204,204,0.2);
       }
       &.stick-item {
         border-bottom: none;
@@ -61,29 +62,27 @@
       &:last-child {
         border-color: transparent;
       }
-      >div:first-child {
-        width: calc(100% - 17rem);
+      .log-msg {
+        flex: 1;
+        display: flex;
         >span {
           display: inline-block;
           text-overflow: ellipsis;
           overflow: hidden;
           white-space: nowrap;
           vertical-align: middle;
-          &:first-child {
-            width: calc(100% - 5rem);
+          &.title {
+            flex: 1;
             margin: 0 0.5rem;
             font-size: 14px;
           }
-          &:last-child {
-            width: 4rem;
+          &.author, &.edittype, &.time, &.classify {
+            margin-right: 0.5rem;
+            color: #646f778a;
           }
         }
-        .author {
-          color: #646f778a;
-        }
       }
-      >div:last-child {
-        width: 17rem;
+      .log-operator {
         text-align: right;
         .time {
           margin-right: 0.4rem;
