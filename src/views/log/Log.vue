@@ -1,44 +1,55 @@
 <template>
   <div class="log">
     <!-- 日志列表 -->
-    <transition name="slide-fade">
-      <div class="logbox ScrollBar" v-if="!showCont">
-        <h3>所有日志</h3>
-        <div class="option">
-          <div class="tabs">
-            <span :class="{'active': orderBy === 'create'}" @click="orderBy='create'">按创建时间</span>
-            <span :class="{'active': orderBy === 'modify'}" @click="orderBy='modify'">按修改时间</span>
+    <div class="logbox ScrollBar" v-show="!showCont">
+      <!-- 日志分类 -->
+      <el-tabs type="border-card" v-model="activeClassification">
+        <el-tab-pane v-for="(item, index) of logClassList" :key="index" :name="item">
+          <!-- tab 头 -->
+          <span slot="label" :title="item">
+            <i v-if="item === mainClassName" class="el-icon-house"></i>
+            {{item}}
+          </span>
+          <!-- 日志操作选项 -->
+          <div class="option">
+            <div class="tabs">
+              <span :class="{'active': orderBy === 'create'}" @click="orderBy='create'">按创建时间</span>
+              <span :class="{'active': orderBy === 'modify'}" @click="orderBy='modify'">按修改时间</span>
+            </div>
+            <!-- 日志搜索框 -->
+            <LogSearch type="home" :classification="activeClassification"></LogSearch>
+            <!-- 页码 -->
+            <el-pagination
+              class="pagination"
+              :current-page.sync="pageNo"
+              :page-size="pageSize"
+              layout="total, prev, pager, next"
+              :total="totalNumber"
+              v-if="totalNumber !== 0">
+            </el-pagination>
           </div>
-          <!-- 日志搜索框 -->
-          <LogSearch type="home"></LogSearch>
-          <!-- 页码 -->
-          <el-pagination
-            class="pagination"
-            :current-page.sync="pageNo"
-            :page-size="pageSize"
-            layout="total, prev, pager, next"
-            :total="totalNumber"
-            v-if="totalNumber !== 0">
-          </el-pagination>
-        </div>
-        <ul class="log-list">
-          <li
-            v-for="(item, index) of loglist"
-            :key="index"
-            @click="choiceLog(item.log_id)"
-            :class="{'stick-item': item.isStick === 'true'}">
-            <div>
-              <span class="title" :title="item.title">{{item.title}}</span>
-              <span class="author" :title="item.author">{{item.author}}</span>
-            </div>
-            <div>
-              <span class="time" v-if="orderBy === 'create'">创建时间：{{item.cTime}}</span>
-              <span class="time" v-if="orderBy === 'modify'">修改时间：{{item.mTime}}</span>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </transition>
+          <!-- 日志列表 -->
+          <ul class="log-list" v-if="loglist.length !== 0" v-loading="isloadinglist" element-loading-text="日志列表加载中">
+            <li
+              v-for="(item, index) of loglist"
+              :key="index"
+              @click="choiceLog(item.log_id)"
+              :class="{'stick-item': item.isStick === 'true'}">
+              <div>
+                <span class="title" :title="item.title">{{item.title}}</span>
+                <span class="author" :title="item.author">{{item.author}}</span>
+              </div>
+              <!-- 日志操作图标们 -->
+              <div>
+                <span class="time" v-if="orderBy === 'create'">创建时间：{{item.cTime}}</span>
+                <span class="time" v-if="orderBy === 'modify'">修改时间：{{item.mTime}}</span>
+              </div>
+            </li>
+          </ul>
+          <div v-else class="noLogTips">暂无日志</div>            
+        </el-tab-pane>
+      </el-tabs>
+    </div>
     <!-- 日志详情 -->
     <div class="logdetail ScrollBar" v-if="showCont">
       <LogCont :backLogList="backLogList"></LogCont>
@@ -59,9 +70,13 @@ import LogSearch from '@/components/logcont/LogSearch.vue';
   },
 })
 export default class AdminLog extends Vue {
+  mainClassName: string = '所有日志';  // 常量，主要分类的名称
+  logClassList: string[] = [];
   loglist: object[] = [];
   showCont: boolean = false;
   orderBy: 'create' | 'modify' = 'create';
+  activeClassification: string = this.mainClassName;
+  isloadinglist: boolean = false;
   // 分页
   totalNumber: number = 0;
   pageNo: number = 1;
@@ -77,37 +92,53 @@ export default class AdminLog extends Vue {
     if (this.$route.query.id) {
       this.showCont = true;
     } else {
-      this.showCont = false;
-      let res: any = false;
-      let params = {
-        pageNo: this.pageNo,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy,
-        isVisible: true
-      };
-      res = await LogHelper.getLogListIsVisible(params);
-      if (res) {
-        this.totalNumber = res.totalNumber;
-        this.loglist = res.list;
-      }
+      // 获取日志分类
+      let res = await LogHelper.getHomeLogAllClass();
+      this.logClassList = res || [];
+      this.logClassList.unshift(this.mainClassName);
+      await this.getLogList();
     }
   }
 
+  // 获取日志列表
+  @Watch('activeClassification')
+  async getLogList() {
+    this.isloadinglist = true;
+    this.showCont = false;
+    let params: any = {
+      pageNo: this.pageNo,
+      pageSize: this.pageSize,
+      orderBy: this.orderBy,
+      isVisible: true,
+    };
+    this.activeClassification !== this.mainClassName && (params.classification = this.activeClassification);
+    let res = await LogHelper.getLogListIsVisible(params);
+    if (!res) {
+      res = {
+        totalNumber: 0,
+        list: []
+      };
+    }
+    this.isloadinglist = false;
+    this.totalNumber = res.totalNumber;
+    this.loglist = res.list;
+  }
+
   @Watch('$route')
-  onRouteChanged() { // 路由变化要监听
+  onRouteChanged() { // 路由变化要监听~
     this.init();
   }
 
   // 切换排序方式
   @Watch("orderBy")
   hangleorderBy() {
-    this.pageNo === 1 ? this.init() : this.pageNo = 1;
+    this.pageNo === 1 ? this.getLogList() : this.pageNo = 1;
   }
 
   // 点击切换页码
   @Watch("pageNo")
   handlePageNo() {
-    this.init();
+    this.getLogList();
   }
 
   // 选择一篇日志
@@ -123,7 +154,6 @@ export default class AdminLog extends Vue {
   // 返回日志列表
   async backLogList() {
     this.$router.push({ query: {} });
-    await this.init();
   }
 }
 </script>
@@ -137,22 +167,17 @@ export default class AdminLog extends Vue {
 @media screen and (min-width: @splitWidth) {
   .log {
     width: 100%;
+    .noLogTips {
+      margin-top: 2rem;
+      letter-spacing: .1rem;
+      font-size: 16px;
+      font-weight: bold;
+      color: palevioletred;
+    }
     .logdetail {
       width: 100%;
       height: calc(100% - 44px);
       padding: 22px 0;
-      .backlist {
-        position: fixed;
-        left: 5%;
-        top: 80px;
-        z-index: 2;
-      }
-      .el-switch {
-        position: fixed;
-        right: 5%;
-        top: 80px;
-        z-index: 2;
-      }
     }
   }
 }
@@ -162,16 +187,17 @@ export default class AdminLog extends Vue {
   .log {
     width: 100%;
     overflow: hidden;
-    .loglist {
+    .logbox {
       width: 100%;
-      height: calc(100% - 11px);
-      padding-top: 11px;
+      height: calc(100% - 10px);
+      margin: 0 auto;
+      padding-top: 10px;
       >h3 {
         margin: 0 10px 5px;
         padding-bottom: 5px;
+        font-size: 17px;
         border-bottom: 1px solid #ccc;
         box-sizing: border-box;
-        font-size: 17px;
       }
       .option {
         position: fixed;
@@ -196,7 +222,7 @@ export default class AdminLog extends Vue {
         height: 35px;
         opacity: 0.7;
       }
-      .log-list {
+      >ul {
         height: calc(100% - 80px);
         overflow-y: auto;
         padding: 0 10px;
@@ -211,6 +237,12 @@ export default class AdminLog extends Vue {
           >div {
             >span {
               display: block;
+            }
+            i {
+              font-size: 14px;
+            }
+            i:hover {
+              color: red;
             }
           }
           .title {
@@ -232,34 +264,15 @@ export default class AdminLog extends Vue {
         }
       }
     }
-    .slide-fade-enter-active {
-      transition: all .3s ease;
-    }
-    .slide-fade-leave-active {
-      transition: all .6s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-    }
-    .slide-fade-enter, .slide-fade-leave-to {
-      transform: translateX(-10px); /* 这个如果为正数，就是从下到上，为负从上到下，改成X控制左右 */
-      opacity: 0;
-    }
     .logdetail {
-      height: calc(100% - 22px);
-      padding: 22px 5px 0;
-      .backlist {
-        width: 45px;
-        height: 40px;
-        padding: 0;
-        position: fixed;
-        left: 5px;
-        bottom: 5px;
-        opacity: 0.7;
-        z-index: 2;
-      }
+      height: calc(100% - 20px);
+      padding: 10px 5px;
       .el-switch {
         position: fixed;
-        right: 5%;
-        top: 80px;
+        right: 17px;
+        top: 50px;
         z-index: 2;
+        opacity: 0.7;
       }
     }
   }
