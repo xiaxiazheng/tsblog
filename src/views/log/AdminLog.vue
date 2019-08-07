@@ -21,6 +21,12 @@
               <span :class="{'active': orderBy === 'modify'}" @click="orderBy='modify'">按修改时间</span>
               <span :class="{'active': isShowVisible === true }" @click="isShowVisible=!isShowVisible">显示可见</span>
               <span :class="{'active': isShowInvisible === true }" @click="isShowInvisible=!isShowInvisible">显示私密</span>
+              <span
+                v-if="activeClassification === mainClassName"
+                :class="{'active': isShowNotClassify === true}"
+                @click="isShowNotClassify=!isShowNotClassify">
+                仅显示未分类
+              </span>
             </div>
             <!-- 日志搜索框 -->
             <LogSearch type="admin" :classification="activeClassification"></LogSearch>
@@ -42,8 +48,10 @@
               @click="choiceLog(item.log_id)"
               :class="{'stick-item': item.isStick === 'true'}">
               <div class="log-msg">
-                <span class="title" :title="item.title">{{item.title}}</span>
-                <span class="classify" v-if="item.classification !== ''" :title="`分类：${item.classification}`">[{{item.classification}}]</span>
+                <span class="title" :title="item.title">
+                  {{item.title}}
+                  <span class="classify" v-if="activeClassification === mainClassName && item.classification !== ''" :title="`分类：${item.classification}`">[ {{item.classification}} ]</span>
+                </span>
                 <span class="author" :title="`作者：${item.author}`">{{item.author}}</span>
                 <span class="edittype" title="编辑类型">{{item.edittype === 'richtext' ? '（富文本文档）' : '（markdown）'}}</span>
                 <span class="time" v-if="orderBy === 'create'">创建时间：{{item.cTime}}</span>
@@ -147,6 +155,7 @@ export default class AdminLog extends Vue {
   isShowVisible: boolean = true;
   isShowInvisible: boolean = true;
   isloadinglist: boolean = false;
+  isShowNotClassify: boolean = false;
   // 切换分类
   isShowSwitchDialog: boolean = false;
   switchingLog: any = "";
@@ -187,6 +196,7 @@ export default class AdminLog extends Vue {
       orderBy: this.orderBy
     };
     this.activeClassification !== this.mainClassName && (params.classification = this.activeClassification);
+    this.activeClassification === this.mainClassName && this.isShowNotClassify === true && (params.classification = '');
     if (this.isShowInvisible && this.isShowVisible) {  // 全部日志
       res = await LogHelper.getLogListAll(params);
     } else if (this.isShowVisible) {  // 可见日志
@@ -228,6 +238,12 @@ export default class AdminLog extends Vue {
   @Watch("pageNo")
   handlePageNo() {
     this.getLogList();
+  }
+
+  // 切换是否“仅显示未分类”
+  @Watch("isShowNotClassify")
+  handleOnlyShowNotClassify() {
+    this.pageNo === 1 ? this.getLogList() : this.pageNo = 1;
   }
 
   // 打开日志切换选择对话框

@@ -12,7 +12,7 @@
     .tabs {
       >span {
         display: inline-block;
-        margin-right: 15px;
+        margin-right: 0.5rem;
         padding: 5px 10px;
         border: 1px solid rgba(204,204,204,0.4);
         box-sizing: border-box;
@@ -75,8 +75,13 @@
             flex: 1;
             margin: 0 0.5rem;
             font-size: 14px;
+            .classify {
+              margin-left: 1rem;
+              font-size: 12px;
+              color: #646f778a;
+            }
           }
-          &.author, &.edittype, &.time, &.classify {
+          &.author, &.edittype, &.time {
             margin-right: 0.5rem;
             color: #646f778a;
           }
