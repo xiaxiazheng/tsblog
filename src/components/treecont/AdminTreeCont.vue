@@ -37,8 +37,9 @@
 							<span>{{item.motifytime}}</span>
 						</span>
 					</div>
+
 					<!-- 上传图片的组件 -->
-					<div class="uploadtreecontimg">
+					<!-- <div class="uploadtreecontimg">
 						<el-upload
 							:action="uploadUrl"
 							name="treecont"
@@ -56,7 +57,7 @@
 							:class="{'alreadyhasone': item.filename}">
 								<i class="el-icon-plus"></i>
 						</el-upload>
-					</div>
+					</div> -->
 				</li>
 			</ul>
 			<div class="button">
@@ -65,10 +66,6 @@
 			<div class="save">
 				<el-button type="primary" @click="saveText" :disabled="!isModify" icon="el-icon-check"></el-button>
 			</div>
-			<!-- 查看大图的 dialog -->
-			<el-dialog :visible.sync="dialogVisible" :title="dialogImageName">
-				<img width="100%" :src="dialogImageUrl" :alt="dialogImageName" :title="dialogImageName">
-			</el-dialog>
 		</div>
 		<div class="treemainbox" v-else>
 			<TreeMain type="admin" @scrollToTop="scrollToTop"></TreeMain>
@@ -83,6 +80,7 @@ import { TreeContHelper } from '@/client/TreeContHelper';
 import { ImgHelper } from '@/client/ImgHelper';
 import { baseUrl, baseImgUrl } from '../../config';
 import TreeMain from '@/components/TreeMain.vue';
+import ImageBox from '@/components/ImageBox.vue';
 
 interface ContType {
   id: any;

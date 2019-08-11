@@ -21,6 +21,21 @@
       <el-input class="markdown-editor" type="textarea" resize="none" v-model="logcont"></el-input>
       <div class="markdown-shower ScrollBar" v-html="markHTML" v-highlight></div>  
     </div>
+    <!-- 图片列表 -->
+    <div class="imageList">
+      <ImageBox
+        v-for="(item, index) of imgList"
+        :key="index"
+        :other_id="logid"
+        type="log"
+        :imageFileName="item.filename"
+        :imageName="item.imgname"
+        :imageId="item.img_id"
+        :createTime="item.cTIme"
+        :initImageList="initImageList">
+      </ImageBox>
+      <ImageBox type="log" :other_id="logid" :imageFileName="''" :initImageList="initImageList"></ImageBox>
+    </div>
   </div>
 </template>
 
@@ -29,11 +44,19 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { VueEditor } from 'vue2-editor';
 import { LogHelper } from '@/client/LogHelper';
 import marked from 'marked';
+import ImageBox from '@/components/ImageBox.vue';
+
+interface ImageTableType {
+  img_id: string;
+  imgname: string;
+
+}
 
 @Component({
   components: {
-    VueEditor
-  },
+    VueEditor,
+    ImageBox
+  }
 })
 export default class AdminLogCont extends Vue {
   @Prop({ type: Function }) backLogList: any;
@@ -44,6 +67,7 @@ export default class AdminLogCont extends Vue {
   cTime: string = '';
   mTime: string = '';
   logcont: string = '';
+  imgList: any[] = [];
   titleBackup: string = "";
   authorBackup: string = "";
   logcontBackup: string = '';
@@ -51,7 +75,7 @@ export default class AdminLogCont extends Vue {
   isModify: boolean = false;  // 页面内容是否修改了
   edittype: 'richtext' | 'markdown' = 'richtext';
 
-  mounted() {
+  beforeMount() {
     this.$nextTick(function () {
       this.init();
     });
@@ -68,10 +92,21 @@ export default class AdminLogCont extends Vue {
       this.mTime = res.mTime;
       this.edittype = res.edittype;
       this.logcont = res.logcont;
+      this.imgList = res.imgList;
       // 备份，用于做是否修改的检查
       this.titleBackup = res.title;
       this.authorBackup = res.author;
       this.logcontBackup = res.logcont;
+    }
+  }
+
+  // 更新图片列表
+  async initImageList() {
+    if (this.$route.query.id) {
+      this.imgList = [];
+      let id = decodeURIComponent(atob(<string>this.$route.query.id));
+      let res = await LogHelper.getLogCont(id);
+      this.imgList = res.imgList;
     }
   }
 
@@ -237,6 +272,11 @@ export default class AdminLogCont extends Vue {
         word-break: break-all;
         font-size: 13px;
       }
+    }
+    // 图片列表
+    .imageList {
+      margin-top: 1rem;
+      text-align: left;
     }
   }
 }
