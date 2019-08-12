@@ -196,7 +196,7 @@ export default class AdminLog extends Vue {
       orderBy: this.orderBy
     };
     this.activeClassification !== this.mainClassName && (params.classification = this.activeClassification);
-    this.activeClassification === this.mainClassName && this.isShowNotClassify === true && (params.classification = '');
+    this.activeClassification === this.mainClassName && this.isShowNotClassify && (params.classification = '');
     if (this.isShowInvisible && this.isShowVisible) {  // 全部日志
       res = await LogHelper.getLogListAll(params);
     } else if (this.isShowVisible) {  // 可见日志

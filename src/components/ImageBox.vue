@@ -107,10 +107,10 @@ export default class ImageBox extends Vue {
 
   handleSuccess() {
     this.$message({
-        type: 'success',
-        message: "上传成功",
-        duration: 1000
-      });
+      type: 'success',
+      message: "上传成功",
+      duration: 1000
+    });
     this.initImageList();
   }
 

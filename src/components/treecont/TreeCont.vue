@@ -66,7 +66,7 @@ export default class TreeCont extends Vue {
 
   title: string = "";
   c_id: string = '';
-  contList: any[] = []
+  contList: any[] = [];
   baseImgUrl: string = `${baseImgUrl}/treecont/`;
   dialogVisible: boolean = false;
   dialogImageName: string = "";
