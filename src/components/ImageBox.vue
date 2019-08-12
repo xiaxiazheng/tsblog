@@ -3,8 +3,8 @@
     <!-- 上传图片的组件 -->
     <el-upload
       class="avatar-uploader"
-      name="log"
       list-type="picture-card"
+      :name="type"
       :data="uploadData"
       :action="uploadUrl"
       :show-file-list="false"
@@ -25,7 +25,7 @@
       <i class="el-icon-delete" title="删除图片" @click="handleRemove"></i>
     </div>
     <!-- 查看大图的 dialog -->
-    <el-dialog :visible.sync="isPreviewImage" :title="imageName">
+    <el-dialog class="previewImage" :visible.sync="isPreviewImage" :title="imageName">
       <img width="100%" :src="imageUrl" :alt="imageName" :title="imageName">
     </el-dialog>
   </div>
@@ -56,14 +56,21 @@ export default class ImageBox extends Vue {
   mounted() {
     this.$nextTick(function () {
       this.uploadUrl = `${baseUrl}/${this.type}_upload`;
-      this.imageUrl = this.imageFileName && this.imageFileName !== '' ? `${baseImgUrl}/${this.type}/${this.imageFileName}` : ''
+      this.imageUrl = this.imageFileName && this.imageFileName !== '' ? `${baseImgUrl}/${this.type}/${this.imageFileName}` : '';
+      this.handleOtherIdChange();
     });
+  }
+
+  // 文件名变动更新 url
+  @Watch("imageFileName")
+  hangleFileName() {
+    this.imageUrl = this.imageFileName && this.imageFileName !== '' ? `${baseImgUrl}/${this.type}/${this.imageFileName}` : '';
   }
 
   @Watch("other_id")
   handleOtherIdChange() {
     this.uploadData = {
-      log_id: this.other_id
+      other_id: this.other_id
     };
   }
 
@@ -126,7 +133,7 @@ export default class ImageBox extends Vue {
       let res = await ImgHelper.deleteImg(params);
       if (res) {
         this.$message.success('删除成功');
-        this.initImageList();
+        await this.initImageList();
       } else {
         this.$message.error('删除失败');
       }
@@ -186,6 +193,9 @@ export default class ImageBox extends Vue {
         color: #27e4cf;
       }
     }
+  }
+  .previewImage {
+    text-align: center;
   }
 }
 </style>

@@ -4,36 +4,36 @@
       <h1>{{title}}</h1>
       <!-- 内容 -->
       <ul>
-        <li v-for="(item, index) in contObj.list" :key="index">
+        <li v-for="(item, index) in contList" :key="index">
           <h2>
             <a
               :class="{ 'activeSearch': $route.query.searchSort == item.sort }"
-              :href="`#${contObj.id}-${item.sort}`"
-              :name="`${contObj.id}-${item.sort}`">
+              :href="`#${c_id}-${item.sort}`"
+              :name="`${c_id}-${item.sort}`">
               {{item.title}}
             </a>
-            <span v-if="contObj.list">
+            <span v-if="contList">
               修改时间：
               <span>{{item.motifytime}}</span>
             </span>
           </h2>
           <p v-html="item.cont" v-highlight></p>
           <div v-if="item.filename" class="imgbox">
-            <img v-lazy="baseImgUrl + item.filename" :alt="getRealImgName(item.filename)" @click="showBigImg(baseImgUrl + item.filename, getRealImgName(item.filename))" title="点击查看大图">
-            <span>{{ getRealImgName(item.filename) }}</span>
+            <img v-lazy="baseImgUrl + item.filename" :alt="item.imgname" @click="showBigImg(baseImgUrl + item.filename, item.imgname)" title="点击查看大图">
+            <span>{{ item.imgname }}</span>
           </div>
         </li>
       </ul>
       <!-- 右边的锚点们 -->
       <div class="mao">
         <a
-          v-for="(item, index) of contObj.list"
+          v-for="(item, index) of contList"
           :key="index"
           :class="{ 'activeSearch': $route.query.searchSort == item.sort }"
-          :href="`#${contObj.id}-${item.sort}`">{{item.title}}</a>
+          :href="`#${c_id}-${item.sort}`">{{item.title}}</a>
       </div>
       <!-- 查看大图的 dialog -->
-      <el-dialog :visible.sync="dialogVisible" :title="dialogImageName">
+      <el-dialog class="previewImage" :visible.sync="dialogVisible" :title="dialogImageName">
         <img width="100%" :src="dialogImageUrl" :alt="dialogImageName" :title="dialogImageName">
       </el-dialog>
     </div>
@@ -65,10 +65,8 @@ export default class TreeCont extends Vue {
   @Prop() isPC: any;
 
   title: string = "";
-  contObj: ContType = {
-    list: []
-  };
-  // searchSort: string = -1;
+  c_id: string = '';
+  contList: any[] = []
   baseImgUrl: string = `${baseImgUrl}/treecont/`;
   dialogVisible: boolean = false;
   dialogImageName: string = "";
@@ -101,33 +99,23 @@ export default class TreeCont extends Vue {
 
   async init() {
     if (this.$route.query.id) {
-      let id = decodeURIComponent(atob(<string>this.$route.query.id));
-
-      let res0 = await TreeHelper.getChildName(id); // 获取当前节点的名称
+      // 获取当前内容节点的id
+      this.c_id = decodeURIComponent(atob(<string>this.$route.query.id));
+      // 获取当前内容节点的标题
+      let res0 = await TreeHelper.getChildName(this.c_id); // 获取当前节点的名称
       this.title = res0.length !== 0 ? res0[0].c_label : '';
-
-      let res = await TreeContHelper.getNodeCont(id);
+      // 获取当前内容节点的内容列表
+      let res = await TreeContHelper.getNodeCont(this.c_id);
       if (!res) return;
-      this.contObj = res;
-      for (let i in this.contObj["list"]) {
-        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/</g, "&lt;"); // html标签的<转成实体字符,让所有的html标签失效
-        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/&lt;pre/g, "<pre"); // 把pre标签转回来
-        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/pre>\n/g, "pre>"); // 把pre后面的空格去掉
-        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/&lt;\/pre>/g, "</pre>"); // 把pre结束标签转回来
-        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/  /g, "&nbsp;&nbsp;"); // 把空格转成实体字符，以防多空格被合并
-        this.contObj["list"][i].cont = this.contObj["list"][i].cont.replace(/\n|\r\n/g, "<br/>"); // 把换行转成br标签
+      this.contList = res;
+      for (let item of this.contList) {
+        item.cont = item.cont.replace(/</g, "&lt;"); // html标签的<转成实体字符,让所有的html标签失效
+        item.cont = item.cont.replace(/&lt;pre/g, "<pre"); // 把pre标签转回来
+        item.cont = item.cont.replace(/pre>\n/g, "pre>"); // 把pre后面的空格去掉
+        item.cont = item.cont.replace(/&lt;\/pre>/g, "</pre>"); // 把pre结束标签转回来
+        item.cont = item.cont.replace(/  /g, "&nbsp;&nbsp;"); // 把空格转成实体字符，以防多空格被合并
+        item.cont = item.cont.replace(/\n|\r\n/g, "<br/>"); // 把换行转成br标签
       }
-    }
-  }
-
-  /* 获取文件原本的名称，没有id没有后缀那种 */
-  getRealImgName(filename: any) {
-    if (filename) {
-      let list = filename.split(".");
-      let filetype = list[list.length - 1]; // 文件类型
-      let randomNum = list[list.length - 2];
-      let originname = filename.substr(0, filename.length - filetype.length - randomNum.length - 2 - decodeURIComponent(atob(<string>this.$route.query.id)).length);
-      return originname;
     }
   }
 
@@ -343,6 +331,10 @@ export default class TreeCont extends Vue {
 
       .mao {
         display: none;
+      }
+
+      .previewImage {
+        text-align: center;
       }
     
       pre {

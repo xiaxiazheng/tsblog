@@ -3,7 +3,7 @@
 	  <div v-if="$route.query.id" class="admincontent">
       <h1>{{title}}</h1>
 			<ul>
-				<li v-for="(item, index) in contObj.list" :key="index">
+				<li v-for="(item, index) in contList" :key="index">
 					<!-- 小标题框 -->
           <el-input v-model="item.title" placeholder="请输入内容"></el-input>
           <!-- 文本输入框 -->
@@ -21,11 +21,11 @@
 								<i class="el-icon-arrow-up"></i>
 							</el-button>
               <!-- 下移按钮 -->
-							<el-button type="text" size="mini" @click="() => downCont(item, index)" v-if="index !== contObj.list.length - 1">
+							<el-button type="text" size="mini" @click="() => downCont(item, index)" v-if="index !== contList.length - 1">
 								<i class="el-icon-arrow-down"></i>
 							</el-button>
               <!-- 删除按钮 -->
-							<el-button type="text" size="mini" @click="() => deleteCont(item, index)" v-if="contObj.list.length > 1">
+							<el-button type="text" size="mini" @click="() => deleteCont(item, index)" v-if="contList.length > 1">
 								<i class="el-icon-delete"></i>	
 							</el-button>
 						</span>
@@ -37,27 +37,17 @@
 							<span>{{item.motifytime}}</span>
 						</span>
 					</div>
-
-					<!-- 上传图片的组件 -->
-					<!-- <div class="uploadtreecontimg">
-						<el-upload
-							:action="uploadUrl"
-							name="treecont"
-							list-type="picture-card"
-							:data="{ 
-								c_id: contObj.id,
-							  sort: item.sort
-							}"
-							:on-preview="handlePictureCardPreview"
-							:on-success="handleSuccess"
-							:on-error="handleError"
-							:before-remove="handleRemove"
-							:file-list="item.filelist"
-							:limit="1"
-							:class="{'alreadyhasone': item.filename}">
-								<i class="el-icon-plus"></i>
-						</el-upload>
-					</div> -->
+          <!-- 上传图片的组件 -->
+          <div class="imageList">
+            <ImageBox
+              type="treecont"
+              :other_id="item.cont_id"
+              :imageFileName="item.filename"
+              :imageName="item.imgname"
+              :imageId="item.img_id"
+              :initImageList="initImageList">
+            </ImageBox>
+          </div>
 				</li>
 			</ul>
 			<div class="button">
@@ -89,24 +79,17 @@ interface ContType {
 
 @Component({
   components: {
-    TreeMain
+    TreeMain,
+    ImageBox
   },
 })
 export default class AdminTreeCont extends Vue {
   @Prop() propsname: any;
 
   title: string = '';
-  contObj: ContType = {
-    id: '',
-    list: []
-  };
+  c_id: string = '';
+  contList: any[] = [];
   isModify: boolean = true;
-  // 图片相关
-  imgUrllist: any[] = [];
-  uploadUrl: string = `${baseUrl}/treecont_upload`;
-  dialogVisible: boolean = false;
-  dialogImageName: string = '';
-  dialogImageUrl: string = '';
 
   mounted() {
     this.$nextTick(async function () {
@@ -133,56 +116,50 @@ export default class AdminTreeCont extends Vue {
   onRouteChanged() {
     this.init();
   }
-
-  // 子组件冒上来调用父组件的方法
-  scrollToTop() {
-    this.$emit('scrollToTop');
-  }
   
   async init() {
     if (this.$route.query.id && this.$route.query.id !== '') {
-      let id: any = decodeURIComponent(atob(<string>this.$route.query.id)); // 子节点的id
-      let res1: any = await TreeHelper.getChildName(id);
+      // 获取当前内容节点的id
+      this.c_id = decodeURIComponent(atob(<string>this.$route.query.id));
+      // 获取内容节点标题
+      let res1: any = await TreeHelper.getChildName(this.c_id);
       this.title = res1.length !== 0 ? res1[0].c_label : '';
-      let res: any = await TreeContHelper.getNodeCont(id);
+      // 获取内容节点的内容列表
+      let res: any = await TreeContHelper.getNodeCont(this.c_id);
       if (!res) return;
-      this.contObj = {
-        id: res.id,
-        list: []
-      };
-      for (let item of res.list) {
-        // 处理文件名，treecont的图片名有点特殊，‘原来的名字+id+'.'+一个随机数+'.'+图片类型
-        let imgname: string = '';
-        if (item.filename) {
-          let list = item.filename.split('.');
-          let filetype = list[list.length - 1]; // 文件类型
-          let randomNum = list[list.length - 2];
-          let originname = item.filename.substr(0, item.filename.length - filetype.length - randomNum.length - 2 - decodeURIComponent(atob(<string>this.$route.query.id)).length);
-          imgname = `${originname}.${filetype}`;
-        }
-        this.contObj['list'].push({
-          imgname,
+      this.contList = [];
+      for (let item of res) {
+        this.contList.push({
+          c_id: item.c_id,
+          cont_id: item.cont_id,
           cont: item.cont,
           createtime: item.createtime,
           motifytime: item.motifytime,
           sort: item.sort,
           title: item.title,
+          img_id: item.img_id || '',
+          imgname: item.imgname || '',
           filename: item.filename || '',
-          filelist: item.filename ? [{
-            filename: item.filename || '',
-            imgname: imgname || '',
-            url: item.filename ? `${baseImgUrl}/treecont/${item.filename}` : ''
-          }] : [],
         });
       }
     }
+  }
+
+  // 刷新图片列表
+  initImageList() {
+    this.init();
+  }
+
+  // 子组件冒上来调用父组件的方法
+  scrollToTop() {
+    this.$emit('scrollToTop');
   }
 
   // 新增节点
   async addCont() {
     let params = {
       id: decodeURIComponent(atob(<string>this.$route.query.id)), // 子节点的id
-      sort: this.contObj['list'][this.contObj['list'].length - 1].sort
+      sort: this.contList[this.contList.length - 1].sort
     };
     let res: any = await TreeContHelper.addNodeCont(params);
     if (res) {
@@ -223,8 +200,8 @@ export default class AdminTreeCont extends Vue {
     let params = {
       thiscTime: item.createtime,
       thisSort: item.sort,
-      othercTime: this.contObj['list'][index - 1].createtime,
-      otherSort: this.contObj['list'][index - 1].sort,
+      othercTime: this.contList[index - 1].createtime,
+      otherSort: this.contList[index - 1].sort,
     };
     let res: any = await TreeContHelper.changeContSort(params);
     if (res) {
@@ -240,8 +217,8 @@ export default class AdminTreeCont extends Vue {
     let params = {
       thiscTime: item.createtime,
       thisSort: item.sort,
-      othercTime: this.contObj['list'][index + 1].createtime,
-      otherSort: this.contObj['list'][index + 1].sort,
+      othercTime: this.contList[index + 1].createtime,
+      otherSort: this.contList[index + 1].sort,
     };
     let res: any = await TreeContHelper.changeContSort(params);
     if (res) {
@@ -254,65 +231,22 @@ export default class AdminTreeCont extends Vue {
 
   // 保存页面文本
   async saveText() {
-    for (let item of this.contObj['list']) {
+    for (let item of this.contList) {
       if (item.cont === '') {
         this.$message.warning('输入框可以为空，但文本域不能为空撒');
         return;
       }
     }
-    let params: any = this.contObj;
+    let params: any = {
+      id: this.c_id,
+      list: this.contList
+    };
     let res: any = await TreeContHelper.modifyNodeCont(params);
     if (!res) {
       this.$message.error('编辑失败');
     } else {
       this.$message.success(res);
     }
-  }
-
-  /** 图片操作 */
-  // 点击查看大图
-  handlePictureCardPreview(file: any) {
-    this.dialogImageUrl = file.url;
-    this.dialogImageName = file.imgname;
-    this.dialogVisible = true;
-  }
-
-  // 上传成功后
-  handleSuccess(response: any, file: any, fileList: any) {
-    this.$message.success("上传成功");
-    this.init();
-  }
-
-  // 上传失败后
-  handleError(err: any, file: any, fileList: any) {
-    this.$message.error("上传失败");
-    this.init();
-  }
-
-  // 删除图片后
-  async handleRemove(file: any, fileList: any) {
-    /* 如果不是服务器上的图片，就直接删除 */
-    if (file.status === 'ready') {
-      return true;
-    }
-    this.$confirm(`此操作将永久删除该文件${file.imgname}, 是否继续?`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }).then(async () => {
-      let params = {
-        filename: file.filename
-      };
-      let res = await ImgHelper.deleteTreeContImg(params);
-      if (res) {
-        this.$message.success('删除成功');
-      } else {
-        this.$message.error('删除失败');
-      }
-    }).catch(() => {
-      this.$message.info('已取消删除');
-    });
-    return false;
   }
 }
 </script>
@@ -385,17 +319,11 @@ export default class AdminTreeCont extends Vue {
               color: #ccc;
             }
           }
-          /* 上传图片 */
-          .uploadtreecontimg {
+          // 上传图片
+          .imageList {
             position: absolute;
-            right: -157px;
             top: 10px;
-            .alreadyhasone {
-              width: 148px;
-              .el-upload--picture-card {
-                display: none;
-              }
-            }
+            right: -170px;
           }
         }
       }
@@ -451,15 +379,6 @@ export default class AdminTreeCont extends Vue {
 					.time {
 						float: right;
 						color: #ccc;
-					}
-				}
-        .uploadtreecontimg {  /* 上传图片 */
-          text-align: left;
-					.alreadyhasone {
-						width: 148px;
-						.el-upload--picture-card {
-						  display: none;
-						}
 					}
 				}
 			}

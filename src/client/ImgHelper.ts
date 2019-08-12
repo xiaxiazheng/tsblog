@@ -14,9 +14,4 @@ export namespace ImgHelper {
     const data = await axiosPostHelper(`${baseUrl}/deleteimg`, params);
     return data && data.resultsCode === 'success' ? true : false;
   }
-  
-  export async function deleteTreeContImg(params: any): Promise<boolean> {
-    const data = await axiosPostHelper(`${baseUrl}/deletetreecontimg`, params);
-    return data && data.resultsCode === 'success' ? true : false;
-  }
 }

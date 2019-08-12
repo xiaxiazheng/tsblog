@@ -26,8 +26,8 @@
       <ImageBox
         v-for="(item, index) of imgList"
         :key="index"
-        :other_id="logid"
         type="log"
+        :other_id="logid"
         :imageFileName="item.filename"
         :imageName="item.imgname"
         :imageId="item.img_id"
@@ -103,7 +103,6 @@ export default class AdminLogCont extends Vue {
   // 更新图片列表
   async initImageList() {
     if (this.$route.query.id) {
-      this.imgList = [];
       let id = decodeURIComponent(atob(<string>this.$route.query.id));
       let res = await LogHelper.getLogCont(id);
       this.imgList = res.imgList;
