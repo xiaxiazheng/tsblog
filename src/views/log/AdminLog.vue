@@ -274,19 +274,20 @@ export default class AdminLog extends Vue {
     this.$prompt('请输入新的分类名称：', `修改分类名称“${item}”`, {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-    }).then(async ({ value }) => {
-      if (!value || value === '') {
-        this.$message.error('分类名称不能为空');
+    }).then(async (obj: any) => {
+      if (!obj.value || obj.value === '') {
+        this.$message.warning('分类名称不能为空');
+        return;
       } else {
         let params = {
-          newClassName: value,
+          newClassName: obj.value,
           oldClassName: item
         };
         let res = await LogHelper.editClassName(params);
         if (res) {
           this.$message.success('修改成功');
           await this.init();
-          this.activeClassification = value;
+          this.activeClassification = obj.value;
         }
       }
     }).catch(() => {
