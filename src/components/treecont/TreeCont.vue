@@ -65,7 +65,7 @@ export default class TreeCont extends Vue {
   @Prop() isPC: any;
 
   title: string = "";
-  c_id: string = '';
+  cId: string = '';
   contList: any[] = [];
   baseImgUrl: string = `${baseImgUrl}/treecont/`;
   dialogVisible: boolean = false;
@@ -100,12 +100,12 @@ export default class TreeCont extends Vue {
   async init() {
     if (this.$route.query.id) {
       // 获取当前内容节点的id
-      this.c_id = decodeURIComponent(atob(<string>this.$route.query.id));
+      this.cId = decodeURIComponent(atob(<string>this.$route.query.id));
       // 获取当前内容节点的标题
-      let res0 = await TreeHelper.getChildName(this.c_id); // 获取当前节点的名称
+      let res0 = await TreeHelper.getChildName(this.cId); // 获取当前节点的名称
       this.title = res0.length !== 0 ? res0[0].c_label : '';
       // 获取当前内容节点的内容列表
-      let res = await TreeContHelper.getNodeCont(this.c_id);
+      let res = await TreeContHelper.getNodeCont(this.cId);
       if (!res) return;
       this.contList = res;
       for (let item of this.contList) {

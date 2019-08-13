@@ -87,7 +87,7 @@ export default class AdminTreeCont extends Vue {
   @Prop() propsname: any;
 
   title: string = '';
-  c_id: string = '';
+  cId: string = '';
   contList: any[] = [];
   isModify: boolean = true;
 
@@ -120,12 +120,12 @@ export default class AdminTreeCont extends Vue {
   async init() {
     if (this.$route.query.id && this.$route.query.id !== '') {
       // 获取当前内容节点的id
-      this.c_id = decodeURIComponent(atob(<string>this.$route.query.id));
+      this.cId = decodeURIComponent(atob(<string>this.$route.query.id));
       // 获取内容节点标题
-      let res1: any = await TreeHelper.getChildName(this.c_id);
+      let res1: any = await TreeHelper.getChildName(this.cId);
       this.title = res1.length !== 0 ? res1[0].c_label : '';
       // 获取内容节点的内容列表
-      let res: any = await TreeContHelper.getNodeCont(this.c_id);
+      let res: any = await TreeContHelper.getNodeCont(this.cId);
       if (!res) return;
       this.contList = [];
       for (let item of res) {
@@ -238,7 +238,7 @@ export default class AdminTreeCont extends Vue {
       }
     }
     let params: any = {
-      id: this.c_id,
+      id: this.cId,
       list: this.contList
     };
     let res: any = await TreeContHelper.modifyNodeCont(params);

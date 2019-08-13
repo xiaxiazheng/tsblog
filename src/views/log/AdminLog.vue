@@ -278,17 +278,16 @@ export default class AdminLog extends Vue {
       if (!obj.value || obj.value === '') {
         this.$message.warning('分类名称不能为空');
         return;
-      } else {
-        let params = {
-          newClassName: obj.value,
-          oldClassName: item
-        };
-        let res = await LogHelper.editClassName(params);
-        if (res) {
-          this.$message.success('修改成功');
-          await this.init();
-          this.activeClassification = obj.value;
-        }
+      }
+      let params = {
+        newClassName: obj.value,
+        oldClassName: item
+      };
+      let res = await LogHelper.editClassName(params);
+      if (res) {
+        this.$message.success('修改成功');
+        await this.init();
+        this.activeClassification = obj.value;
       }
     }).catch(() => {
            

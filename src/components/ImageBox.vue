@@ -39,7 +39,7 @@ import { baseUrl, baseImgUrl } from '../config';
 @Component
 export default class ImageBox extends Vue {
   @Prop() type: any;
-  @Prop() other_id: any;
+  @Prop() otherId: any;
   @Prop() imageFileName?: any;
   @Prop() imageName?: any;
   @Prop() imageId?: any;
@@ -49,7 +49,7 @@ export default class ImageBox extends Vue {
   imageUrl: string = '';  // 图片真实的 url
   uploadData: any = {};  // 上传附带的数据
   uploadUrl: string = '';  // 上传图片的 url
-  isHover: boolean = true;
+  isHover: boolean = false;
   // 预览
   isPreviewImage: boolean = false;
 
@@ -70,7 +70,7 @@ export default class ImageBox extends Vue {
   @Watch("other_id")
   handleOtherIdChange() {
     this.uploadData = {
-      other_id: this.other_id
+      other_id: this.otherId
     };
   }
 
@@ -79,7 +79,7 @@ export default class ImageBox extends Vue {
   }
 
   handleMouseout() {
-    this.isHover = true;
+    this.isHover = false;
   }
 
   copyImgTag() {
