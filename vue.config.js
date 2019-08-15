@@ -19,7 +19,8 @@ module.exports = {
       "vuex": "Vuex",
       'marked': 'marked',
       'quill': 'Quill',
-      'vue-quill-editor': "VueQuillEditor"
+      'vue-quill-editor': "VueQuillEditor",
+      'quill-image-resize-module': 'ImageResize'
     },
   }
 }
