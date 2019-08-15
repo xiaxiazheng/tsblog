@@ -15,7 +15,7 @@
       <span>修改时间：{{mTime}}</span>
     </div>
     <!-- 富文本编辑框 -->
-    <vue-editor v-if="edittype === 'richtext'" class="vueeditor" v-model="logcont"></vue-editor>
+    <Editor ref="editor" :logcont="logcont" :getChange="getChange"></Editor>
     <!-- Markdown 编辑框和展示框 -->
     <div v-if="edittype === 'markdown'" class="markdownbox">
       <el-input class="markdown-editor" type="textarea" resize="none" v-model="logcont"></el-input>
@@ -27,35 +27,34 @@
         v-for="(item, index) of imgList"
         :key="index"
         type="log"
-        :other_id="logid"
+        :otherId="logid"
         :imageFileName="item.filename"
         :imageName="item.imgname"
         :imageId="item.img_id"
         :createTime="item.cTIme"
         :initImageList="initImageList">
       </ImageBox>
-      <ImageBox type="log" :other_id="logid" :imageFileName="''" :initImageList="initImageList"></ImageBox>
+      <ImageBox type="log" :otherId="logid" :imageFileName="''" :initImageList="initImageList"></ImageBox>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { VueEditor } from 'vue2-editor';
 import { LogHelper } from '@/client/LogHelper';
 import marked from 'marked';
 import ImageBox from '@/components/ImageBox.vue';
+import Editor from '@/components/Editor.vue';
 
 interface ImageTableType {
   img_id: string;
   imgname: string;
-
 }
 
 @Component({
   components: {
-    VueEditor,
-    ImageBox
+    ImageBox,
+    Editor
   }
 })
 export default class AdminLogCont extends Vue {
@@ -138,18 +137,29 @@ export default class AdminLogCont extends Vue {
     }
   }
 
+  // 获取变化
+  getChange(isChange: boolean) {
+    this.isModify = (
+      this.title !== this.titleBackup || 
+      this.author !== this.authorBackup || 
+      isChange 
+    ) ? true : false;
+  }
+
+  // 保存日志
   async saveLog() {
+    let childEditor: any = this.$refs.editor;
     let params = {
       id: this.logid,
       title: this.title,
       author: this.author,
-      logcont: this.logcont
+      logcont: childEditor.returnContent()
     };
     let res = await LogHelper.modifyLogCont(params);
     if (res) {
       this.$message.success(res);
       // 清空为未修改状态
-      this.logcontBackup = this.logcont;
+      this.logcontBackup = childEditor.returnContent();
       this.isModify = false;
     } else {
       this.$message.error('保存失败');

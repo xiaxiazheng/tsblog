@@ -19,7 +19,7 @@
           </h2>
           <p v-html="item.cont" v-highlight></p>
           <div v-if="item.filename" class="imgbox">
-            <img v-lazy="baseImgUrl + item.filename" :alt="item.imgname" @click="showBigImg(baseImgUrl + item.filename, item.imgname)" title="点击查看大图">
+            <img :src="baseImgUrl + item.filename" :alt="item.imgname" @click="showBigImg(baseImgUrl + item.filename, item.imgname)" title="点击查看大图">
             <span>{{ item.imgname }}</span>
           </div>
         </li>

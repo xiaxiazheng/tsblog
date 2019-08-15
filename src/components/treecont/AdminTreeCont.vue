@@ -41,7 +41,7 @@
           <div class="imageList">
             <ImageBox
               type="treecont"
-              :other_id="item.cont_id"
+              :otherId="item.cont_id"
               :imageFileName="item.filename"
               :imageName="item.imgname"
               :imageId="item.img_id"

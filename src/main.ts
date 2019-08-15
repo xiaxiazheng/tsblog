@@ -3,7 +3,6 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import hljs from 'highlight.js';
-import VueLazyload from 'vue-lazyload';
 
 // 使页面 pre 代码高亮
 let hlfunc = function (el: any) {
@@ -22,8 +21,6 @@ Vue['prototype']['$message'] = Message;   // this.$message
 Vue['prototype']['$confirm'] = MessageBox.confirm; // this.$confirm
 
 Vue.config.productionTip = false;
-
-Vue.use(VueLazyload);
 
 import './static/less/global.less';
 

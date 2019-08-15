@@ -7,7 +7,7 @@
       <span>创建时间: {{cTime}}</span>
       <span>修改时间: {{mTime}}</span>
     </div>
-    <vue-editor v-if="edittype === 'richtext'" v-model="logcont" disabled></vue-editor>
+    <Editor type="onlyShow" :logcont="logcont"></Editor>
     <div class="markdown" v-if="edittype === 'markdown'" v-html="markHTML" v-highlight></div>
   </div>
 </template>
@@ -15,13 +15,13 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { LogHelper } from '@/client/LogHelper';
-import { VueEditor } from 'vue2-editor';
 import marked from 'marked';
+import Editor from '@/components/Editor.vue';
 
 @Component({
   components: {
-    VueEditor
-  },
+    Editor
+  }
 })
 export default class LogCont extends Vue {
   @Prop({ type: Function }) backLogList: any;
@@ -78,7 +78,7 @@ export default class LogCont extends Vue {
       z-index: 2;
     }
     .title {
-      font-size: 16px;
+      font-size: 20px;
     }
     .author {
       margin: 10px 0;
@@ -94,22 +94,13 @@ export default class LogCont extends Vue {
       font-size: 1rem;
       text-align: left;
     }
-    .markdown {
+    .richtext, .markdown {
       display: inline-block;
       width: 100%;
       padding: 5px 15px;
       color: #606266;
       text-align: left;
       word-break: break-all;
-      font-size: 14px;
-    }
-
-    // 无奈之举23333
-    .ql-container.ql-snow {
-      border-color: transparent;
-    }
-    .ql-toolbar {
-      display: none;
     }
   }  
 }
@@ -131,17 +122,6 @@ export default class LogCont extends Vue {
       >span {
         display: block;
       }
-    }
-
-    // 无奈之举23333
-    .ql-editor {
-      padding: 12px 0;
-    }
-    .ql-container.ql-snow {
-      border-color: transparent;
-    }
-    .ql-toolbar {
-      display: none;
     }
   }  
 }

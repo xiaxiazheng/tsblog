@@ -20,7 +20,7 @@
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
     <div v-if="imageFileName" v-show="isHover" class="wrapper">
-      <i class="el-icon-document-copy" title="复制图片<img>标签" @click="copyImgTag"></i>
+      <i class="el-icon-document-copy" title="复制图片的 url" @click="copyImgTag"></i>
       <i class="el-icon-search" title="预览大图" @click="isPreviewImage=true"></i>
       <i class="el-icon-delete" title="删除图片" @click="handleRemove"></i>
     </div>
@@ -67,7 +67,7 @@ export default class ImageBox extends Vue {
     this.imageUrl = this.imageFileName && this.imageFileName !== '' ? `${baseImgUrl}/${this.type}/${this.imageFileName}` : '';
   }
 
-  @Watch("other_id")
+  @Watch("otherId")
   handleOtherIdChange() {
     this.uploadData = {
       other_id: this.otherId
@@ -83,7 +83,7 @@ export default class ImageBox extends Vue {
   }
 
   copyImgTag() {
-    const copyStr = `<img src="${this.imageUrl}" />`;
+    const copyStr = `${this.imageUrl}`;
     const input = document.createElement('input');
     document.body.appendChild(input);
     input.setAttribute('value', copyStr);
