@@ -24,8 +24,6 @@ Vue.config.productionTip = false;
 
 import './static/less/global.less';
 
-console.log(window);
-
 new Vue({
   router,
   store,
