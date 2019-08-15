@@ -10,19 +10,23 @@
       :show-file-list="false"
       :on-success="handleSuccess"
       :on-error="handleError"
-      :before-upload="beforeUpload"
-      >
+      :before-upload="beforeUpload">
       <img
         v-if="imageFileName"
-        :src="imageUrl"
+        ref="image"
         class="avatar"
         @mouseenter="handleMouseover">
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
-    <div v-if="imageFileName" v-show="isHover" class="wrapper">
+    <!-- hover 显示的操作 icon 们 -->
+    <div v-if="imageFileName" v-show="isHover && !isLoading" class="wrapper">
       <i class="el-icon-document-copy" title="复制图片的 url" @click="copyImgTag"></i>
       <i class="el-icon-search" title="预览大图" @click="isPreviewImage=true"></i>
       <i class="el-icon-delete" title="删除图片" @click="handleRemove"></i>
+    </div>
+    <!-- loading 界面 -->
+    <div v-show="isLoading" class="wrapper">
+      <i class="el-icon-loading loading" title="图片加载中..." @click="copyImgTag"></i>
     </div>
     <!-- 查看大图的 dialog -->
     <el-dialog class="previewImage" :visible.sync="isPreviewImage" :title="imageName">
@@ -50,6 +54,7 @@ export default class ImageBox extends Vue {
   uploadData: any = {};  // 上传附带的数据
   uploadUrl: string = '';  // 上传图片的 url
   isHover: boolean = false;
+  isLoading: boolean = false;
   // 预览
   isPreviewImage: boolean = false;
 
@@ -72,6 +77,24 @@ export default class ImageBox extends Vue {
     this.uploadData = {
       other_id: this.otherId
     };
+  }
+
+  // 等图片顺利 onload 了再显示，要是出错了就显示出错图片
+  @Watch("imageUrl")
+  waitingLoad(url: string) {
+    this.isLoading = true;
+    let img = new Image();
+    img.onload = () => {
+      const image: any = this.$refs.image;
+      image.src = img.src;
+      this.isLoading = false;
+    };
+    img.onerror = () => {
+      const image: any = this.$refs.image;
+      image.src = require('@/static/img/imageNotFound.png');
+      this.isLoading = false;
+    };
+    img.src = url;
   }
 
   handleMouseover() {
@@ -153,7 +176,8 @@ export default class ImageBox extends Vue {
 .imageBox {
   position: relative;
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 1%;
+  margin-bottom: 1%;
   .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
@@ -192,6 +216,9 @@ export default class ImageBox extends Vue {
       &:hover {
         color: #27e4cf;
       }
+    }
+    .loading {
+      font-size: 2.2rem;
     }
   }
   .previewImage {

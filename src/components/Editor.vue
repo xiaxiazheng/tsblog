@@ -65,7 +65,7 @@ export default class Editor extends Vue {
       }
     },
     theme: 'snow'
-  }
+  };
 
   @Watch("logcont")
   handleLogChange() {

@@ -1,6 +1,6 @@
 <template>
   <div class="adminwall">
-    <div class="ScrollBar">
+    <div class="wallBox ScrollBar">
       <ImageBox
         v-for="(item, index) of imageList"
         :key="index"
@@ -60,9 +60,10 @@ export default class AdminPhotoWall extends Vue {
 <style lang="less">
   .adminwall {
     overflow-y: auto;
-    >div {
+    .wallBox {
       height: calc(100% - 30px);
       padding: 15px;
+      text-align: center;
     }
   }
 </style>
