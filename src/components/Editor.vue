@@ -21,6 +21,9 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { quillEditor } from 'vue-quill-editor';
 import hljs from 'highlight.js';
+import Quill from 'quill';
+import ImageResize from 'quill-image-resize-module';
+Quill.register('modules/imageResize', ImageResize);
 
 @Component({
   components: {
@@ -48,6 +51,14 @@ export default class Editor extends Vue {
   editorOption: any = {
     placeholder: '请输入内容',
     modules: {
+      imageResize: { //调整大小组件。
+        displayStyles: {
+            backgroundColor: 'black',
+            border: 'none',
+            color: 'white'
+        },
+        modules: [ 'Resize', 'DisplaySize' ]
+      },
       toolbar: {
         container: this.toolbarOptions,  // 工具栏
         handlers: {
@@ -79,8 +90,6 @@ export default class Editor extends Vue {
 
   @Watch("content")
   handleChange() {
-    // console.log(this.logcont);
-    // console.log(this.content);
     this.type !== 'onlyShow' && this.getChange(this.logcont !== this.content);
   }
 
@@ -137,6 +146,9 @@ export default class Editor extends Vue {
     .ql-container {
       width: 100%;
       font-size: 14px;
+      img {
+        max-width: 50%;
+      }
     }
   }
   .onlyShow {

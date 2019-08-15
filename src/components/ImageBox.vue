@@ -91,7 +91,7 @@ export default class ImageBox extends Vue {
         this.isLoading = false;
       };
       img.onerror = () => {
-        console.log(url);
+        // console.log(url);
         const image: any = this.$refs.image;
         image.src = require('@/static/img/imageNotFound.png');
         this.isLoading = false;
