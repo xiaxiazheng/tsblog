@@ -140,15 +140,15 @@ export default class TreeMain extends Vue {
       this.title = "盛兴中英文学校";
       this.cont = "孩子要成才，请到盛兴来！";
     }
+    this.getFiveModify();
+  }
 
-    /* 下面这一块实现的是 默认树首页显示最近修改的5个节点 */
+  // 默认树首页显示最近修改的5个节点
+  async getFiveModify() {
     let params = {
       pageNo: 1,
       pageSize: 5
     };
-    // if (this.keywords.length !== 0) {
-    //   Vue.set(params, 'keywords', this.keywords);
-    // }
     let res;
     if (this.type === "home") {
       res = await TreeContHelper.getAlmostCont(params);
@@ -262,10 +262,6 @@ export default class TreeMain extends Vue {
           searchSort: item.sort
         }
       });
-      // this.$router.replace({
-      //   path: `tree?id=${btoa(encodeURIComponent(item.c_id))}&isSearch=true#${item.c_id}-${item.sort}`
-      // })
-      // console.log('点击搜索结果', item);
     } else {
       this.$router.replace({
         name: "AdminTree",

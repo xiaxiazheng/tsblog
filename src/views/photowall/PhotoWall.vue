@@ -82,9 +82,8 @@ export default class PhotoWall extends Vue {
     if (this.loadedNumber < this.imgUrllist.length) {
       const error = require('@/static/img/imageNotFound.png');
       for (let i = this.loadedNumber; i < this.imgUrllist.length && i < this.loadedNumber + 6; i = i + 1) {
-        // for (let i = 0; i < this.imgUrllist.length; i++) {
-        let prom = this.preloadImage(this.imgUrllist[i].dataset);
-        prom.then(
+        let promise = this.preloadImage(this.imgUrllist[i].dataset);
+        promise.then(
           (img: any) => {  // 图片顺利加载
             this.imgUrllist[i].url = img.src;
             this.loadedNumber = this.loadedNumber + 1;

@@ -8,8 +8,8 @@
           <h2>
             <a
               :class="{ 'activeSearch': $route.query.searchSort == item.sort }"
-              :href="`#${c_id}-${item.sort}`"
-              :name="`${c_id}-${item.sort}`">
+              :href="`#${cId}-${item.sort}`"
+              :name="`${cId}-${item.sort}`">
               {{item.title}}
             </a>
             <span v-if="contList">
@@ -30,7 +30,7 @@
           v-for="(item, index) of contList"
           :key="index"
           :class="{ 'activeSearch': $route.query.searchSort == item.sort }"
-          :href="`#${c_id}-${item.sort}`">{{item.title}}</a>
+          :href="`#${cId}-${item.sort}`">{{item.title}}</a>
       </div>
       <!-- 查看大图的 dialog -->
       <el-dialog class="previewImage" :visible.sync="dialogVisible" :title="dialogImageName">

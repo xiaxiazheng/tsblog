@@ -25,7 +25,7 @@
       <i class="el-icon-delete" title="删除图片" @click="handleRemove"></i>
     </div>
     <!-- loading 界面 -->
-    <div v-show="isLoading" class="wrapper">
+    <div v-if="imageFileName" v-show="isLoading" class="wrapper">
       <i class="el-icon-loading loading" title="图片加载中..." @click="copyImgTag"></i>
     </div>
     <!-- 查看大图的 dialog -->
@@ -82,19 +82,22 @@ export default class ImageBox extends Vue {
   // 等图片顺利 onload 了再显示，要是出错了就显示出错图片
   @Watch("imageUrl")
   waitingLoad(url: string) {
-    this.isLoading = true;
-    let img = new Image();
-    img.onload = () => {
-      const image: any = this.$refs.image;
-      image.src = img.src;
-      this.isLoading = false;
-    };
-    img.onerror = () => {
-      const image: any = this.$refs.image;
-      image.src = require('@/static/img/imageNotFound.png');
-      this.isLoading = false;
-    };
-    img.src = url;
+    if (this.imageUrl !== '') {
+      this.isLoading = true;
+      let img = new Image();
+      img.onload = () => {
+        const image: any = this.$refs.image;
+        image.src = img.src;
+        this.isLoading = false;
+      };
+      img.onerror = () => {
+        console.log(url);
+        const image: any = this.$refs.image;
+        image.src = require('@/static/img/imageNotFound.png');
+        this.isLoading = false;
+      };
+      img.src = url;
+    }
   }
 
   handleMouseover() {

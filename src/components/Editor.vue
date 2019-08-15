@@ -1,5 +1,10 @@
 <template>
-  <div class="editorBox" :class="{ 'onlyShow': type === 'onlyShow'}">
+  <div
+    class="editorBox"
+    :class="{
+      'onlyShow': type === 'onlyShow',
+      'editing': type !== 'onlyShow'
+    }">
     <quill-editor class="editor"
                   v-model="content"
                   ref="myQuillEditor"
@@ -33,7 +38,7 @@ export default class Editor extends Vue {
     ['bold', 'italic', 'underline', 'strike', 'clean'],
     [{ 'header': 1 }, { 'header': 2 }],
     [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
     [{ 'indent': '-1' }, { 'indent': '+1' }],
     [{ 'size': ['small', false, 'large', 'huge'] }],
     [{ 'color': [] }, { 'background': [] }],
@@ -74,8 +79,8 @@ export default class Editor extends Vue {
 
   @Watch("content")
   handleChange() {
-    console.log(this.logcont);
-    console.log(this.content);
+    // console.log(this.logcont);
+    // console.log(this.content);
     this.type !== 'onlyShow' && this.getChange(this.logcont !== this.content);
   }
 
@@ -108,7 +113,7 @@ export default class Editor extends Vue {
   }
 
   returnContent() {
-    console.log(this.content);
+    // console.log(this.content);
     return this.content;
   }
 
@@ -130,7 +135,7 @@ export default class Editor extends Vue {
 <style lang="less">
   .editorBox {
     .ql-container {
-      min-height: 359px;
+      width: 100%;
       font-size: 14px;
     }
   }
@@ -140,6 +145,37 @@ export default class Editor extends Vue {
     }
     .ql-toolbar {
       display: none;
+    }
+  }
+  .editing {
+    .ql-container {
+      max-height: 630px;
+      min-height: 359px;
+      overflow-y: auto;
+      & {
+        display: inline-block;
+        overflow:hidden;
+        overflow-y: auto;
+      }
+      &::-webkit-scrollbar {
+        /*滚动条整体样式*/
+        width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
+        height: 7px;
+      }
+      &::-webkit-scrollbar-thumb {
+        /*滚动条里面小方块*/
+        border-radius: .5rem;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        background: #dcdfe6;
+      }
+      &::-webkit-scrollbar-track {
+        /*滚动条里面轨道*/
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        border-radius: .5rem;
+        background: white;
+      }
     }
   }
 </style>
