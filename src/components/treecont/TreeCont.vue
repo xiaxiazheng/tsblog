@@ -18,9 +18,11 @@
             </span>
           </h2>
           <p v-html="item.cont" v-highlight></p>
-          <div v-if="item.filename" class="imgbox">
-            <img :src="baseImgUrl + item.filename" :alt="item.imgname" @click="showBigImg(baseImgUrl + item.filename, item.imgname)" title="点击查看大图">
-            <span>{{ item.imgname }}</span>
+          <div v-for="(jtem, jndex) of item.imgList" :key="jndex" class="imgbox">
+            <img
+              :src="`${baseImgUrl}${jtem.imgfilename}`" :alt="jtem.imgname"
+              @click="showBigImg(baseImgUrl + jtem.imgfilename, jtem.imgname)" title="点击查看大图">
+            <span>{{ jtem.imgname }}</span>
           </div>
         </li>
       </ul>
@@ -170,7 +172,7 @@ export default class TreeCont extends Vue {
           margin: 20px 0;
           .imgbox {
             max-width: 70%;
-            margin: 0 auto;
+            margin: 0 auto 5px;
             overflow: hidden;
             text-align: center;
             img {
@@ -212,28 +214,28 @@ export default class TreeCont extends Vue {
             color: #ecac61;
           }
         }
-      }
-      .mao:hover {
-        opacity: 0.9;
-      }
-      .mao::-webkit-scrollbar {
-        /*滚动条整体样式*/
-        width: 3px; /* 高宽分别对应横竖滚动条的尺寸 */
-        height: 7px;
-      }
-      .mao::-webkit-scrollbar-thumb {
-        /*滚动条里面小方块*/
-        border-radius: 0.5rem;
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        background: #d2d5dc;
-      }
-      .mao::-webkit-scrollbar-track {
-        /*滚动条里面轨道*/
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        border-radius: 0.5rem;
-        background: white;
+        &:hover {
+          opacity: 0.9;
+        }
+        &::-webkit-scrollbar {
+          /*滚动条整体样式*/
+          width: 3px; /* 高宽分别对应横竖滚动条的尺寸 */
+          height: 7px;
+        }
+        &::-webkit-scrollbar-thumb {
+          /*滚动条里面小方块*/
+          border-radius: 0.5rem;
+          box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          background: #d2d5dc;
+        }
+        &::-webkit-scrollbar-track {
+          /*滚动条里面轨道*/
+          box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          border-radius: 0.5rem;
+          background: white;
+        }
       }
     
       pre {
@@ -250,26 +252,26 @@ export default class TreeCont extends Vue {
           "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono",
           "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier,
           monospace;
+        &::-webkit-scrollbar {
+          /*滚动条整体样式*/
+          width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
+          height: 7px;
+        }
+        &::-webkit-scrollbar-thumb {
+          /*滚动条里面小方块*/
+          border-radius: 0.5rem;
+          box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          background: white;
+        }
+        &::-webkit-scrollbar-track {
+          /*滚动条里面轨道*/
+          box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          border-radius: 0.5rem;
+          background: #282c34;
+        } 
       }
-      pre::-webkit-scrollbar {
-        /*滚动条整体样式*/
-        width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
-        height: 7px;
-      }
-      pre::-webkit-scrollbar-thumb {
-        /*滚动条里面小方块*/
-        border-radius: 0.5rem;
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        background: white;
-      }
-      pre::-webkit-scrollbar-track {
-        /*滚动条里面轨道*/
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        border-radius: 0.5rem;
-        background: #282c34;
-      } 
     }
     .treemainbox {
       width: 67%;

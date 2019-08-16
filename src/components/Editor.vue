@@ -54,9 +54,9 @@ export default class Editor extends Vue {
     modules: {
       imageResize: { //调整大小组件。
         displayStyles: {
-            backgroundColor: 'black',
-            border: 'none',
-            color: 'white'
+          backgroundColor: 'black',
+          border: 'none',
+          color: 'white'
         },
         modules: ['Resize', 'DisplaySize']
       },

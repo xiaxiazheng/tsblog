@@ -4,47 +4,58 @@
       <h1>{{title}}</h1>
 			<ul>
 				<li v-for="(item, index) in contList" :key="index">
-					<!-- 小标题框 -->
-          <el-input v-model="item.title" placeholder="请输入内容"></el-input>
-          <!-- 文本输入框 -->
-          <el-input
-						type="textarea"
-						:autosize="{ minRows: 3, maxRows: 15 }"
-						placeholder="请输入内容"
-						v-model="item.cont">
-					</el-input>
-					<!-- 左下角的各种控制按键 -->
-					<div class="ctrlbox">
-						<span class="iconbox">
-              <!-- 上移按钮 -->
-							<el-button type="text" size="mini" @click="() => upCont(item, index)" v-if="index !== 0">
-								<i class="el-icon-arrow-up"></i>
-							</el-button>
-              <!-- 下移按钮 -->
-							<el-button type="text" size="mini" @click="() => downCont(item, index)" v-if="index !== contList.length - 1">
-								<i class="el-icon-arrow-down"></i>
-							</el-button>
-              <!-- 删除按钮 -->
-							<el-button type="text" size="mini" @click="() => deleteCont(item, index)" v-if="contList.length > 1">
-								<i class="el-icon-delete"></i>	
-							</el-button>
-						</span>
-						<span class="time">
-							创建时间：
-							<span>{{item.createtime}}</span>
-							&nbsp;&nbsp;&nbsp;&nbsp;
-							修改时间：
-							<span>{{item.motifytime}}</span>
-						</span>
-					</div>
+          <!-- 左边的编辑模块 -->
+          <div class="editorContBox">
+            <!-- 小标题框 -->
+            <el-input v-model="item.title" placeholder="请输入内容"></el-input>
+            <!-- 文本输入框 -->
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 3, maxRows: 15 }"
+              placeholder="请输入内容"
+              v-model="item.cont">
+            </el-input>
+            <!-- 左下角的各种控制按键 -->
+            <div class="ctrlbox">
+              <span class="iconbox">
+                <!-- 上移按钮 -->
+                <el-button type="text" size="mini" @click="() => upCont(item, index)" v-if="index !== 0">
+                  <i class="el-icon-arrow-up"></i>
+                </el-button>
+                <!-- 下移按钮 -->
+                <el-button type="text" size="mini" @click="() => downCont(item, index)" v-if="index !== contList.length - 1">
+                  <i class="el-icon-arrow-down"></i>
+                </el-button>
+                <!-- 删除按钮 -->
+                <el-button type="text" size="mini" @click="() => deleteCont(item, index)" v-if="contList.length > 1">
+                  <i class="el-icon-delete"></i>	
+                </el-button>
+              </span>
+              <span class="time">
+                创建时间：
+                <span>{{item.createtime}}</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                修改时间：
+                <span>{{item.motifytime}}</span>
+              </span>
+            </div>
+          </div>
           <!-- 上传图片的组件 -->
-          <div class="imageList">
+          <div class="imageListBox">
+            <ImageBox
+              v-for="(jtem, jndex) of item.imgList"
+              :key="jndex"
+              type="treecont"
+              :otherId="item.cont_id"
+              :imageFileName="jtem.imgfilename"
+              :imageName="jtem.imgname"
+              :imageId="jtem.img_id"
+              :initImageList="initImageList">
+            </ImageBox>
             <ImageBox
               type="treecont"
               :otherId="item.cont_id"
-              :imageFileName="item.filename"
-              :imageName="item.imgname"
-              :imageId="item.img_id"
+              :imageFileName="''"
               :initImageList="initImageList">
             </ImageBox>
           </div>
@@ -127,21 +138,19 @@ export default class AdminTreeCont extends Vue {
       // 获取内容节点的内容列表
       let res: any = await TreeContHelper.getNodeCont(this.cId);
       if (!res) return;
-      this.contList = [];
-      for (let item of res) {
-        this.contList.push({
-          c_id: item.c_id,
-          cont_id: item.cont_id,
-          cont: item.cont,
-          createtime: item.createtime,
-          motifytime: item.motifytime,
-          sort: item.sort,
-          title: item.title,
-          img_id: item.img_id || '',
-          imgname: item.imgname || '',
-          filename: item.filename || '',
-        });
-      }
+      this.contList = res;
+      // for (let item of res) {
+      //   this.contList.push({
+      //     c_id: item.c_id,
+      //     cont_id: item.cont_id,
+      //     cont: item.cont,
+      //     createtime: item.createtime,
+      //     motifytime: item.motifytime,
+      //     sort: item.sort,
+      //     title: item.title,
+      //     imgList: item.imgList
+      //   });
+      // }
     }
   }
 
@@ -260,70 +269,79 @@ export default class AdminTreeCont extends Vue {
 		text-align: left;
     padding: 10px;
     .admincontent {
-      width: 67%;
+      width: 81%;
       margin: 0 auto;
+      padding-left: 75px;
       h1 {
         margin-bottom: 10px;
       }
       >ul {
-        width: 82.6%; /* 经过计算的，别乱改啊 */
         li {
           position: relative;
           text-align: right;
           margin-top: 5px;
-          // 小标题
-          .el-input {
+          // 左边的编辑模块
+          .editorContBox {
+            display: inline-block;
+            width: calc(100% - 320px);
+            vertical-align: top;
+            // 小标题
+            .el-input {
+              margin-top: 10px;
+            }
+            // 内容输入框
+            .el-textarea {
+              margin-top: 10px;
+              >textarea {
+                display: inline-block;
+                overflow:hidden;
+                overflow-y: auto;
+                height: 100%;
+                resize: none;
+              }
+              >textarea::-webkit-scrollbar {
+                /*滚动条整体样式*/
+                width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
+                height: 7px;
+              }
+              >textarea::-webkit-scrollbar-thumb {
+                /*滚动条里面小方块*/
+                border-radius: .5rem;
+                box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+                -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+                background: #dcdfe6;
+              }
+              >textarea::-webkit-scrollbar-track {
+                /*滚动条里面轨道*/
+                box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+                -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+                border-radius: .5rem;
+                background: white;
+              }
+            }
+            /* 控制栏 */
+            .ctrlbox {
+              position: relative;
+              overflow: hidden;
+              .iconbox {
+                position: absolute;
+                left: 0;
+                top: -5px;
+              }
+              .time {
+                float: right;
+                color: #ccc;
+              }
+            }
+          }
+          // 上传图片的组件
+          .imageListBox {
+            display: inline-block;
+            width: 310px;
+            margin-left: 10px;
             margin-top: 10px;
-          }
-          // 内容输入框
-          .el-textarea {
-            margin-top: 10px;
-            >textarea {
-              display: inline-block;
-              overflow:hidden;
-              overflow-y: auto;
-              height: 100%;
-              resize: none;
-            }
-            >textarea::-webkit-scrollbar {
-              /*滚动条整体样式*/
-              width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
-              height: 7px;
-            }
-            >textarea::-webkit-scrollbar-thumb {
-              /*滚动条里面小方块*/
-              border-radius: .5rem;
-              box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-              -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-              background: #dcdfe6;
-            }
-            >textarea::-webkit-scrollbar-track {
-              /*滚动条里面轨道*/
-              box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-              -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-              border-radius: .5rem;
-              background: white;
-            }
-          }
-          /* 控制栏 */
-          .ctrlbox {
-            position: relative;
-            overflow: hidden;
-            .iconbox {
-              position: absolute;
-              left: 0;
-              top: -5px;
-            }
-            .time {
-              float: right;
-              color: #ccc;
-            }
-          }
-          // 上传图片
-          .imageList {
-            position: absolute;
-            top: 10px;
-            right: -170px;
+            vertical-align: top;
+            text-align: left;
           }
         }
       }
