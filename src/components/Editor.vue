@@ -5,14 +5,15 @@
       'onlyShow': type === 'onlyShow',
       'editing': type !== 'onlyShow'
     }">
-    <quill-editor class="editor"
-                  v-model="content"
-                  ref="myQuillEditor"
-                  :options="editorOption"
-                  @blur="onEditorBlur($event)"
-                  @focus="onEditorFocus($event)"
-                  @ready="onEditorReady($event)"
-                  :disabled="type==='onlyShow'">
+    <quill-editor
+      class="editor"
+      v-model="content"
+      ref="myQuillEditor"
+      :options="editorOption"
+      @blur="onEditorBlur($event)"
+      @focus="onEditorFocus($event)"
+      @ready="onEditorReady($event)"
+      :disabled="type==='onlyShow'">
     </quill-editor>
   </div>
 </template>
@@ -57,7 +58,7 @@ export default class Editor extends Vue {
             border: 'none',
             color: 'white'
         },
-        modules: [ 'Resize', 'DisplaySize' ]
+        modules: ['Resize', 'DisplaySize']
       },
       toolbar: {
         container: this.toolbarOptions,  // 工具栏
@@ -161,32 +162,35 @@ export default class Editor extends Vue {
   }
   .editing {
     .ql-container {
-      max-height: 630px;
-      min-height: 359px;
-      overflow-y: auto;
-      & {
-        display: inline-block;
-        overflow:hidden;
+      .ql-editor {
+        width: 100%;
+        max-height: 610px;
+        min-height: 359px;
         overflow-y: auto;
-      }
-      &::-webkit-scrollbar {
-        /*滚动条整体样式*/
-        width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
-        height: 7px;
-      }
-      &::-webkit-scrollbar-thumb {
-        /*滚动条里面小方块*/
-        border-radius: .5rem;
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        background: #dcdfe6;
-      }
-      &::-webkit-scrollbar-track {
-        /*滚动条里面轨道*/
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-        border-radius: .5rem;
-        background: white;
+        & {
+          display: inline-block;
+          overflow:hidden;
+          overflow-y: auto;
+        }
+        &::-webkit-scrollbar {
+          /*滚动条整体样式*/
+          width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
+          height: 7px;
+        }
+        &::-webkit-scrollbar-thumb {
+          /*滚动条里面小方块*/
+          border-radius: .5rem;
+          box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          background: #dcdfe6;
+        }
+        &::-webkit-scrollbar-track {
+          /*滚动条里面轨道*/
+          box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+          border-radius: .5rem;
+          background: white;
+        }        
       }
     }
   }
