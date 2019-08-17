@@ -144,6 +144,7 @@ export default class Editor extends Vue {
 
 <style lang="less">
   .editorBox {
+    letter-spacing: 1px;
     .ql-container {
       width: 100%;
       font-size: 14px;
@@ -164,7 +165,7 @@ export default class Editor extends Vue {
     .ql-container {
       .ql-editor {
         width: 100%;
-        max-height: 610px;
+        max-height: 646px;
         min-height: 359px;
         overflow-y: auto;
         & {

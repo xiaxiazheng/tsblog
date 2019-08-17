@@ -7,8 +7,9 @@
       <span>创建时间: {{cTime}}</span>
       <span>修改时间: {{mTime}}</span>
     </div>
-    <Editor type="onlyShow" :logcont="logcont"></Editor>
-    <div class="markdown" v-if="edittype === 'markdown'" v-html="markHTML" v-highlight></div>
+    <Editor v-if="edittype === 'richtext'" type="onlyShow" :logcont="logcont"></Editor>
+    <MarkdownShower v-if="edittype === 'markdown'" :logcont="logcont"></MarkdownShower>
+    <!-- <div class="markdown" v-if="edittype === 'markdown'" v-html="markHTML" v-highlight></div> -->
   </div>
 </template>
 
@@ -17,10 +18,12 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { LogHelper } from '@/client/LogHelper';
 import marked from 'marked';
 import Editor from '@/components/Editor.vue';
+import MarkdownShower from '@/components/MarkdownShower.vue';
 
 @Component({
   components: {
-    Editor
+    Editor,
+    MarkdownShower
   }
 })
 export default class LogCont extends Vue {
@@ -57,7 +60,6 @@ export default class LogCont extends Vue {
       this.mTime = res.mTime;
       this.logcont = res.logcont;
       this.edittype = res.edittype;
-      this.edittype === 'markdown' && (this.markHTML = marked(this.logcont));
     }
   }
 }
@@ -93,14 +95,6 @@ export default class LogCont extends Vue {
     .logcont {
       font-size: 1rem;
       text-align: left;
-    }
-    .richtext, .markdown {
-      display: inline-block;
-      width: 100%;
-      padding: 5px 15px;
-      color: #606266;
-      text-align: left;
-      word-break: break-all;
     }
   }  
 }

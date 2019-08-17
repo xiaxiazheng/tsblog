@@ -396,8 +396,8 @@ export default class AdminLog extends Vue {
     }
     .logdetail {
       width: 100%;
-      height: calc(100% - 44px);
-      padding: 22px 0;
+      height: calc(100% - 22px);
+      padding: 22px 0 0;
       .el-switch {
         position: fixed;
         right: 5%;

@@ -2,7 +2,7 @@
   <div
     class="adminlogcont"
     :class="{
-      'width70': edittype === 'richtext',
+      'width80': edittype === 'richtext',
       'width90': edittype === 'markdown'
     }">
     <el-button class="backbutton" v-if="!isModify" icon="el-icon-back" plain @click="backToLogList"></el-button>
@@ -15,7 +15,7 @@
       <span>修改时间：{{mTime}}</span>
     </div>
     <!-- 富文本编辑框 -->
-    <Editor ref="editor" :logcont="logcont" :getChange="getChange"></Editor>
+    <Editor v-if="edittype === 'richtext'" ref="editor" class="richtextbox" :logcont="logcont" :getChange="getChange"></Editor>
     <!-- Markdown 编辑框和展示框 -->
     <div v-if="edittype === 'markdown'" class="markdownbox">
       <el-input class="markdown-editor" type="textarea" resize="none" v-model="logcont"></el-input>
@@ -42,9 +42,9 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { LogHelper } from '@/client/LogHelper';
-import marked from 'marked';
 import ImageBox from '@/components/ImageBox.vue';
 import Editor from '@/components/Editor.vue';
+import marked from 'marked';
 
 interface ImageTableType {
   img_id: string;
@@ -149,17 +149,27 @@ export default class AdminLogCont extends Vue {
   // 保存日志
   async saveLog() {
     let childEditor: any = this.$refs.editor;
-    let params = {
+    let params: any = {
       id: this.logid,
       title: this.title,
       author: this.author,
-      logcont: childEditor.returnContent()
     };
+    if (this.edittype === 'richtext') {
+      params.logcont = childEditor.returnContent();
+    }
+    if (this.edittype === 'markdown') {
+      params.logcont = this.logcont;
+    }
     let res = await LogHelper.modifyLogCont(params);
     if (res) {
       this.$message.success(res);
       // 清空为未修改状态
-      this.logcontBackup = childEditor.returnContent();
+      if (this.edittype === 'richtext') {
+        this.logcontBackup = childEditor.returnContent();
+      }
+      if (this.edittype === 'markdown') {
+        this.logcontBackup = this.logcont;
+      }
       this.isModify = false;
     } else {
       this.$message.error('保存失败');
@@ -173,7 +183,7 @@ export default class AdminLogCont extends Vue {
 
 // PC 端
 @media screen and (min-width: @splitWidth) {
-  .width70 { width: 70%; }
+  .width80 { width: 80%; }
   .width90 { width: 90%; }
   .adminlogcont {
     margin: 0 auto;
@@ -209,33 +219,6 @@ export default class AdminLogCont extends Vue {
       left: 5%;
       top: 125px;
       margin-left: 0;
-    }
-    // 富文本编辑器
-    .vueeditor {
-      height: 660px;
-      margin-bottom: 45px;
-      // 在这里写里面进度条的样式
-      .ql-editor {
-        &::-webkit-scrollbar {
-          /*滚动条整体样式*/
-          width: 7px; /* 高宽分别对应横竖滚动条的尺寸 */
-          height: 7px;
-        }
-        &::-webkit-scrollbar-thumb {
-          /*滚动条里面小方块*/
-          border-radius: .5rem;
-          box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-          background: #dcdfe6;
-        }
-        &::-webkit-scrollbar-track {
-          /*滚动条里面轨道*/
-          box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-          border-radius: .5rem;
-          background: white;
-        }
-      }
     }
     // markdown 编辑器
     .markdownbox {
@@ -279,13 +262,26 @@ export default class AdminLogCont extends Vue {
         border-radius: 4px;
         text-align: left;
         word-break: break-all;
-        font-size: 13px;
+        font-size: 14px;
       }
+    }
+    // 富文本编辑器
+    .richtextbox {
+      display: inline-block;
+      width: calc(100% - 155px);
+      vertical-align: top;
+      margin-bottom: 20px;
     }
     // 图片列表
     .imageList {
-      margin-top: 1rem;
-      text-align: left;
+      width: 155px;
+      display: inline-block;
+      text-align: right;
+      vertical-align: top;
+      .imageBox {
+        margin-right: 0;
+        margin-bottom: 5px;
+      }
     }
   }
 }
