@@ -124,8 +124,9 @@ export default class ImageBox extends Vue {
   }
 
   beforeUpload(file: any) {
-    if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
-      this.$message.warning(`上传图片仅支持'image/jepg'以及'image/png'类型，暂不支持'${file.type}'类型`);
+    const typeList = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!typeList.includes(file.type)) {
+      this.$message.warning(`上传图片仅支持'image/jepg','image/png'及'image/gif'类型，暂不支持'${file.type}'类型`);
       return false;
     }
     return true;

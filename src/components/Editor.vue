@@ -166,7 +166,7 @@ export default class Editor extends Vue {
       .ql-editor {
         width: 100%;
         max-height: 646px;
-        min-height: 359px;
+        min-height: 470px;
         overflow-y: auto;
         & {
           display: inline-block;

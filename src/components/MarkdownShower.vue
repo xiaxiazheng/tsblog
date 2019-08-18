@@ -1,5 +1,6 @@
+/** 专门显示 markdown 的组件 */
 <template>
-  <div class="markdown" v-html="markHTML" v-highlight>
+  <div class="markdown-shower" v-html="markHTML" v-highlight>
   </div>
 </template>
 
@@ -9,27 +10,25 @@ import marked from 'marked';
 
 @Component
 export default class ImageBox extends Vue {
-  @Prop() logcont: any;
+  @Prop() markCont: any;
 
-  markCont: string = '';
   markHTML: string = '';
 
   mounted() {
     this.$nextTick(function() {
-      this.markCont = this.logcont;
-      // this.markHTML = marked(this.logcont);
+      this.handleEditMarkCont();
     });
   }
 
-  @Watch('markCont')
-  handleWatch() {
+  @Watch("markCont")
+  handleEditMarkCont() {
     this.markHTML = marked(this.markCont);
   }
 }
 </script>
 
 <style lang="less">
-  .markdown {
+  .markdown-shower {
     display: inline-block;
     width: 100%;
     padding: 5px 15px;

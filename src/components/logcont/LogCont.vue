@@ -8,7 +8,7 @@
       <span>修改时间: {{mTime}}</span>
     </div>
     <Editor v-if="edittype === 'richtext'" type="onlyShow" :logcont="logcont"></Editor>
-    <MarkdownShower v-if="edittype === 'markdown'" :logcont="logcont"></MarkdownShower>
+    <MarkdownShower v-if="edittype === 'markdown'" :markCont="logcont"></MarkdownShower>
     <!-- <div class="markdown" v-if="edittype === 'markdown'" v-html="markHTML" v-highlight></div> -->
   </div>
 </template>

@@ -18,11 +18,16 @@
     <Editor v-if="edittype === 'richtext'" ref="editor" class="richtextbox" :logcont="logcont" :getChange="getChange"></Editor>
     <!-- Markdown 编辑框和展示框 -->
     <div v-if="edittype === 'markdown'" class="markdownbox">
+      <!-- 编辑框 -->
       <el-input class="markdown-editor" type="textarea" resize="none" v-model="logcont"></el-input>
-      <div class="markdown-shower ScrollBar" v-html="markHTML" v-highlight></div>  
+      <!-- 展示框 -->
+      <MarkdownShower class="ScrollBar markdown-show" :markCont="logcont"></MarkdownShower>
     </div>
     <!-- 图片列表 -->
-    <div class="imageList">
+    <div :class="{
+        'richtext-imageList': edittype === 'richtext',
+        'markdown-imageList': edittype === 'markdown'
+      }">
       <ImageBox
         v-for="(item, index) of imgList"
         :key="index"
@@ -44,7 +49,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { LogHelper } from '@/client/LogHelper';
 import ImageBox from '@/components/ImageBox.vue';
 import Editor from '@/components/Editor.vue';
-import marked from 'marked';
+import MarkdownShower from '@/components/MarkdownShower.vue';
 
 interface ImageTableType {
   img_id: string;
@@ -54,7 +59,8 @@ interface ImageTableType {
 @Component({
   components: {
     ImageBox,
-    Editor
+    Editor,
+    MarkdownShower
   }
 })
 export default class AdminLogCont extends Vue {
@@ -112,8 +118,6 @@ export default class AdminLogCont extends Vue {
   @Watch('author')
   @Watch('logcont')
   handleEdit() {
-    // 若为 markdown 则修改就显示效果
-    this.edittype === 'markdown' && (this.markHTML = marked(this.logcont));
     // 若修改了就标记状态
     this.isModify = (
       this.title !== this.titleBackup || 
@@ -252,17 +256,11 @@ export default class AdminLogCont extends Vue {
           }
         }
       }
-      .markdown-shower {
-        display: inline-block;
-        padding: 5px 15px;
-        color: #606266;
+      .markdown-show {
         background-color: #fff;
         border: 1px solid #dcdfe6;
         box-sizing: border-box;
         border-radius: 4px;
-        text-align: left;
-        word-break: break-all;
-        font-size: 14px;
       }
     }
     // 富文本编辑器
@@ -273,7 +271,7 @@ export default class AdminLogCont extends Vue {
       margin-bottom: 20px;
     }
     // 图片列表
-    .imageList {
+    .richtext-imageList {
       width: 155px;
       display: inline-block;
       text-align: right;
@@ -281,6 +279,15 @@ export default class AdminLogCont extends Vue {
       .imageBox {
         margin-right: 0;
         margin-bottom: 5px;
+      }
+    }
+    .markdown-imageList {
+      width: 100%;
+      margin-top: 7px;
+      text-align: left;
+      .imageBox {
+        margin-right: 7px;
+        margin-bottom: 10px;
       }
     }
   }
