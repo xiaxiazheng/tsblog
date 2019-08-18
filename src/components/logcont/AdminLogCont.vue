@@ -15,7 +15,7 @@
       <span>修改时间：{{mTime}}</span>
     </div>
     <!-- 富文本编辑框 -->
-    <Editor v-if="edittype === 'richtext'" ref="editor" class="richtextbox" :logcont="logcont" :getChange="getChange"></Editor>
+    <RichtextEditor v-if="edittype === 'richtext'" ref="editor" class="richtextbox" :logcont="logcont" :getChange="getChange"></RichtextEditor>
     <!-- Markdown 编辑框和展示框 -->
     <div v-if="edittype === 'markdown'" class="markdownbox">
       <!-- 编辑框 -->
@@ -48,8 +48,8 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { LogHelper } from '@/client/LogHelper';
 import ImageBox from '@/components/ImageBox.vue';
-import Editor from '@/components/Editor.vue';
-import MarkdownShower from '@/components/MarkdownShower.vue';
+import RichtextEditor from '@/components/logcont/RichtextEditor.vue';
+import MarkdownShower from '@/components/logcont/MarkdownShower.vue';
 
 interface ImageTableType {
   img_id: string;
@@ -59,8 +59,8 @@ interface ImageTableType {
 @Component({
   components: {
     ImageBox,
-    Editor,
-    MarkdownShower
+    RichtextEditor,
+    MarkdownShower,
   }
 })
 export default class AdminLogCont extends Vue {

@@ -1,10 +1,5 @@
 <template>
-  <div
-    class="editorBox"
-    :class="{
-      'onlyShow': type === 'onlyShow',
-      'editing': type !== 'onlyShow'
-    }">
+  <div class="richtexteditor">
     <quill-editor
       class="editor"
       v-model="content"
@@ -12,8 +7,7 @@
       :options="editorOption"
       @blur="onEditorBlur($event)"
       @focus="onEditorFocus($event)"
-      @ready="onEditorReady($event)"
-      :disabled="type==='onlyShow'">
+      @ready="onEditorReady($event)">
     </quill-editor>
   </div>
 </template>
@@ -32,12 +26,11 @@ Quill.register('modules/imageResize', ImageResize);
   }
 })
 export default class Editor extends Vue {
-  @Prop() type: any;
   @Prop() logcont: any;
   @Prop({ type: Function }) getChange?: any;
 
   content: any = '';
-  toolbarOptions: any = [
+  toolbarOptions: any = [  // 工具条配置
     ['code-block', 'blockquote'],
     ['bold', 'italic', 'underline', 'strike', 'clean'],
     [{ 'header': 1 }, { 'header': 2 }],
@@ -49,7 +42,7 @@ export default class Editor extends Vue {
     [{ 'align': [] }],
     ['link', 'image'],
   ];
-  editorOption: any = {
+  editorOption: any = {  // 编辑器配置
     placeholder: '请输入内容',
     modules: {
       imageResize: { //调整大小组件。
@@ -66,7 +59,10 @@ export default class Editor extends Vue {
           // 劫持插入图片事件
           'image': (value: any) => {
             if (value) {
-              this.insertImage();
+              // 获取当前光标位置，之所以在这里就获取因为 insertImage 会打开一个弹框，打开之后就丢失了光标位置了
+              const editor: any = this.$refs.myQuillEditor;
+              let index = editor.quill.getSelection().index;
+              this.insertImage(editor.quill, index);
             } else {
               const editor: any = this.$refs.myQuillEditor;
               editor.quill.format('image', false);
@@ -91,7 +87,7 @@ export default class Editor extends Vue {
 
   @Watch("content")
   handleChange() {
-    this.type !== 'onlyShow' && this.getChange(this.logcont !== this.content);
+    this.getChange(this.logcont !== this.content);
   }
 
   mounted() {
@@ -101,18 +97,15 @@ export default class Editor extends Vue {
   }
 
   // 插入图片
-  insertImage() {
+  insertImage(quill: any, cursorIndex: number) {
     this.$prompt('请输入要插入的图片的 url', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消'
     }).then((obj: any) => {
-      const editor: any = this.$refs.myQuillEditor;
-      // 获取当前光标位置
-      let length = editor.quill.getSelection().index;
       // 插入图片
-      editor.quill.insertEmbed(length, 'image', obj.value);
+      quill.insertEmbed(cursorIndex, 'image', obj.value);
       // 调整光标到最后
-      editor.quill.setSelection(length + 1);
+      quill.setSelection(length + 1);
     }).catch(() => {
       this.$message({
         type: 'info',
@@ -143,26 +136,14 @@ export default class Editor extends Vue {
 </script>
 
 <style lang="less">
-  .editorBox {
+  .richtexteditor {
     letter-spacing: 1px;
     .ql-container {
       width: 100%;
       font-size: 14px;
       img {
-        max-width: 50%;
+        max-width: 100%;
       }
-    }
-  }
-  .onlyShow {
-    .ql-container.ql-snow {
-      border-color: transparent;
-    }
-    .ql-toolbar {
-      display: none;
-    }
-  }
-  .editing {
-    .ql-container {
       .ql-editor {
         width: 100%;
         max-height: 646px;

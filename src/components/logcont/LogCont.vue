@@ -7,9 +7,8 @@
       <span>创建时间: {{cTime}}</span>
       <span>修改时间: {{mTime}}</span>
     </div>
-    <Editor v-if="edittype === 'richtext'" type="onlyShow" :logcont="logcont"></Editor>
+    <RichtextShower v-if="edittype === 'richtext'" :logcont="logcont"></RichtextShower>
     <MarkdownShower v-if="edittype === 'markdown'" :markCont="logcont"></MarkdownShower>
-    <!-- <div class="markdown" v-if="edittype === 'markdown'" v-html="markHTML" v-highlight></div> -->
   </div>
 </template>
 
@@ -17,12 +16,12 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { LogHelper } from '@/client/LogHelper';
 import marked from 'marked';
-import Editor from '@/components/Editor.vue';
-import MarkdownShower from '@/components/MarkdownShower.vue';
+import RichtextShower from '@/components/logcont/RichtextShower.vue';
+import MarkdownShower from '@/components/logcont/MarkdownShower.vue';
 
 @Component({
   components: {
-    Editor,
+    RichtextShower,
     MarkdownShower
   }
 })
